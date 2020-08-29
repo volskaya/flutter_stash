@@ -1,0 +1,20 @@
+name: log
+description: Private labeled log printer.
+version: 1.0.0
+author: Roland Volskaya
+homepage: github.com/volskaya
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.17.0 <2.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  logger: ^0.9.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:

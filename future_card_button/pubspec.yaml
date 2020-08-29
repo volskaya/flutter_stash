@@ -1,0 +1,22 @@
+name: future_card_button
+description: Asynchronous button with an animated indicator.
+version: 1.0.0
+author: Roland Volskaya
+homepage: github.com/volskaya/future_card_button
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.17.0 <2.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  fancy_switcher:
+    git:
+      url: git@github.com:volskaya/fancy_switcher.git
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:

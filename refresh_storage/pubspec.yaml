@@ -1,0 +1,23 @@
+name: refresh_storage
+description: Wrapper around PageStorage with dispose & refresh mechanism.
+version: 0.0.1
+author: Roland Volskaya
+homepage: github.com/volskaya/flutter_helpers
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.17.0 <2.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^4.3.1
+  fancy_switcher:
+    git:
+      url: git@github.com:volskaya/fancy_switcher.git
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
