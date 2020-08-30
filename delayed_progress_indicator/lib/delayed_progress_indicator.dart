@@ -42,12 +42,14 @@ class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator> wit
   }
 
   @override
-  Widget build(BuildContext context) => RepaintBoundary(
-        child: CircularProgressIndicator(
-          valueColor: ColorTween(
-            begin: Colors.transparent,
-            end: Theme.of(context).accentColor,
-          ).animate(_controller),
+  Widget build(BuildContext context) => Center(
+        child: RepaintBoundary(
+          child: CircularProgressIndicator(
+            valueColor: ColorTween(
+              begin: Colors.transparent,
+              end: Theme.of(context).accentColor,
+            ).animate(_controller),
+          ),
         ),
       );
 }
