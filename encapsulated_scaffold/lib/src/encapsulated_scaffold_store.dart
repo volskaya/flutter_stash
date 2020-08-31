@@ -6,21 +6,19 @@ import 'package:provider/provider.dart';
 part 'encapsulated_scaffold_store.g.dart';
 
 /// Store of [EncapsulatedScaffold].
-class EncapsulatedScaffoldStore<T> extends _EncapsulatedScaffoldStore<T>
+class EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase> extends _EncapsulatedScaffoldStore<T>
     with _$EncapsulatedScaffoldStore<T> {
   /// Creates [EncapsulatedScaffoldStore].
   ///
   /// Pass `navigator` for convenience.
-  EncapsulatedScaffoldStore({@required GlobalKey<NavigatorState> navigator})
-      : super(navigator);
+  EncapsulatedScaffoldStore({@required GlobalKey<NavigatorState> navigator}) : super(navigator);
 
   /// Get the nearest [EncapsulatedScaffoldStore].
-  static EncapsulatedScaffoldStore<D> of<D>(BuildContext context) =>
-      Provider.of<EncapsulatedScaffoldStore>(context, listen: false)
-          as EncapsulatedScaffoldStore<D>;
+  static EncapsulatedScaffoldStore<D> of<D extends EncapsulatedScaffoldDataBase>(BuildContext context) =>
+      Provider.of<EncapsulatedScaffoldStore>(context, listen: false) as EncapsulatedScaffoldStore<D>;
 }
 
-abstract class _EncapsulatedScaffoldStore<T> with Store {
+abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase> with Store {
   _EncapsulatedScaffoldStore(this.navigator);
 
   final GlobalKey<NavigatorState> navigator;
@@ -31,10 +29,9 @@ abstract class _EncapsulatedScaffoldStore<T> with Store {
   ///
   /// NOTE: .linkedHashSetFrom, to preserve order of insertion
   @observable
-  ObservableSet<EncapsulatedScaffoldState<T>> capsules =
-      ObservableSet<EncapsulatedScaffoldState<T>>.linkedHashSetFrom([]);
+  ObservableSet<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>> capsules =
+      ObservableSet<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>>.linkedHashSetFrom([]);
 
   @computed
-  EncapsulatedScaffoldState<T> get capsule =>
-      capsules.isNotEmpty ? capsules.last : null;
+  EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase> get capsule => capsules.isNotEmpty ? capsules.last : null;
 }

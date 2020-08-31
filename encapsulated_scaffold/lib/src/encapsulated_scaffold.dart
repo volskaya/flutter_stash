@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
 
-typedef EncapsulatedScaffoldCustomBuilder = Widget Function(
-    BuildContext context, Scaffold scaffold);
+typedef EncapsulatedScaffoldCustomBuilder = Widget Function(BuildContext context, Scaffold scaffold);
+
+/// Base class to extend for [EncapsulatedScaffoldData] data.
+abstract class EncapsulatedScaffoldDataBase {
+  /// Creates [EncapsulatedScaffoldDataBase].
+  const EncapsulatedScaffoldDataBase();
+}
 
 /// Route aware capsule for [Scaffold] which exposes convenience methods for
 /// easier deep links and reactions to created scaffolds troughout the app.
@@ -128,19 +133,17 @@ class EncapsulatedScaffold extends StatefulWidget {
   final EncapsulatedScaffoldCustomBuilder customBuilder;
 
   /// Get arguments from [ModalRoute] as [T].
-  static T dataOf<T>(BuildContext context) =>
-      ModalRoute.of(context).settings.arguments as T;
+  static T dataOf<T>(BuildContext context) => ModalRoute.of(context).settings.arguments as T;
 
   @override
-  EncapsulatedScaffoldState createState() =>
-      EncapsulatedScaffoldState<dynamic>();
+  EncapsulatedScaffoldState createState() => EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>();
 }
 
 /// Public state of [EncapsulatedScaffold].
 ///
 /// [EncapsulatedScaffold] is added/removed from [EncapsulatedScaffoldStore] as
 /// it's built or destroyed.
-class EncapsulatedScaffoldState<T> extends State<EncapsulatedScaffold> {
+class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends State<EncapsulatedScaffold> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   EncapsulatedScaffoldStore _store;
 
@@ -148,8 +151,7 @@ class EncapsulatedScaffoldState<T> extends State<EncapsulatedScaffold> {
   ModalRoute route;
 
   /// [ScaffoldState] of [Scaffold] built by this [EncapsulatedScaffold].
-  ScaffoldState get scaffold =>
-      (widget.scaffoldKey ?? _scaffoldKey).currentState;
+  ScaffoldState get scaffold => (widget.scaffoldKey ?? _scaffoldKey).currentState;
   bool _capsuleWasUpdated = false;
 
   /// Cargo of [EncapsulatedScaffold] that built this [EncapsulatedScaffoldState].

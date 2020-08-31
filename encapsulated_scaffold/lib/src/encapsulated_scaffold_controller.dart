@@ -1,3 +1,4 @@
+import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
 import 'package:provider/provider.dart';
@@ -5,7 +6,7 @@ import 'package:provider/provider.dart';
 /// [EncapsulatedScaffoldStore] provider used by descending [EncapsulatedScaffolds].
 ///
 /// Place this above [MaterialApp].
-class EncapsulatedScaffoldController<T> extends StatefulWidget {
+class EncapsulatedScaffoldController<T extends EncapsulatedScaffoldDataBase> extends StatefulWidget {
   /// Creates [EncapsulatedScaffoldController].
   const EncapsulatedScaffoldController({
     Key key,
@@ -28,16 +29,14 @@ class EncapsulatedScaffoldController<T> extends StatefulWidget {
   final GlobalKey<NavigatorState> navigator;
 
   /// Get the nearest [EncapsulatedScaffoldStore].
-  static EncapsulatedScaffoldStore<T> of<T>(BuildContext context) =>
-      Provider.of<EncapsulatedScaffoldStore>(context, listen: false)
-          as EncapsulatedScaffoldStore<T>;
+  static EncapsulatedScaffoldStore<T> of<T extends EncapsulatedScaffoldDataBase>(BuildContext context) =>
+      Provider.of<EncapsulatedScaffoldStore>(context, listen: false) as EncapsulatedScaffoldStore<T>;
 
   @override
-  _EncapsulatedScaffoldControllerState<T> createState() =>
-      _EncapsulatedScaffoldControllerState<T>();
+  _EncapsulatedScaffoldControllerState<T> createState() => _EncapsulatedScaffoldControllerState<T>();
 }
 
-class _EncapsulatedScaffoldControllerState<T>
+class _EncapsulatedScaffoldControllerState<T extends EncapsulatedScaffoldDataBase>
     extends State<EncapsulatedScaffoldController<T>> {
   EncapsulatedScaffoldStore<T> _store;
 
@@ -55,8 +54,7 @@ class _EncapsulatedScaffoldControllerState<T>
   }
 
   @override
-  Widget build(BuildContext context) =>
-      Provider<EncapsulatedScaffoldStore>.value(
+  Widget build(BuildContext context) => Provider<EncapsulatedScaffoldStore>.value(
         value: _store,
         child: widget.child,
       );

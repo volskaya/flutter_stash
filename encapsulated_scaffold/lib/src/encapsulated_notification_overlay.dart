@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_notification_item.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
@@ -22,17 +23,14 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
   final Widget child;
 
   @override
-  EncapsulatedNotificationOverlayController createState() =>
-      EncapsulatedNotificationOverlayController();
+  EncapsulatedNotificationOverlayController createState() => EncapsulatedNotificationOverlayController();
 }
 
 /// Provider of [EncapsulatedNotificationOverlayController].
-class EncapsulatedNotificationOverlayController
-    extends State<EncapsulatedNotificationOverlay> {
+class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotificationOverlay> {
   /// Look up nearest [EncapsulatedNotificationOverlayController].
   static EncapsulatedNotificationOverlayController of(BuildContext context) =>
-      Provider.of<EncapsulatedNotificationOverlayController>(context,
-          listen: false);
+      Provider.of<EncapsulatedNotificationOverlayController>(context, listen: false);
 
   final _items = ObservableList<EncapsulatedNotificationItem>();
   final _paddingNotifier = ValueNotifier<EdgeInsets>(EdgeInsets.zero);
@@ -63,8 +61,7 @@ class EncapsulatedNotificationOverlayController
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
 
-    final backgroundColor =
-        item.backgroundColor ?? theme.colorScheme.secondaryVariant;
+    final backgroundColor = item.backgroundColor ?? theme.colorScheme.secondaryVariant;
     var textColor = item.textColor;
 
     if (textColor == null) {
@@ -80,8 +77,7 @@ class EncapsulatedNotificationOverlayController
 
     final titleStyle = theme.textTheme.headline5.apply(color: textColor);
     final buttonStyle = theme.textTheme.button.apply(color: textColor);
-    final contentStyle =
-        theme.textTheme.subtitle1.copyWith(color: textColor, height: 1.25);
+    final contentStyle = theme.textTheme.subtitle1.copyWith(color: textColor, height: 1.25);
 
     final contents = Column(
       mainAxisSize: MainAxisSize.min,
@@ -142,9 +138,7 @@ class EncapsulatedNotificationOverlayController
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOutQuart,
         child: child,
-        padding: _paddingNotifier.value
-            .add(theme.cardTheme.margin * 1.5)
-            .add(mediaQuery.viewInsets),
+        padding: _paddingNotifier.value.add(theme.cardTheme.margin * 1.5).add(mediaQuery.viewInsets),
       ),
       child: Material(
         elevation: 12,
@@ -175,15 +169,14 @@ class EncapsulatedNotificationOverlayController
   @override
   void initState() {
     super.initState();
-    _store = EncapsulatedScaffoldStore.of<dynamic>(context);
+    _store = EncapsulatedScaffoldStore.of<EncapsulatedScaffoldDataBase>(context);
 
     // Reaction to adjust screen padding based on the last
     // encapsulated scaffold
     _capsuleReactionDisposer = autorun((_) {
       final onScreenCapsule = _store.capsule;
-      final mediaQuery = onScreenCapsule.scaffold?.context != null
-          ? MediaQuery.of(onScreenCapsule.scaffold.context)
-          : null;
+      final mediaQuery =
+          onScreenCapsule.scaffold?.context != null ? MediaQuery.of(onScreenCapsule.scaffold.context) : null;
 
       _paddingNotifier.value = mediaQuery?.padding ?? EdgeInsets.zero;
     });
@@ -197,8 +190,7 @@ class EncapsulatedNotificationOverlayController
   }
 
   @override
-  Widget build(BuildContext context) =>
-      Provider<EncapsulatedNotificationOverlayController>.value(
+  Widget build(BuildContext context) => Provider<EncapsulatedNotificationOverlayController>.value(
         value: this,
         child: Stack(
           fit: StackFit.expand,
