@@ -6,6 +6,62 @@ import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+/// When the [callback] is null, the button is locked/loading.
+typedef FutureButtonChildBuilder = Widget Function(BuildContext context, VoidCallback callback);
+
+/// Builder that passes locking mechanism of [FutureCardButton].
+class FutureButtonBuilder extends StatefulWidget {
+  /// Creates [FutureButtonBuilder].
+  const FutureButtonBuilder({
+    Key key,
+    @required this.builder,
+    @required this.onPressed,
+    this.family,
+  }) : super(key: key);
+
+  /// Child builder callback.
+  final FutureButtonChildBuilder builder;
+
+  /// Future event, when the button is pressed.
+  final Future Function() onPressed;
+
+  /// If `family` is defined, the buttons will share the same notifiers
+  /// and lock/unlock at the same time
+  final String family;
+
+  @override
+  _FutureButtonBuilderState createState() => _FutureButtonBuilderState();
+}
+
+class _FutureButtonBuilderState extends State<FutureButtonBuilder> {
+  // Used, when the widget has no family
+  final _privateNotifier = ValueNotifier<bool>(false);
+
+  ValueNotifier<bool> get _notifier {
+    if (widget.family?.isNotEmpty == true) {
+      FutureCardButton._notifiers[widget.family] ??= ValueNotifier<bool>(false);
+      return FutureCardButton._notifiers[widget.family];
+    }
+    return _privateNotifier;
+  }
+
+  Future _handleOnPressed() async {
+    if (_notifier.value) return; // Redundant
+    _notifier.value = true;
+    try {
+      await widget.onPressed?.call();
+    } finally {
+      _notifier.value = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: _notifier,
+        builder: (context, __) => widget.builder(context, !_notifier.value ? _handleOnPressed : null),
+      );
+}
+
 /// [FutureCardButton] allows passing future `onPress` callacks which animate
 /// in an a loader indicator, until the future is completed.
 ///
@@ -102,8 +158,7 @@ class FutureCardButton extends StatefulWidget {
   final bool _adaptive;
 
   /// Returns true when the `family` is locked - `onPress` future in progress.
-  static bool isFamilyLocked(String family) =>
-      _notifiers.containsKey(family) && _notifiers[family].value;
+  static bool isFamilyLocked(String family) => _notifiers.containsKey(family) && _notifiers[family].value;
 
   @override
   FutureCardButtonState createState() => FutureCardButtonState();
@@ -174,8 +229,7 @@ class FutureCardButtonState extends State<FutureCardButton> {
                     size: const Size.square(24),
                     child: const CupertinoActivityIndicator(),
                   )
-                : KeyedSubtree(
-                    key: const ValueKey('idle'), child: widget.child),
+                : KeyedSubtree(key: const ValueKey('idle'), child: widget.child),
           ),
         ),
       ),
