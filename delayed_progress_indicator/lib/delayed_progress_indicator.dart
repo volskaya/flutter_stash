@@ -10,10 +10,14 @@ class DelayedProgressIndicator extends StatefulWidget {
   const DelayedProgressIndicator({
     Key key,
     this.delay = const Duration(seconds: 3),
+    this.size = 20,
   }) : super(key: key);
 
   /// Duration after which the progress indicator fades in.
   final Duration delay;
+
+  /// Square size of the indicator,
+  final double size;
 
   @override
   _DelayedProgressIndicatorState createState() => _DelayedProgressIndicatorState();
@@ -44,11 +48,14 @@ class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator> wit
   @override
   Widget build(BuildContext context) => Center(
         child: RepaintBoundary(
-          child: CircularProgressIndicator(
-            valueColor: ColorTween(
-              begin: Colors.transparent,
-              end: Theme.of(context).accentColor,
-            ).animate(_controller),
+          child: SizedBox.fromSize(
+            size: Size.square(widget.size),
+            child: CircularProgressIndicator(
+              valueColor: ColorTween(
+                begin: Colors.transparent,
+                end: Theme.of(context).accentColor,
+              ).animate(_controller),
+            ),
           ),
         ),
       );
