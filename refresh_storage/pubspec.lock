@@ -53,11 +53,9 @@ packages:
   fancy_switcher:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "8acaf5e0f9fbf37d44baceb46fb6ea63b97fa7eb"
-      url: "git@github.com:volskaya/fancy_switcher.git"
-    source: git
+      path: "/home/projects/packages/fancy_switcher"
+      relative: false
+    source: path
     version: "0.0.1"
   flutter:
     dependency: "direct main"
