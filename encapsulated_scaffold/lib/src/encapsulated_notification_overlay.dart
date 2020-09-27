@@ -16,11 +16,15 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
   /// Creates [EncapsulatedNotificationOverlay].
   const EncapsulatedNotificationOverlay({
     Key key,
-    @required this.child,
+    @required this.body,
+    @required this.children,
   }) : super(key: key);
 
-  /// Child widget, preferably child of [MaterialApp.builder].
-  final Widget child;
+  /// Body widget, preferably child of [MaterialApp.builder].
+  final Widget body;
+
+  /// Children items to build in the overlay stack, above the [body] and below the notifications.
+  final List<Widget> children;
 
   @override
   EncapsulatedNotificationOverlayController createState() => EncapsulatedNotificationOverlayController();
@@ -54,118 +58,6 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
     item.onDismissed?.call();
   }
 
-  Widget _buildOverlayItem(
-    BuildContext context,
-    EncapsulatedNotificationItem item,
-  ) {
-    final mediaQuery = MediaQuery.of(context);
-    final theme = Theme.of(context);
-
-    final backgroundColor = item.backgroundColor ?? theme.colorScheme.secondaryVariant;
-    var textColor = item.textColor;
-
-    if (textColor == null) {
-      switch (ThemeData.estimateBrightnessForColor(backgroundColor)) {
-        case Brightness.dark:
-          textColor = Colors.white;
-          break;
-        case Brightness.light:
-          textColor = Colors.black;
-          break;
-      }
-    }
-
-    final titleStyle = theme.textTheme.headline5.apply(color: textColor);
-    final buttonStyle = theme.textTheme.button.apply(color: textColor);
-    final contentStyle = theme.textTheme.subtitle1.copyWith(color: textColor, height: 1.25);
-
-    final contents = Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        if (item.title != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: DefaultTextStyle(
-              style: titleStyle,
-              child: item.icon != null
-                  ? Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        item.icon,
-                        const SizedBox(width: 6),
-                        item.title,
-                      ],
-                    )
-                  : item.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        DefaultTextStyle(
-          style: contentStyle,
-          child: item.content,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 10,
-        )
-      ],
-    );
-
-    final buttons = item.buttons.isNotEmpty
-        ? <Widget>[
-            const Divider(height: 0),
-            Row(
-              children: item.buttons
-                  .map((button) => Flexible(
-                        flex: 100 ~/ (item.buttons.length + 1),
-                        child: SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: DefaultTextStyle(
-                            style: buttonStyle,
-                            child: button,
-                          ),
-                        ),
-                      ))
-                  .toList(growable: false),
-            ),
-          ]
-        : const <Widget>[];
-
-    return AnimatedBuilder(
-      animation: _paddingNotifier,
-      builder: (_, child) => AnimatedPadding(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOutQuart,
-        child: child,
-        padding: _paddingNotifier.value.add(theme.cardTheme.margin * 1.5).add(mediaQuery.viewInsets),
-      ),
-      child: Material(
-        elevation: 12,
-        clipBehavior: Clip.antiAlias,
-        color: backgroundColor,
-        shape: theme.cardTheme.shape,
-        child: InkWell(
-          onTap: () => _dismissItem(item),
-          child: IconTheme.merge(
-            data: IconThemeData(color: textColor, size: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Padding(
-                  padding: theme.cardTheme.margin,
-                  child: contents,
-                ),
-                if (buttons.isNotEmpty) ...buttons,
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -195,19 +87,62 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
         child: Stack(
           fit: StackFit.expand,
           children: <Widget>[
-            widget.child,
+            widget.body,
+            ...widget.children,
             Observer(
-              builder: (context) => FancySwitcher.vertical(
-                alignment: Alignment.bottomCenter,
-                child: _items.isNotEmpty
-                    ? KeyedSubtree(
-                        key: ValueKey(_items.last.tag),
-                        child: _buildOverlayItem(context, _items.last),
-                      )
-                    : const SizedBox(key: ValueKey('idle')),
-              ),
+              builder: (_) {
+                final item = _items.isNotEmpty ? _items.last : null;
+                return FancySwitcher.vertical(
+                  alignment: Alignment.bottomCenter,
+                  child: item != null
+                      ? _NotificationItem(
+                          key: ValueKey(item.tag + item.createTime.millisecondsSinceEpoch.toString()),
+                          duration: item.timeout,
+                          builder: (context, animation) => item.builder(context, () => _dismissItem(item), animation),
+                        )
+                      : const SizedBox(key: ValueKey('idle')),
+                );
+              },
             ),
           ],
         ),
       );
+}
+
+class _NotificationItem extends StatefulWidget {
+  const _NotificationItem({
+    Key key,
+    @required this.builder,
+    @required this.duration,
+  }) : super(key: key);
+
+  final Widget Function(BuildContext context, Animation<double> animation) builder;
+  final Duration duration;
+
+  @override
+  __NotificationItemState createState() => __NotificationItemState();
+}
+
+class __NotificationItemState extends State<_NotificationItem> with SingleTickerProviderStateMixin<_NotificationItem> {
+  AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = widget.duration != null
+        ? (AnimationController(
+            vsync: this,
+            duration: widget.duration,
+          )..forward())
+        : null;
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context, _controller?.view);
 }

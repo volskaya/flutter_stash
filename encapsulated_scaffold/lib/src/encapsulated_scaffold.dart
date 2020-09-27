@@ -189,7 +189,10 @@ class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends 
   @override
   void dispose() {
     super.dispose();
-    if (_capsuleWasUpdated) _store.capsules.remove(this);
+    if (_capsuleWasUpdated) {
+      // Avoid calling this while the widget tree is locked
+      WidgetsBinding.instance.addPostFrameCallback((_) => _store.capsules.remove(this));
+    }
   }
 
   @override
