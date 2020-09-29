@@ -1,13 +1,11 @@
-import 'dart:async';
-
+import 'package:encapsulated_scaffold/src/encapsulated_notification_overlay_scrim.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
-import 'package:encapsulated_scaffold/src/encapsulated_notification_item.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
-import 'package:provider/provider.dart';
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 
 /// [EncapsulatedNotificationOverlay] provides [EncapsulatedNotificationOverlayController].
 ///
@@ -16,7 +14,7 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
   /// Creates [EncapsulatedNotificationOverlay].
   const EncapsulatedNotificationOverlay({
     Key key,
-    @required this.body,
+    this.body,
     @required this.children,
   }) : super(key: key);
 
@@ -32,35 +30,24 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
 
 /// Provider of [EncapsulatedNotificationOverlayController].
 class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotificationOverlay> {
-  /// Look up nearest [EncapsulatedNotificationOverlayController].
-  static EncapsulatedNotificationOverlayController of(BuildContext context) =>
-      Provider.of<EncapsulatedNotificationOverlayController>(context, listen: false);
-
-  final _items = ObservableList<EncapsulatedNotificationItem>();
   final _paddingNotifier = ValueNotifier<EdgeInsets>(EdgeInsets.zero);
 
   EncapsulatedScaffoldStore _store;
   ReactionDisposer _capsuleReactionDisposer;
 
-  /// Push an [EncapsulatedNotificationItem] to the overlay.
-  void pushItem(EncapsulatedNotificationItem item) {
-    _items.add(item);
-
-    if (item.timeout != null) {
-      Timer(item.timeout, () {
-        if (_items.contains(item)) _items.remove(item);
-      });
+  bool _handleBackButton(bool stopDefaultButtonEvent, RouteInfo _) {
+    if (stopDefaultButtonEvent) return true;
+    if (_store.importantNotifications.isNotEmpty) {
+      _store.importantNotifications.removeLast().dismiss();
+      return true;
     }
-  }
-
-  void _dismissItem(EncapsulatedNotificationItem item) {
-    _items.remove(item);
-    item.onDismissed?.call();
+    return false;
   }
 
   @override
   void initState() {
     super.initState();
+    BackButtonInterceptor.add(_handleBackButton);
     _store = EncapsulatedScaffoldStore.of<EncapsulatedScaffoldDataBase>(context);
 
     // Reaction to adjust screen padding based on the last
@@ -76,37 +63,61 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
 
   @override
   void dispose() {
-    super.dispose();
+    BackButtonInterceptor.remove(_handleBackButton);
     _capsuleReactionDisposer();
-    _items.clear();
+    super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => Provider<EncapsulatedNotificationOverlayController>.value(
-        value: this,
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            widget.body,
-            ...widget.children,
-            Observer(
-              builder: (_) {
-                final item = _items.isNotEmpty ? _items.last : null;
-                return FancySwitcher.vertical(
-                  alignment: Alignment.bottomCenter,
-                  child: item != null
-                      ? _NotificationItem(
-                          key: ValueKey(item.tag + item.createTime.millisecondsSinceEpoch.toString()),
-                          duration: item.timeout,
-                          builder: (context, animation) => item.builder(context, () => _dismissItem(item), animation),
-                        )
-                      : const SizedBox(key: ValueKey('idle')),
-                );
-              },
-            ),
-          ],
+  Widget build(BuildContext context) {
+    final notifications = AnimatedBuilder(
+      animation: _paddingNotifier,
+      builder: (context, child) => TweenAnimationBuilder<EdgeInsets>(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.fastOutSlowIn,
+        tween: EdgeInsetsTween(end: _paddingNotifier.value + MediaQuery.of(context).viewInsets),
+        builder: (_, value, __) => Transform.translate(
+          offset: Offset(0, -value.bottom),
+          child: child,
         ),
-      );
+      ),
+      child: Observer(
+        builder: (_) {
+          // Prioritize important notifications
+          final item = _store.importantNotifications.isNotEmpty
+              ? _store.importantNotifications.last
+              : _store.notifications.isNotEmpty ? _store.notifications.last : null;
+
+          return FancySwitcher.vertical(
+            alignment: Alignment.bottomCenter,
+            child: item != null
+                ? _NotificationItem(
+                    key: ValueKey(item.tag + item.createTime.millisecondsSinceEpoch.toString()),
+                    duration: item.timeout,
+                    builder: (context, animation) =>
+                        item.builder(context, () => _store.dismissNotification(item), animation),
+                  )
+                : const SizedBox(key: ValueKey('idle')),
+          );
+        },
+      ),
+    );
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        if (widget.body != null) widget.body,
+        ...widget.children,
+        Observer(
+          builder: (_) => EncapsulatedNotificationOverlayScrim(
+            toggled: _store.importantNotifications.isNotEmpty,
+            child: notifications,
+            onDismissed: () =>
+                (_store.importantNotifications.isNotEmpty ? _store.importantNotifications.last : null)?.dismiss(),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _NotificationItem extends StatefulWidget {

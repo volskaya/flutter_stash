@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:encapsulated_scaffold/src/encapsulated_notification_item.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
@@ -28,10 +31,43 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
   /// shows a toast, in the current view
   ///
   /// NOTE: .linkedHashSetFrom, to preserve order of insertion
-  @observable
-  ObservableSet<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>> capsules =
-      ObservableSet<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>>.linkedHashSetFrom([]);
+  final capsules = ObservableSet<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>>.linkedHashSetFrom([]);
+  final notifications = ObservableList<EncapsulatedNotificationItem>();
+  final importantNotifications = ObservableList<EncapsulatedNotificationItem>();
+  final _notificationTimers = <EncapsulatedNotificationItem, Timer>{};
 
   @computed
   EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase> get capsule => capsules.isNotEmpty ? capsules.last : null;
+
+  ObservableList<EncapsulatedNotificationItem> _getAppropriateNotificationList(EncapsulatedNotificationItem item) =>
+      item.important ? importantNotifications : notifications;
+
+  /// Push an [EncapsulatedNotificationItem] to the overlay.
+  ///
+  /// Pass tags as [replacements] to pop existing notifications as the new one is added.
+  ///
+  @action
+  void pushNotification(EncapsulatedNotificationItem item, [Set<String> replacements = const <String>{}]) {
+    _getAppropriateNotificationList(item).add(item);
+    if (replacements.isNotEmpty) {
+      notifications.removeWhere((item) => replacements.contains(item.tag));
+      importantNotifications.removeWhere((item) => replacements.contains(item.tag));
+    }
+
+    if (item.timeout != null) {
+      assert(!item.important);
+      _notificationTimers[item]?.cancel();
+      _notificationTimers[item] = Timer(item.timeout, () {
+        _notificationTimers.remove(item);
+        dismissNotification(item);
+      });
+    }
+  }
+
+  /// Remove an [EncapsulatedNotificationItem] from the overlay.
+  @action
+  void dismissNotification(EncapsulatedNotificationItem item) {
+    final didRemove = _getAppropriateNotificationList(item).remove(item);
+    if (didRemove) item.onDismissed?.call();
+  }
 }

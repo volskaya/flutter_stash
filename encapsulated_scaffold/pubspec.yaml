@@ -15,6 +15,7 @@ dependencies:
   flutter_mobx: ^1.1.0+1
   mobx_codegen: ^1.1.0+1
   provider: ^4.3.1
+  back_button_interceptor: ^4.3.1
   fancy_switcher:
     path: /home/projects/packages/fancy_switcher
 

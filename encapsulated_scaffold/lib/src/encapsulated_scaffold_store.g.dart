@@ -21,28 +21,35 @@ mixin _$EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase>
                   name: '_EncapsulatedScaffoldStore.capsule'))
           .value;
 
-  final _$capsulesAtom = Atom(name: '_EncapsulatedScaffoldStore.capsules');
+  final _$_EncapsulatedScaffoldStoreActionController =
+      ActionController(name: '_EncapsulatedScaffoldStore');
 
   @override
-  ObservableSet<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>>
-      get capsules {
-    _$capsulesAtom.reportRead();
-    return super.capsules;
+  void pushNotification(EncapsulatedNotificationItem item,
+      [Set<String> replacements = const <String>{}]) {
+    final _$actionInfo = _$_EncapsulatedScaffoldStoreActionController
+        .startAction(name: '_EncapsulatedScaffoldStore.pushNotification');
+    try {
+      return super.pushNotification(item, replacements);
+    } finally {
+      _$_EncapsulatedScaffoldStoreActionController.endAction(_$actionInfo);
+    }
   }
 
   @override
-  set capsules(
-      ObservableSet<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>>
-          value) {
-    _$capsulesAtom.reportWrite(value, super.capsules, () {
-      super.capsules = value;
-    });
+  void dismissNotification(EncapsulatedNotificationItem item) {
+    final _$actionInfo = _$_EncapsulatedScaffoldStoreActionController
+        .startAction(name: '_EncapsulatedScaffoldStore.dismissNotification');
+    try {
+      return super.dismissNotification(item);
+    } finally {
+      _$_EncapsulatedScaffoldStoreActionController.endAction(_$actionInfo);
+    }
   }
 
   @override
   String toString() {
     return '''
-capsules: ${capsules},
 capsule: ${capsule}
     ''';
   }
