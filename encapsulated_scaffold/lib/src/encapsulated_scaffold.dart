@@ -181,6 +181,7 @@ class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends 
       route = ModalRoute.of(context);
       _store.capsules.add(this);
       _capsuleWasUpdated = true;
+      route.popped.then((dynamic _) => _capsuleWasUpdated ? _store.capsules.remove(this) : null);
     });
 
     super.initState();
