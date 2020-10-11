@@ -1,3 +1,4 @@
+import 'package:encapsulated_scaffold/src/encapsulated_notification_item.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_notification_overlay_scrim.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
@@ -6,6 +7,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:provider/provider.dart';
+
+/// Props provided to descending notifications.
+class EncapsulatedNotificationProps {
+  /// Creates [EncapsulatedNotificationProps].
+  const EncapsulatedNotificationProps(this.dismiss, this.dismissAnimation, this.reference);
+
+  /// Callable to dismiss the notification.
+  final VoidCallback dismiss;
+
+  /// Progress animation of the notifications dismiss timeout.
+  /// Is null when the notification is built without a timeout.
+  final Animation<double> dismissAnimation;
+
+  /// Reference to the [EncapsulatedNotificatoinItem] these props belong to.
+  final EncapsulatedNotificationItem reference;
+
+  /// Get [EncapsulatedNotificationProps] provided trough the [BuildContext].
+  static EncapsulatedNotificationProps of(BuildContext context) {
+    try {
+      return Provider.of<EncapsulatedNotificationProps>(context, listen: false);
+    } catch (e) {
+      print('No EncapsulatedNotificationProps found in the build context.'
+          'Built widget is not a descendant of an EncapsulatedScaffoldOverlay notification?');
+      rethrow;
+    }
+  }
+}
 
 /// [EncapsulatedNotificationOverlay] provides [EncapsulatedNotificationOverlayController].
 ///
@@ -30,7 +59,7 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
 
 /// Provider of [EncapsulatedNotificationOverlayController].
 class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotificationOverlay> {
-  final _paddingNotifier = ValueNotifier<EdgeInsets>(EdgeInsets.zero);
+  final _padding = Observable<EdgeInsets>(EdgeInsets.zero);
 
   EncapsulatedScaffoldStore _store;
   ReactionDisposer _capsuleReactionDisposer;
@@ -54,10 +83,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
     // encapsulated scaffold
     _capsuleReactionDisposer = autorun((_) {
       final onScreenCapsule = _store.capsule;
-      final mediaQuery =
-          onScreenCapsule.scaffold?.context != null ? MediaQuery.of(onScreenCapsule.scaffold.context) : null;
-
-      _paddingNotifier.value = mediaQuery?.padding ?? EdgeInsets.zero;
+      _padding.value = onScreenCapsule.bodyMediaQuery?.padding ?? EdgeInsets.zero;
     });
   }
 
@@ -70,65 +96,64 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
 
   @override
   Widget build(BuildContext context) {
-    final notifications = AnimatedBuilder(
-      animation: _paddingNotifier,
-      builder: (context, child) => TweenAnimationBuilder<EdgeInsets>(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.fastOutSlowIn,
-        tween: EdgeInsetsTween(end: _paddingNotifier.value + MediaQuery.of(context).viewInsets),
-        builder: (_, value, __) => Transform.translate(
-          offset: Offset(0, -value.bottom),
-          child: child,
-        ),
-      ),
-      child: Observer(
-        builder: (_) {
-          // Prioritize important notifications
-          final item = _store.importantNotifications.isNotEmpty
-              ? _store.importantNotifications.last
-              : _store.notifications.isNotEmpty ? _store.notifications.last : null;
+    final notifications = Observer(
+      name: 'encapsulated_notification_overlay_notifications',
+      builder: (_) {
+        final showScrim = _store.importantNotifications.isNotEmpty;
+        final item = _store.importantNotifications.isNotEmpty // Prioritize important notifications.
+            ? _store.importantNotifications.last
+            : _store.notifications.isNotEmpty ? _store.notifications.last : null;
 
-          return FancySwitcher.vertical(
+        return EncapsulatedNotificationOverlayScrim(
+          toggled: showScrim,
+          onDismissed: () =>
+              (_store.importantNotifications.isNotEmpty ? _store.importantNotifications.last : null)?.dismiss(),
+          child: FancySwitcher(
             alignment: Alignment.bottomCenter,
             child: item != null
                 ? _NotificationItem(
+                    store: _store,
+                    important: item.important,
+                    padding: _padding,
                     key: ValueKey(item.tag + item.createTime.millisecondsSinceEpoch.toString()),
                     duration: item.timeout,
-                    builder: (context, animation) =>
-                        item.builder(context, () => _store.dismissNotification(item), animation),
+                    builder: (context, animation) => Provider<EncapsulatedNotificationProps>.value(
+                      value: EncapsulatedNotificationProps(item.dismiss, animation, item),
+                      child: item.builder(context, item.dismiss, animation),
+                    ),
                   )
                 : const SizedBox(key: ValueKey('idle')),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
+
     return Stack(
       fit: StackFit.expand,
       children: <Widget>[
         if (widget.body != null) widget.body,
         ...widget.children,
-        Observer(
-          builder: (_) => EncapsulatedNotificationOverlayScrim(
-            toggled: _store.importantNotifications.isNotEmpty,
-            child: notifications,
-            onDismissed: () =>
-                (_store.importantNotifications.isNotEmpty ? _store.importantNotifications.last : null)?.dismiss(),
-          ),
-        ),
+        notifications,
       ],
     );
   }
 }
 
-class _NotificationItem extends StatefulWidget {
+class _NotificationItem extends StatefulObserverWidget {
   const _NotificationItem({
     Key key,
     @required this.builder,
     @required this.duration,
-  }) : super(key: key);
+    @required this.store,
+    this.padding,
+    this.important = false,
+  }) : super(key: key, name: 'notification_item');
 
   final Widget Function(BuildContext context, Animation<double> animation) builder;
   final Duration duration;
+  final EncapsulatedScaffoldStore store;
+  final Observable<EdgeInsets> padding;
+  final bool important;
 
   @override
   __NotificationItemState createState() => __NotificationItemState();
@@ -155,5 +180,21 @@ class __NotificationItemState extends State<_NotificationItem> with SingleTicker
   }
 
   @override
-  Widget build(BuildContext context) => widget.builder(context, _controller?.view);
+  Widget build(BuildContext context) {
+    final notification = widget.builder(context, _controller?.view);
+    if (widget.important) return notification;
+
+    final padding = (widget.important || widget.padding == null ? EdgeInsets.zero : widget.padding.value) +
+        MediaQuery.of(context).viewInsets;
+
+    return TweenAnimationBuilder<EdgeInsets>(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.fastOutSlowIn,
+      tween: EdgeInsetsTween(end: padding),
+      builder: (_, value, __) => Transform.translate(
+        offset: Offset(0, -value.bottom),
+        child: notification,
+      ),
+    );
+  }
 }

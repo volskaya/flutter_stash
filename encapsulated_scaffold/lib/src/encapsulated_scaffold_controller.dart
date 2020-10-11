@@ -42,9 +42,9 @@ class _EncapsulatedScaffoldControllerState<T extends EncapsulatedScaffoldDataBas
 
   @override
   void initState() {
-    super.initState();
     _store = EncapsulatedScaffoldStore<T>(navigator: widget.navigator);
     widget.onInit?.call(_store);
+    super.initState();
   }
 
   @override

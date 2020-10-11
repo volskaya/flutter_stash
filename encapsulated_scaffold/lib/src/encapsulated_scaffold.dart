@@ -146,6 +146,7 @@ class EncapsulatedScaffold extends StatefulWidget {
 class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends State<EncapsulatedScaffold> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   EncapsulatedScaffoldStore _store;
+  BuildContext _bodyBuildContext;
 
   /// [ModalRoute] where this [EncapsulatedScaffoldState] is built in.
   ModalRoute route;
@@ -159,6 +160,9 @@ class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends 
 
   /// [EncapsulatedScaffold] tag or named route name, if tag is not set.
   String get tag => widget.tag ?? route.settings.name;
+
+  /// [MediaQueryData] of the body widget. Useful for reaction to page padding changes.
+  MediaQueryData get bodyMediaQuery => _bodyBuildContext != null ? MediaQuery.of(_bodyBuildContext) : null;
 
   /// [EncapsulatedScaffoldState] arguments. Cast as [T].
   T get arguments {
@@ -189,11 +193,9 @@ class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends 
 
   @override
   void dispose() {
+    // Avoid calling this while the widget tree is locked
+    if (_capsuleWasUpdated) WidgetsBinding.instance.addPostFrameCallback((_) => _store.capsules.remove(this));
     super.dispose();
-    if (_capsuleWasUpdated) {
-      // Avoid calling this while the widget tree is locked
-      WidgetsBinding.instance.addPostFrameCallback((_) => _store.capsules.remove(this));
-    }
   }
 
   @override
@@ -202,12 +204,15 @@ class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends 
       key: widget.scaffoldKey ?? _scaffoldKey,
       extendBodyBehindAppBar: widget.extendBodyBehindAppBar,
       extendBody: widget.extendBody,
-      appBar: widget.appBar,
-      body: widget.body,
-      bottomNavigationBar: widget.bottomNavigationBar,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
       floatingActionButton: widget.floatingActionButton,
       resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
+      bottomNavigationBar: widget.bottomNavigationBar,
+      appBar: widget.appBar,
+      body: Builder(builder: (context) {
+        _bodyBuildContext = context;
+        return widget.body ?? const SizedBox();
+      }),
     );
     return widget.customBuilder?.call(context, scaffold) ?? scaffold;
   }

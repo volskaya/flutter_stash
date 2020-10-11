@@ -31,7 +31,7 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
   /// shows a toast, in the current view
   ///
   /// NOTE: .linkedHashSetFrom, to preserve order of insertion
-  final capsules = ObservableSet<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>>.linkedHashSetFrom([]);
+  final capsules = ObservableSet<EncapsulatedScaffoldState<T>>.linkedHashSetFrom([]);
   final notifications = ObservableList<EncapsulatedNotificationItem>();
   final importantNotifications = ObservableList<EncapsulatedNotificationItem>();
   final _notificationTimers = <EncapsulatedNotificationItem, Timer>{};
