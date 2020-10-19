@@ -46,6 +46,7 @@ class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator> wit
   @override
   void dispose() {
     _timer?.cancel();
+    _controller?.dispose();
     super.dispose();
   }
 
