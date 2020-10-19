@@ -11,14 +11,13 @@ class _RefreshStorageItem<T> {
   })  : _dispose = dispose,
         isDisposable = dispose != null;
 
-  // final String identifier;
   final T data;
   final ValueChanged<T> _dispose;
   final bool isDisposable;
 
   bool _isDisposed = false;
 
-  /// [WillPopCallback] compatible dispose
+  /// [WillPopCallback] compatible dispose.
   void dispose([dynamic _]) {
     if (!_isDisposed) {
       _isDisposed = true;
@@ -30,7 +29,7 @@ class _RefreshStorageItem<T> {
 /// [RefreshStorage] abstracts [PageStorage], allowing to dispose data manually and
 /// being aware of refreshes.
 class RefreshStorage {
-  /// Route -> Identifier -> Refresh count
+  /// Route -> Identifier -> Refresh count.
   static final _disposedRefreshes = <ModalRoute, Map<String, int>>{};
 
   /// Write and get a value from [PageStorage]. Data are built with `builder`
@@ -61,13 +60,13 @@ class RefreshStorage {
 
     if (item == null) {
       item = _RefreshStorageItem<T>(data: builder(), dispose: dispose);
-      if (item.isDisposable) targetRoute.popped.then(item.dispose);
+      if (item.isDisposable) targetRoute.completed.then(item.dispose);
       targetStorage.writeState(context, item, identifier: id);
     }
 
     assert(_disposedRefreshes.containsKey(targetRoute) && _disposedRefreshes[targetRoute][identifier] != null);
 
-    // Dispose storages of the previous refresh number
+    // Dispose storages of the previous refresh number.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       while (_disposedRefreshes[targetRoute][identifier] < _refreshes) {
         final oldRefresh = _disposedRefreshes[targetRoute][identifier];
@@ -83,7 +82,7 @@ class RefreshStorage {
           final id = '$i-$identifier';
           final item = targetStorage.readState(context, identifier: id) as _RefreshStorageItem<T>;
 
-          // This storage was supposed to be deleted already
+          // This storage was supposed to be deleted already.
           if (item != null) return false;
         }
 
