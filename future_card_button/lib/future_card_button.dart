@@ -30,10 +30,11 @@ class FutureButtonBuilder extends StatefulWidget {
   final String family;
 
   @override
-  _FutureButtonBuilderState createState() => _FutureButtonBuilderState();
+  FutureButtonBuilderState createState() => FutureButtonBuilderState();
 }
 
-class _FutureButtonBuilderState extends State<FutureButtonBuilder> {
+/// State of [FutureButtonBuilder] that exposes [FutureBuilderState.press].
+class FutureButtonBuilderState extends State<FutureButtonBuilder> {
   // Used, when the widget has no family
   final _privateNotifier = ValueNotifier<bool>(false);
 
@@ -54,6 +55,9 @@ class _FutureButtonBuilderState extends State<FutureButtonBuilder> {
       _notifier.value = false;
     }
   }
+
+  /// Trigger buttons press event.
+  Future press() => _handleOnPressed();
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
