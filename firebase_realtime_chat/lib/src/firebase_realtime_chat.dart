@@ -15,13 +15,8 @@ part 'firebase_realtime_chat.g.dart';
 
 enum _FirebaseRealtimeChatMessageSource { offline, online }
 
-typedef FirebaseRealtimeChatMessageBuilder<T extends FirebaseRealtimeChatMessageImpl> = T Function(
-    [Map<dynamic, dynamic> json]);
-typedef FirebaseRealtimeChatMessageSnapshotBuilder<T extends FirebaseRealtimeChatMessageImpl> = T Function(
-    DatabaseReference reference, DataSnapshot snapshot);
-
-typedef FirebaseRealtimeChatParticipantBuilder<T extends FirebaseRealtimeChatParticipantImpl> = T Function(
-    bool online, bool writing);
+typedef FirebaseRealtimeChatMessageBuilder<T extends FirebaseRealtimeChatMessageImpl> = T Function(Map value);
+typedef FirebaseRealtimeChatParticipantBuilder<T extends FirebaseRealtimeChatParticipantImpl> = T Function();
 
 class _FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatMessageImpl> = __FirebaseRealtimeChatPageStorage<T>
     with _$_FirebaseRealtimeChatPageStorage<T>;
@@ -37,44 +32,30 @@ abstract class __FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatM
 }
 
 /// Firebase realtime chat list & ui builder, similar to FirestoreCollectionBuilder.
-class FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl, D extends FirebaseRealtimeChatParticipantImpl>
-    extends _FirebaseRealtimeChat<T, D> with _$FirebaseRealtimeChat<T, D> {
-  /// Creates [FirebaseRealtimeChat].
-  FirebaseRealtimeChat({
-    /// Realtime database list this chat will target.
-    @required DatabaseReference collection,
-
-    /// Message model builder with optional json.
-    @required FirebaseRealtimeChatMessageBuilder<T> messageBuilder,
-
-    /// Message snapshot builder.
-    @required FirebaseRealtimeChatMessageSnapshotBuilder<T> messageSnapshotBuilder,
-
-    /// Participant model builder.
-    @required FirebaseRealtimeChatParticipantBuilder<D> participantBuilder,
-  }) : super(
-          collection: collection,
-          messageBuilder: messageBuilder,
-          messageSnapshotBuilder: messageSnapshotBuilder,
-          participantBuilder: participantBuilder,
-        );
-}
+class FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
+    D extends FirebaseRealtimeChatParticipantImpl> = _FirebaseRealtimeChat<T, D> with _$FirebaseRealtimeChat<T, D>;
 
 abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     D extends FirebaseRealtimeChatParticipantImpl> with Store {
   _FirebaseRealtimeChat({
     @required this.collection,
     @required this.messageBuilder,
-    @required this.messageSnapshotBuilder,
     @required this.participantBuilder,
+    this.itemsPerPage = 20,
   });
 
+  /// Realtime database list this chat will target.
   final DatabaseReference collection;
+
+  /// Message model builder with optional json.
   final FirebaseRealtimeChatMessageBuilder<T> messageBuilder;
-  final FirebaseRealtimeChatMessageSnapshotBuilder<T> messageSnapshotBuilder;
+
+  /// Participant model builder.
   final FirebaseRealtimeChatParticipantBuilder<D> participantBuilder;
 
-  static const _kDefaultItemsPerPage = 20;
+  /// Number of item to paginate per page. Subscribed items will still fetch as much as possible.
+  final int itemsPerPage;
+
   static final _log = Log.named('FirebaseRealtimeChat');
 
   DatabaseReference get chatReference => collection.child(chatId);
@@ -88,6 +69,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   _FirebaseRealtimeChatPageStorage<T> _storage;
   D _lastPresence;
   StreamSubscription _onAddedSubscription;
+  DateTime subscriptionTime;
 
   // @observable
   // MyFirebaseRealtimeChatParticipants participants;
@@ -100,7 +82,6 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   bool _fetchingPage = false;
 
   bool get _isSubscribed => _onAddedSubscription != null;
-  int get itemsPerPage => _kDefaultItemsPerPage;
   int get page => _storage.page;
   set page(int val) => _storage.page = val;
   bool get isEndReached => _storage.isEndReached;
@@ -121,10 +102,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
   /// Uses cursor only from the nearest online confirmed document
   int get _subscriptionTimestamp => paginatedItems
-      .firstWhere(
-        (item) => (item.online || item.readBy.isNotEmpty) && item.createTime != null,
-        orElse: () => null,
-      )
+      .firstWhere((item) => (item.online || item.readBy.isNotEmpty) && item.createTime != null, orElse: () => null)
       ?.createTime;
 
   /// Call pagination on either the last item or 1 page in advance
@@ -282,10 +260,9 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         final targetList = _isScrolled ? pendingItems : subscribedItems;
         _seenItems.add(child.snapshot.key);
         targetList.add(
-          messageSnapshotBuilder(
-            messageCollection.child(child.snapshot.key),
-            child.snapshot,
-          )..updateMirror(),
+          messageBuilder(child.snapshot.value as Map)
+            ..reference = messageCollection.child(child.snapshot.key)
+            ..updateMirror(),
         );
       },
     );
@@ -303,7 +280,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     // assert(participants == null);
 
     // NOTE: At the moment, rules enforce having an existing presence,
-    //  to be allowed to read message documents
+    // to be allowed to read message documents
     await reportPresence(online: true);
 
     // _log.v('Reported initial presence, subscribing to chat $chatId participants');
@@ -362,7 +339,9 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
       );
     }
 
-    final presence = participantBuilder(online, writing);
+    final presence = participantBuilder()
+      ..online = online
+      ..writing = writing;
     if (_lastPresence?.online != presence.online || _lastPresence?.writing != presence.writing) {
       _lastPresence = presence;
 
@@ -452,21 +431,18 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     _startListening();
   }
 
-  DateTime subscriptionTime;
   Future _startListening() async {
     final now = DateTime.now().toUtc().millisecondsSinceEpoch;
 
     // First page will always attempt to fetch from offline.
     // If offline storage has items, use their newest timestamp
-    // to fetch any missed messages
+    // to fetch any missed messages.
     if (paginatedItems.isEmpty) await fetchPage(1, now);
     if (_disposed) return;
 
-    // Try to reacquire subscription timestamp, if offline pagination
-    // returned results
+    // Try to reacquire subscription timestamp, if offline pagination returned results.
     final timestamp = _subscriptionTimestamp ?? now;
     subscriptionTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-
     _startSubscription(timestamp: timestamp);
     if (paginatedItems.isEmpty) await fetchPage(1, timestamp);
     if (!_disposed) await _startParticipating();
@@ -481,7 +457,24 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     // participants?.unsubscribe();
     // participants = null;
 
-    // Send last presence, indicating the user is offline
+    // Send last presence, indicating the user is offline.
     reportPresence(writing: false, online: false);
+  }
+
+  void handleAppLifecycleStatus(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _startSubscription(timestamp: _subscriptionTimestamp ?? DateTime.now().toUtc().millisecondsSinceEpoch);
+        reportPresence(); // This will setup the `_onDisconnectReaction` again.
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        _disposeSubscription();
+        reportPresence(writing: false, online: false);
+        _onDisconnectReaction?.cancel();
+        _onDisconnectReaction = null;
+        break;
+    }
   }
 }
