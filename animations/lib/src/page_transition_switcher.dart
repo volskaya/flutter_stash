@@ -445,6 +445,9 @@ class _PageTransitionSwitcherState extends State<PageTransitionSwitcher> with Ti
 
   @override
   Widget build(BuildContext context) {
-    return widget.layoutBuilder(_activeEntries.map<Widget>((_ChildEntry entry) => entry.transition).toList());
+    return widget.layoutBuilder(
+      _activeEntries.map<Widget>((_ChildEntry entry) => entry.transition).toList(),
+      widget.alignment,
+    );
   }
 }
