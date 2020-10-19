@@ -16,6 +16,7 @@ class EncapsulatedNotificationItem {
     this.onDismissed,
     this.timeout = const Duration(seconds: 10),
     this.important = false,
+    this.dismissible = true,
   })  : assert(timeout == null || timeout >= const Duration(seconds: 5)),
         assert(important == false || timeout == null, 'Don\'t dim backgrounds of temporary notifications'),
         createTime = DateTime.now(),
@@ -45,6 +46,9 @@ class EncapsulatedNotificationItem {
 
   /// Dim the background behind the notification and intercept pop.
   final bool important;
+
+  /// Wether the user is allowed to manually dismiss this notification.
+  final bool dismissible;
 
   @override
   bool operator ==(Object other) {

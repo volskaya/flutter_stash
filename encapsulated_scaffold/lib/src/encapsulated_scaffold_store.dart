@@ -70,4 +70,12 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
     final didRemove = _getAppropriateNotificationList(item).remove(item);
     if (didRemove) item.onDismissed?.call();
   }
+
+  /// Dismiss all notifications.
+  /// Dismissing them like this won't call [EncapsulatedNotificationItem.onDismissed].
+  @action
+  void dismissAllNotifications({bool includingUndismissible = false}) {
+    notifications.removeWhere((item) => item.dismissible ? true : includingUndismissible);
+    importantNotifications.removeWhere((item) => item.dismissible ? true : includingUndismissible);
+  }
 }

@@ -182,19 +182,14 @@ class __NotificationItemState extends State<_NotificationItem> with SingleTicker
   @override
   Widget build(BuildContext context) {
     final notification = widget.builder(context, _controller?.view);
-    if (widget.important) return notification;
-
     final padding = (widget.important || widget.padding == null ? EdgeInsets.zero : widget.padding.value) +
         MediaQuery.of(context).viewInsets;
 
-    return TweenAnimationBuilder<EdgeInsets>(
+    return AnimatedPadding(
       duration: const Duration(milliseconds: 300),
       curve: Curves.fastOutSlowIn,
-      tween: EdgeInsetsTween(end: padding),
-      builder: (_, value, __) => Transform.translate(
-        offset: Offset(0, -value.bottom),
-        child: notification,
-      ),
+      padding: EdgeInsets.only(bottom: padding.bottom),
+      child: notification,
     );
   }
 }

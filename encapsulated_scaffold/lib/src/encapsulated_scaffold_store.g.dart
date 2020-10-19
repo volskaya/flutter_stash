@@ -48,6 +48,19 @@ mixin _$EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase>
   }
 
   @override
+  void dismissAllNotifications({bool includingUndismissible = false}) {
+    final _$actionInfo =
+        _$_EncapsulatedScaffoldStoreActionController.startAction(
+            name: '_EncapsulatedScaffoldStore.dismissAllNotifications');
+    try {
+      return super.dismissAllNotifications(
+          includingUndismissible: includingUndismissible);
+    } finally {
+      _$_EncapsulatedScaffoldStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 capsule: ${capsule}
