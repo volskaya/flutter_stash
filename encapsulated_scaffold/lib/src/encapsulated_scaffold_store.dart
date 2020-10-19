@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:encapsulated_scaffold/src/encapsulated_notification_item.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 
@@ -57,7 +58,7 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
     if (item.timeout != null) {
       assert(!item.important);
       _notificationTimers[item]?.cancel();
-      _notificationTimers[item] = Timer(item.timeout, () {
+      _notificationTimers[item] = Timer(item.timeout * timeDilation, () {
         _notificationTimers.remove(item);
         dismissNotification(item);
       });

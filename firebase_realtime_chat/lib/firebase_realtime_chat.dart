@@ -1,4 +1,4 @@
-library await_route;
+library firebase_realtime_chat;
 
 export 'src/firebase_realtime_chat.dart';
 export 'src/firebase_realtime_chat_builder.dart';
