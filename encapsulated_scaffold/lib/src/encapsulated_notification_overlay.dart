@@ -98,7 +98,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
   Widget build(BuildContext context) {
     final notifications = Observer(
       name: 'encapsulated_notification_overlay_notifications',
-      builder: (_) {
+      builder: (context) {
         final showScrim = _store.importantNotifications.isNotEmpty;
         final item = _store.importantNotifications.isNotEmpty // Prioritize important notifications.
             ? _store.importantNotifications.last
@@ -117,7 +117,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
                     padding: _padding,
                     key: ValueKey(item.tag + item.createTime.millisecondsSinceEpoch.toString()),
                     duration: item.timeout,
-                    builder: (context, animation) => Provider<EncapsulatedNotificationProps>.value(
+                    builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
                       value: EncapsulatedNotificationProps(item.dismiss, animation, item),
                       child: item.builder(context, item.dismiss, animation),
                     ),
