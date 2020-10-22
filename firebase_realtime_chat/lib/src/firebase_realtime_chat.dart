@@ -192,7 +192,13 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         return !isSeen;
       }).map((entry) {
         _seenItems.add(entry.key);
-        final message = messageBuilder(entry.value as Map)..reference = messageCollection.child(entry.key);
+
+        // HACK: Forges a [DataSnapshot] with a custom patch.
+        final snapshot = DataSnapshot.fake(entry.key, entry.value as Map);
+        final message = messageBuilder(entry.value as Map)
+          ..reference = messageCollection.child(entry.key)
+          ..snapshot = snapshot;
+
         if (usedSource == _FirebaseRealtimeChatMessageSource.online) message.updateMirror();
         return message;
       }).toList(growable: false)
@@ -262,6 +268,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         targetList.add(
           messageBuilder(child.snapshot.value as Map)
             ..reference = messageCollection.child(child.snapshot.key)
+            ..snapshot = child.snapshot
             ..updateMirror(),
         );
       },
@@ -347,7 +354,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
       try {
         await participantsCollection.child(senderId).update(<String, dynamic>{
-          ...presence.toJson(),
+          ...Map<String, dynamic>.from(presence.toJson()),
           'updateTime': ServerValue.timestamp,
         });
       } on PlatformException catch (e) {

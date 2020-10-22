@@ -73,6 +73,12 @@ class FirebaseRealtimeChatMirrorStorage {
     await ref.store.record(ref.record).put(_database, json, merge: true);
   }
 
+  /// Delete the record at the path.
+  Future delete(String path) async {
+    final ref = _FirebaseRealtimeChatMirrorStorageRef.fromPath(path);
+    await ref.store.record(ref.record).delete(_database);
+  }
+
   /// Get a document from the storage.
   Future<Map<String, dynamic>> get(String path) async {
     final ref = _FirebaseRealtimeChatMirrorStorageRef.fromPath(path);

@@ -5,6 +5,9 @@ abstract class FirebaseRealtimeChatMessageImpl {
   /// Reference to the message in the database.
   DatabaseReference reference;
 
+  /// Snapshot that was used to build this model.
+  DataSnapshot snapshot;
+
   /// Server timestamp of this chat message.
   int createTime;
 
@@ -15,7 +18,7 @@ abstract class FirebaseRealtimeChatMessageImpl {
   List<String> readBy;
 
   /// Json serializer of this participant.
-  Map<String, dynamic> toJson();
+  Map toJson();
 
   /// When the chat fetches an item, it's mirror storage needs to be updated as well.
   Future updateMirror();
@@ -33,5 +36,5 @@ abstract class FirebaseRealtimeChatParticipantImpl {
   bool writing;
 
   /// Json serializer of this participant.
-  Map<String, dynamic> toJson();
+  Map toJson();
 }
