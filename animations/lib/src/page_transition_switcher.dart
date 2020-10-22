@@ -60,7 +60,7 @@ class _ChildEntry {
 /// The builder should return a widget which contains the given children, laid
 /// out as desired. It must not return null. The builder should be able to
 /// handle an empty list of `entries`.
-typedef PageTransitionSwitcherLayoutBuilder = Widget Function(List<Widget> entries, [Alignment alignment]);
+typedef PageTransitionSwitcherLayoutBuilder = Widget Function(List<Widget> entries, [AlignmentGeometry alignment]);
 
 /// Signature for builders used to generate custom transitions for
 /// [PageTransitionSwitcher].
@@ -184,7 +184,7 @@ class PageTransitionSwitcher extends StatefulWidget {
         super(key: key);
 
   /// The alignment of the animating children.
-  final Alignment alignment;
+  final AlignmentGeometry alignment;
 
   /// The current child widget to display.
   ///
@@ -273,7 +273,7 @@ class PageTransitionSwitcher extends StatefulWidget {
   ///
   /// See [PageTransitionSwitcherTransitionBuilder] for more information on the function
   /// signature.
-  static Widget defaultLayoutBuilder(List<Widget> entries, [Alignment alignment = Alignment.center]) {
+  static Widget defaultLayoutBuilder(List<Widget> entries, [AlignmentGeometry alignment = Alignment.center]) {
     return Stack(
       children: entries,
       alignment: alignment,
