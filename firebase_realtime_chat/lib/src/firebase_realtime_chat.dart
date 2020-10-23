@@ -206,7 +206,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         final snapshot = DataSnapshot.fake(entry.key, entry.value as Map);
         final message = messageBuilder(entry.value as Map)
           ..reference = messageCollection.child(entry.key)
-          ..snapshot = snapshot;
+          ..snapshot = snapshot
+          ..source = FirebaseRealtimeChatMessageSource.paginated;
 
         if (usedSource == _FirebaseRealtimeChatMessageSource.online) message.updateMirror();
         return message;
@@ -272,12 +273,15 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         }
 
         // When the list is scrolled, new items are pushed to pending items
+        final source =
+            _isScrolled ? FirebaseRealtimeChatMessageSource.pending : FirebaseRealtimeChatMessageSource.subscribed;
         final targetList = _isScrolled ? pendingItems : subscribedItems;
         _seenItems.add(child.snapshot.key);
         targetList.add(
           messageBuilder(child.snapshot.value as Map)
             ..reference = messageCollection.child(child.snapshot.key)
             ..snapshot = child.snapshot
+            ..source = source
             ..updateMirror(),
         );
       },

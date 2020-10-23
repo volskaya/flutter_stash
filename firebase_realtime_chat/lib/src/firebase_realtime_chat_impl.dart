@@ -1,5 +1,17 @@
 import 'package:firebase_database/firebase_database.dart';
 
+/// Source list where this [FirebaseRealtimeChatMessageImpl] was first inserted.
+enum FirebaseRealtimeChatMessageSource {
+  /// Paginated item list.
+  paginated,
+
+  /// Subscribed item list.
+  subscribed,
+
+  /// Pending item list. Later moved to subscribed items, but the source won't reflect that.
+  pending,
+}
+
 /// Implementation required by the [FirebaseFirebaseRealtimeChat] items.
 abstract class FirebaseRealtimeChatMessageImpl {
   /// Reference to the message in the database.
@@ -7,6 +19,9 @@ abstract class FirebaseRealtimeChatMessageImpl {
 
   /// Snapshot that was used to build this model.
   DataSnapshot snapshot;
+
+  /// Source list where this [FirebaseRealtimeChatMessageImpl] was first inserted.
+  FirebaseRealtimeChatMessageSource source;
 
   /// Server timestamp of this chat message.
   int createTime;
