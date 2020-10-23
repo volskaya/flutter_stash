@@ -210,6 +210,7 @@ class FadeThroughTransition extends StatelessWidget {
     Widget _widget = _ZoomedFadeInFadeOut(
       animation: ReverseAnimation(secondaryAnimation),
       child: child,
+      onEnd: onEnd,
     );
 
     if (fillColor != Colors.transparent) {
@@ -222,6 +223,7 @@ class FadeThroughTransition extends StatelessWidget {
     return _ZoomedFadeInFadeOut(
       animation: animation,
       child: _widget,
+      onEnd: onEnd,
     );
   }
 }

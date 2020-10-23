@@ -120,6 +120,14 @@ class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
     );
     if (oldEffective != _effectiveAnimationStatus) {
       _updateAnimations();
+
+      switch (animationStatus) {
+        case AnimationStatus.completed:
+          widget.onEnd?.call();
+          break;
+        default:
+          break; // Do nothing
+      }
     }
   }
 
@@ -146,9 +154,6 @@ class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
     switch (current) {
       case AnimationStatus.dismissed:
       case AnimationStatus.completed:
-        if (lastEffective == _effectiveAnimationStatus) {
-          widget.onEnd?.call();
-        }
         return current;
       case AnimationStatus.forward:
         switch (lastEffective) {
