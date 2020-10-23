@@ -3,6 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:refresh_storage/src/refresh_indicator.dart' as my;
 import 'package:refresh_storage/src/nested_refresh_indicator.dart' as my;
+import 'package:refresh_storage/src/refresh_storage.dart';
+
+class _Storage {
+  int refreshes = 0;
+}
 
 /// Refresh indicator & provider of [RefreshController], which holds
 /// the counter of refreshes.
@@ -14,6 +19,7 @@ class RefreshBuilder extends StatefulWidget {
   const RefreshBuilder({
     Key key,
     @required this.builder,
+    @required this.bucket,
     this.enforceSafeArea = false,
   })  : _wrappedAroundNestedScrollview = false,
         super(key: key);
@@ -22,6 +28,7 @@ class RefreshBuilder extends StatefulWidget {
   const RefreshBuilder.nested({
     Key key,
     @required this.builder,
+    @required this.bucket,
     this.enforceSafeArea = false,
   })  : _wrappedAroundNestedScrollview = true,
         super(key: key);
@@ -31,8 +38,11 @@ class RefreshBuilder extends StatefulWidget {
 
   /// Child should contain a scrollable, which will controll the scroll
   /// indicator in [RefreshBuilder].
-  // final Widget child;
   final IndexedWidgetBuilder builder;
+
+  /// Page storage identifier, where this widget will preserve its refresh
+  /// counter state.
+  final String bucket;
 
   final bool _wrappedAroundNestedScrollview;
 
@@ -52,12 +62,13 @@ class RefreshController extends State<RefreshBuilder> {
     }
   }
 
+  _Storage _storage;
+
   /// Number of times this container has been refreshed.
-  int get refreshes => _refreshes;
-  int _refreshes = 0;
+  int get refreshes => _storage?.refreshes ?? 0;
 
   /// Refresh the controller.
-  void refresh() => setState(() => _refreshes += 1);
+  void refresh() => setState(() => _storage.refreshes += 1);
   Future _futureRefresh() async => refresh();
 
   Widget _buildChild(int refreshes) => KeyedSubtree(
@@ -66,11 +77,22 @@ class RefreshController extends State<RefreshBuilder> {
       );
 
   @override
+  void didChangeDependencies() {
+    _storage ??= RefreshStorage.write(
+      context: context,
+      identifier: widget.bucket + '_refresh_builder',
+      refreshes: 0,
+      builder: () => _Storage(),
+    );
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final child = Provider.value(
       value: this,
       child: FancySwitcher.vertical(
-        child: _buildChild(_refreshes),
+        child: _buildChild(refreshes),
       ),
     );
 

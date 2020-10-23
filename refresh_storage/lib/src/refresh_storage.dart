@@ -55,40 +55,44 @@ class RefreshStorage {
     final id = '$_refreshes-$identifier';
 
     var item = targetStorage.readState(context, identifier: id) as _RefreshStorageItem<T>;
-    _disposedRefreshes[targetRoute] ??= <String, int>{};
-    _disposedRefreshes[targetRoute][identifier] ??= 0;
 
     if (item == null) {
+      _disposedRefreshes[targetRoute] ??= <String, int>{};
+      _disposedRefreshes[targetRoute][identifier] ??= 0;
       item = _RefreshStorageItem<T>(data: builder(), dispose: dispose);
       if (item.isDisposable) targetRoute.completed.then(item.dispose);
       targetStorage.writeState(context, item, identifier: id);
-    }
 
-    assert(_disposedRefreshes.containsKey(targetRoute) && _disposedRefreshes[targetRoute][identifier] != null);
+      assert(_disposedRefreshes.containsKey(targetRoute) && _disposedRefreshes[targetRoute][identifier] != null);
 
-    // Dispose storages of the previous refresh number.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      while (_disposedRefreshes[targetRoute][identifier] < _refreshes) {
-        final oldRefresh = _disposedRefreshes[targetRoute][identifier];
-        final oldId = '$oldRefresh-$identifier';
-        final oldItem = targetStorage.readState(context, identifier: oldId) as _RefreshStorageItem<T>;
-        _disposedRefreshes[targetRoute][identifier] += 1;
-        targetStorage.writeState(context, null, identifier: oldId);
-        if (oldItem?.isDisposable == true) oldItem.dispose();
-      }
-
-      assert((() {
-        for (var i = 0; i < (_refreshes - 1); i++) {
-          final id = '$i-$identifier';
-          final item = targetStorage.readState(context, identifier: id) as _RefreshStorageItem<T>;
-
-          // This storage was supposed to be deleted already.
-          if (item != null) return false;
+      // Dispose storages of the previous refresh number.
+      //
+      // Disposed refresh count is persistent, in case some storages were not
+      // accessed, during nth refresh. This makes sure, when they're seen again,
+      // that any old storages are disposed till the current refresh.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        while (_disposedRefreshes[targetRoute][identifier] < _refreshes) {
+          final oldRefresh = _disposedRefreshes[targetRoute][identifier];
+          final oldId = '$oldRefresh-$identifier';
+          final oldItem = targetStorage.readState(context, identifier: oldId) as _RefreshStorageItem<T>;
+          _disposedRefreshes[targetRoute][identifier] += 1;
+          targetStorage.writeState(context, null, identifier: oldId);
+          if (oldItem?.isDisposable == true) oldItem.dispose();
         }
 
-        return true;
-      })(), 'Page storage contains undisposed refresh data');
-    });
+        assert((() {
+          for (var i = 0; i < (_refreshes - 1); i++) {
+            final id = '$i-$identifier';
+            final item = targetStorage.readState(context, identifier: id) as _RefreshStorageItem<T>;
+
+            // This storage was supposed to be deleted already.
+            if (item != null) return false;
+          }
+
+          return true;
+        })(), 'Page storage contains undisposed refresh data');
+      });
+    }
 
     return item.data;
   }

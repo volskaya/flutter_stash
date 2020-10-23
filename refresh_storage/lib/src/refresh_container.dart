@@ -11,6 +11,7 @@ class RefreshContainer extends StatelessWidget {
   const RefreshContainer({
     Key key,
     @required this.child,
+    @required this.bucket,
     this.enforceSafeArea = false,
   })  : _wrappedAroundNestedScrollview = false,
         super(key: key);
@@ -19,6 +20,7 @@ class RefreshContainer extends StatelessWidget {
   const RefreshContainer.nested({
     Key key,
     @required this.child,
+    @required this.bucket,
     this.enforceSafeArea = false,
   })  : _wrappedAroundNestedScrollview = true,
         super(key: key);
@@ -31,6 +33,10 @@ class RefreshContainer extends StatelessWidget {
   // final Widget child;
   final Widget child;
 
+  /// Page storage identifier, where this widget will preserve its refresh
+  /// counter state.
+  final String bucket;
+
   final bool _wrappedAroundNestedScrollview;
 
   @override
@@ -38,9 +44,11 @@ class RefreshContainer extends StatelessWidget {
       ? RefreshBuilder.nested(
           builder: (_, __) => child,
           enforceSafeArea: enforceSafeArea,
+          bucket: bucket,
         )
       : RefreshBuilder(
           builder: (_, __) => child,
           enforceSafeArea: enforceSafeArea,
+          bucket: bucket,
         );
 }
