@@ -27,10 +27,27 @@ mixin _$_FirebaseRealtimeChatPageStorage<
     });
   }
 
+  final _$participantsAtom =
+      Atom(name: '__FirebaseRealtimeChatPageStorage.participants');
+
+  @override
+  Set<String> get participants {
+    _$participantsAtom.reportRead();
+    return super.participants;
+  }
+
+  @override
+  set participants(Set<String> value) {
+    _$participantsAtom.reportWrite(value, super.participants, () {
+      super.participants = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
-isEndReached: ${isEndReached}
+isEndReached: ${isEndReached},
+participants: ${participants}
     ''';
   }
 }

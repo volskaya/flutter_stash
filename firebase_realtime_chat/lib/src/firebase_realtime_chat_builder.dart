@@ -19,6 +19,7 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
     @required this.messageBuilder,
     @required this.participantBuilder,
     this.itemsPerPage = 20,
+    this.participants,
   }) : super(key: key);
 
   /// Chat room ID in the database.
@@ -38,6 +39,10 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
 
   /// Participant model builder.
   final FirebaseRealtimeChatParticipantBuilder<D> participantBuilder;
+
+  /// If the participant IDs are defined manually, there won't be any subscription observing
+  /// participant IDs in the database.
+  final Set<String> participants;
 
   @override
   _FirebaseRealtimeChatBuilderState<T, D> createState() => _FirebaseRealtimeChatBuilderState<T, D>();
@@ -60,6 +65,8 @@ class _FirebaseRealtimeChatBuilderState<T extends FirebaseRealtimeChatMessageImp
       collection: FirebaseDatabase.instance.reference().child('chats'),
       messageBuilder: widget.messageBuilder,
       participantBuilder: widget.participantBuilder,
+      participants: widget.participants,
+      itemsPerPage: widget.itemsPerPage,
     )
       ..initialize(
         context: context,

@@ -29,6 +29,9 @@ abstract class __FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatM
   @observable
   bool isEndReached = false;
   int page = 0;
+
+  @observable
+  Set<String> participants = const <String>{};
 }
 
 /// Firebase realtime chat list & ui builder, similar to FirestoreCollectionBuilder.
@@ -42,7 +45,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     @required this.messageBuilder,
     @required this.participantBuilder,
     this.itemsPerPage = 20,
-  });
+    Set<String> participants,
+  }) : _participants = participants;
 
   /// Realtime database list this chat will target.
   final DatabaseReference collection;
@@ -56,10 +60,16 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   /// Number of item to paginate per page. Subscribed items will still fetch as much as possible.
   final int itemsPerPage;
 
+  /// If the participant IDs are defined manually, there won't be any subscription observing
+  /// user IDs in the database.
+  final Set<String> _participants;
+  Set<String> get participants => _storage?.participants ?? const <String>{};
+
   static final _log = Log.named('FirebaseRealtimeChat');
 
   DatabaseReference get chatReference => collection.child(chatId);
   DatabaseReference get participantsCollection => chatReference.child('participants');
+  DatabaseReference get participantListCollection => chatReference.child('participantIds');
   DatabaseReference get messageCollection => chatReference.child('messages');
 
   // Assigned in `initialize`.
@@ -68,11 +78,10 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
   _FirebaseRealtimeChatPageStorage<T> _storage;
   D _lastPresence;
-  StreamSubscription _onAddedSubscription;
+  StreamSubscription<Event> _onAddedSubscription;
+  StreamSubscription<Event> _onDisconnectReaction;
+  StreamSubscription<Event> _participantsSubscription;
   DateTime subscriptionTime;
-
-  // @observable
-  // MyFirebaseRealtimeChatParticipants participants;
 
   final scrollController = ScrollController();
   final _seenItems = <String>{};
@@ -284,22 +293,24 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   /// you're expected to redo `_startParticipating`
   Future _startParticipating() async {
     assert(!_disposed);
-    // assert(participants == null);
 
     // NOTE: At the moment, rules enforce having an existing presence,
     // to be allowed to read message documents
     await reportPresence(online: true);
 
-    // _log.v('Reported initial presence, subscribing to chat $chatId participants');
-    // participants = MyFirebaseRealtimeChatParticipants()..reference = participantsCollection;
-    // await participants.subscribe();
+    // Don't subscribe to the participant ID list, if the IDs were passed manually.
+    if (_participants == null) {
+      _participantsSubscription?.cancel();
+      _participantsSubscription = participantListCollection.onValue.listen(
+          (event) => _storage.participants = Set<String>.from(event.snapshot.value as List ?? const <String>[]));
+    } else {
+      assert(_storage.participants == _participants);
+    }
   }
 
   void _handleScroll() {
     assert(scrollController.hasClients);
-    if (!_isScrolled) {
-      movePendingItemsToSubscribedItems();
-    }
+    if (!_isScrolled) movePendingItemsToSubscribedItems();
   }
 
   @action
@@ -310,7 +321,6 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     }
   }
 
-  StreamSubscription<Event> _onDisconnectReaction;
   Future reportPresence({bool online = true, bool writing = false}) async {
     // If reporting presence, add an `onDisconnect` reaction, to clean
     // this up, if the database loses connection with the client
@@ -370,6 +380,9 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
       identifier: 'realtime_chat_${chatId}_$senderId',
       builder: () => _FirebaseRealtimeChatPageStorage<T>(),
     );
+
+    // Participant list provided manually.
+    if (_participants != null) _storage.participants = _participants;
 
     // First reuse pending items
     if (pendingItems.isNotEmpty) {
@@ -461,8 +474,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     scrollController.removeListener(_handleScroll);
     _onDisconnectReaction?.cancel();
     _disposeSubscription();
-    // participants?.unsubscribe();
-    // participants = null;
+    _participantsSubscription?.cancel();
 
     // Send last presence, indicating the user is offline.
     reportPresence(writing: false, online: false);
@@ -472,7 +484,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     switch (state) {
       case AppLifecycleState.resumed:
         _startSubscription(timestamp: _subscriptionTimestamp ?? DateTime.now().toUtc().millisecondsSinceEpoch);
-        reportPresence(); // This will setup the `_onDisconnectReaction` again.
+        _startParticipating();
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
@@ -481,6 +493,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         reportPresence(writing: false, online: false);
         _onDisconnectReaction?.cancel();
         _onDisconnectReaction = null;
+        _participantsSubscription?.cancel();
+        _participantsSubscription = null;
         break;
     }
   }
