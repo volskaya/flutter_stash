@@ -13,8 +13,6 @@ import 'package:sembast/sembast.dart';
 
 part 'firebase_realtime_chat.g.dart';
 
-enum _FirebaseRealtimeChatMessageSource { offline, online }
-
 typedef FirebaseRealtimeChatMessageBuilder<T extends FirebaseRealtimeChatMessageImpl> = T Function(Map value);
 typedef FirebaseRealtimeChatParticipantBuilder<T extends FirebaseRealtimeChatParticipantImpl> = T Function();
 
@@ -153,7 +151,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     _log.v('Paginating page ${page + 1}, startingAt $oldestTimestamp');
 
     // Prefer offline over online
-    _FirebaseRealtimeChatMessageSource usedSource;
+    FirebaseRealtimeChatMessageSource usedSource;
     var messages = <T>[];
     var items = const <String, dynamic>{};
 
@@ -168,7 +166,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     );
 
     if (offlineSnapshots.isNotEmpty) {
-      usedSource = _FirebaseRealtimeChatMessageSource.offline;
+      usedSource = FirebaseRealtimeChatMessageSource.mirrorStorage;
       _log.wtf('Got ${offlineSnapshots.length} items from offline storage');
 
       // If offlineSnapshots are not empty, map them to items
@@ -179,9 +177,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
       );
     } else {
       // If offline storage have no items, fall back to realtime db
-      usedSource = _FirebaseRealtimeChatMessageSource.online;
+      usedSource = FirebaseRealtimeChatMessageSource.realtimeDatabase;
       final query = messageCollection.orderByChild('createTime').limitToLast(itemsPerPage).endAt(oldestTimestamp - 1);
-
       _log.wtf('No offline items, fetching from realtime db');
 
       try {
@@ -207,9 +204,10 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         final message = messageBuilder(entry.value as Map)
           ..reference = messageCollection.child(entry.key)
           ..snapshot = snapshot
-          ..source = FirebaseRealtimeChatMessageSource.paginated;
+          ..list = FirebaseRealtimeChatMessageList.paginated
+          ..source = usedSource;
 
-        if (usedSource == _FirebaseRealtimeChatMessageSource.online) message.updateMirror();
+        if (message.source == FirebaseRealtimeChatMessageSource.realtimeDatabase) message.updateMirror();
         return message;
       }).toList(growable: false)
         // NOTE: Firebase query returns the documents unordered.
@@ -233,7 +231,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     _log.d('Paginated ${messages.length} items');
 
     switch (usedSource) {
-      case _FirebaseRealtimeChatMessageSource.online:
+      case FirebaseRealtimeChatMessageSource.realtimeDatabase:
         if (messages.length < itemsPerPage) {
           _log.v('Collection end reached');
           isEndReached = true;
@@ -273,15 +271,14 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         }
 
         // When the list is scrolled, new items are pushed to pending items
-        final source =
-            _isScrolled ? FirebaseRealtimeChatMessageSource.pending : FirebaseRealtimeChatMessageSource.subscribed;
+        final list = _isScrolled ? FirebaseRealtimeChatMessageList.pending : FirebaseRealtimeChatMessageList.subscribed;
         final targetList = _isScrolled ? pendingItems : subscribedItems;
         _seenItems.add(child.snapshot.key);
         targetList.add(
           messageBuilder(child.snapshot.value as Map)
             ..reference = messageCollection.child(child.snapshot.key)
             ..snapshot = child.snapshot
-            ..source = source
+            ..list = list
             ..updateMirror(),
         );
       },
