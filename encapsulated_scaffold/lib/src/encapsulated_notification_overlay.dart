@@ -102,7 +102,9 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
         final showScrim = _store.importantNotifications.isNotEmpty;
         final item = _store.importantNotifications.isNotEmpty // Prioritize important notifications.
             ? _store.importantNotifications.last
-            : _store.notifications.isNotEmpty ? _store.notifications.last : null;
+            : _store.notifications.isNotEmpty
+                ? _store.notifications.last
+                : null;
 
         return EncapsulatedNotificationOverlayScrim(
           toggled: showScrim,
@@ -112,10 +114,10 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
             alignment: Alignment.bottomCenter,
             child: item != null
                 ? _NotificationItem(
+                    key: ObjectKey(item),
                     store: _store,
                     important: item.important,
                     padding: _padding,
-                    key: ValueKey(item.tag + item.createTime.millisecondsSinceEpoch.toString()),
                     duration: item.timeout,
                     builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
                       value: EncapsulatedNotificationProps(item.dismiss, animation, item),

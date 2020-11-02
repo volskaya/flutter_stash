@@ -11,28 +11,27 @@ typedef EncapsulatedNotificationItemBuilder = Widget Function(
 class EncapsulatedNotificationItem {
   /// Creates [EncapsulatedNotificationItem].
   EncapsulatedNotificationItem({
+    /// Unique notification tag, to differentiate multiple active notifications.
     String tag,
     @required this.builder,
     this.onDismissed,
     this.timeout = const Duration(seconds: 10),
     this.important = false,
     this.dismissible = true,
+    this.previous,
   })  : assert(timeout == null || timeout >= const Duration(seconds: 5)),
         assert(important == false || timeout == null, 'Don\'t dim backgrounds of temporary notifications'),
         createTime = DateTime.now(),
-        tag = tag ?? _getTag();
+        _tag = tag;
 
-  static var _notificationCounter = 0;
-  static String _getTag() {
-    _notificationCounter += 1;
-    return _notificationCounter.toString();
-  }
+  final String _tag;
+  EncapsulatedScaffoldStore _controller;
 
   /// Time when this [EncapsulatedNotificationItem] was constructed.
   final DateTime createTime;
 
   /// Unique notification tag, to differentiate multiple active notifications.
-  final String tag;
+  String get tag => _tag ?? hashCode.toString();
 
   /// Notification widget builder. If [timeout] is null, [timeoutAnimation] will be passed as null as well.
   final EncapsulatedNotificationItemBuilder builder;
@@ -50,16 +49,8 @@ class EncapsulatedNotificationItem {
   /// Wether the user is allowed to manually dismiss this notification.
   final bool dismissible;
 
-  @override
-  bool operator ==(Object other) {
-    if (other.runtimeType != runtimeType) return false;
-    return other is EncapsulatedNotificationItem && other.tag == tag;
-  }
-
-  @override
-  int get hashCode => tag.hashCode;
-
-  EncapsulatedScaffoldStore _controller;
+  /// Reference to the previous [EncapsulatedNotificationItem].
+  final EncapsulatedNotificationItem previous;
 
   /// Deliver this notification to the nearest [EncapsulatedNotificationOverlayController].
   void push(BuildContext context, [Set<String> replacements = const <String>{}]) {
