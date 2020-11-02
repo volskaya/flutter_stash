@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 class AwaitRoute {
   static Future<void> _awaitNow(BuildContext context) {
     final route = ModalRoute.of(context);
-    if (route.animation.isCompleted) return SynchronousFuture<void>(null);
+    if (route?.animation?.isCompleted ?? true) return SynchronousFuture<void>(null);
 
     final completer = Completer<void>();
     final timeout = Timer(const Duration(seconds: 1), completer.complete);
