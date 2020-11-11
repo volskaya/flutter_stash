@@ -1,66 +1,56 @@
 import 'package:encapsulated_scaffold/src/encapsulated_notification_overlay.dart';
-import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/material.dart';
+
+part 'encapsulated_notification_item.freezed.dart';
 
 typedef EncapsulatedNotificationItemBuilder = Widget Function(
     BuildContext context, VoidCallback dismiss, Animation<double> timeoutAnimation);
 
 /// [EncapsulatedNotificationItem] that's used for [EncapsulatedNotificationOverlay]
 /// overlay entries.
-class EncapsulatedNotificationItem {
+@freezed
+abstract class EncapsulatedNotificationItem implements _$EncapsulatedNotificationItem {
   /// Creates [EncapsulatedNotificationItem].
-  EncapsulatedNotificationItem({
-    /// Unique notification tag, to differentiate multiple active notifications.
+  @Assert('timeout == null || timeout >= const Duration(seconds: 5)')
+  @Assert('important == false || timeout == null')
+  factory EncapsulatedNotificationItem({
+    /// Tag to differentiate multiple active notifications.
     String tag,
-    @required this.builder,
-    this.onDismissed,
-    this.timeout = const Duration(seconds: 10),
-    this.important = false,
-    this.dismissible = true,
-    this.previous,
-  })  : assert(timeout == null || timeout >= const Duration(seconds: 5)),
-        assert(important == false || timeout == null, 'Don\'t dim backgrounds of temporary notifications'),
-        createTime = DateTime.now(),
-        _tag = tag;
 
-  final String _tag;
-  EncapsulatedScaffoldStore _controller;
+    /// Notification widget builder. If [timeout] is null, [timeoutAnimation] will be passed as null as well.
+    @required EncapsulatedNotificationItemBuilder builder,
 
-  /// Time when this [EncapsulatedNotificationItem] was constructed.
-  final DateTime createTime;
+    /// Fade out time of the notification. Set null to keep the item on screen
+    /// till user interaction.
+    @Default(Duration(seconds: 10)) @nullable Duration timeout,
 
-  /// Unique notification tag, to differentiate multiple active notifications.
-  String get tag => _tag ?? hashCode.toString();
+    /// Callback on dismiss.
+    VoidCallback onDismissed,
 
-  /// Notification widget builder. If [timeout] is null, [timeoutAnimation] will be passed as null as well.
-  final EncapsulatedNotificationItemBuilder builder;
+    /// Dim the background behind the notification and intercept pop.
+    @Default(false) bool important,
 
-  /// Fade out time of the notification. Set null to keep the item on screen
-  /// till user interaction.
-  final Duration timeout;
+    /// Wether the user is allowed to manually dismiss this notification.
+    @Default(true) bool dismissible,
 
-  /// Callback on dismiss.
-  final VoidCallback onDismissed;
+    /// Reference to the previous [EncapsulatedNotificationItem].
+    EncapsulatedNotificationItem previous,
+  }) = _EncapsulatedNotificationItem;
 
-  /// Dim the background behind the notification and intercept pop.
-  final bool important;
-
-  /// Wether the user is allowed to manually dismiss this notification.
-  final bool dismissible;
-
-  /// Reference to the previous [EncapsulatedNotificationItem].
-  final EncapsulatedNotificationItem previous;
+  EncapsulatedNotificationItem._();
+  EncapsulatedScaffoldStore _store;
 
   /// Deliver this notification to the nearest [EncapsulatedNotificationOverlayController].
   void push(BuildContext context, [Set<String> replacements = const <String>{}]) {
-    _controller = EncapsulatedScaffoldStore.of<EncapsulatedScaffoldDataBase>(context);
-    _controller.pushNotification(this, replacements);
+    _store = EncapsulatedScaffoldStore.of(context);
+    _store.pushNotification(this, replacements);
   }
 
   /// Remove this item from the [EncapsulatedNotificationOverlayController].
   void dismiss() {
-    assert(_controller != null, 'Item must be pushed, before it\'s dismissed');
-    _controller?.dismissNotification(this);
+    assert(_store != null, 'Dismiss was called before push');
+    _store?.dismissNotification(this);
   }
 }
