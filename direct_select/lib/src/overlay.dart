@@ -5,6 +5,7 @@ class _MySelectionOverlay extends StatefulWidget {
   final Widget child;
   final double bottom;
   final Color backgroundColor;
+  final List<Widget> overlayChildren;
 
   const _MySelectionOverlay({
     Key key,
@@ -12,6 +13,7 @@ class _MySelectionOverlay extends StatefulWidget {
     this.bottom,
     this.child,
     this.backgroundColor,
+    this.overlayChildren,
   }) : super(key: key);
 
   @override
@@ -52,7 +54,7 @@ class _MySelectionOverlayState extends State<_MySelectionOverlay> with SingleTic
             decoration: BoxDecoration(color: widget.backgroundColor),
           ),
           Positioned(
-            top: widget.top,
+            top: widget.top - MediaQuery.of(context).size.height / 2,
             left: 0.0,
             right: 0.0,
             bottom: widget.bottom,
@@ -61,6 +63,7 @@ class _MySelectionOverlayState extends State<_MySelectionOverlay> with SingleTic
               child: widget.child,
             ),
           ),
+          ...widget.overlayChildren,
         ],
       ),
     );
@@ -79,6 +82,7 @@ class _MySelectionList extends StatelessWidget {
   final VoidCallback onItemSelected;
   final double itemExtent;
   final double itemMagnification;
+  final bool allowScrollEnd;
 
   const _MySelectionList({
     Key key,
@@ -89,6 +93,7 @@ class _MySelectionList extends StatelessWidget {
     @required this.onItemSelected,
     @required this.itemExtent,
     @required this.itemMagnification,
+    this.allowScrollEnd = true,
   }) : super(key: key);
 
   @override
@@ -96,10 +101,10 @@ class _MySelectionList extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: SizedBox(
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery.of(context).size.height * 2,
         child: NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) {
-            if (scrollNotification is ScrollEndNotification) {
+            if (!allowScrollEnd && scrollNotification is ScrollEndNotification) {
               onItemSelected();
             }
             return false;
@@ -111,7 +116,8 @@ class _MySelectionList extends StatelessWidget {
             childCount: childCount,
             useMagnifier: true,
             magnification: itemMagnification,
-            diameterRatio: 3.0,
+            diameterRatio: 13.0,
+            // squeeze: 10,
             onSelectedItemChanged: onItemChanged,
             itemBuilder: builder,
           ),

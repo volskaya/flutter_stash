@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  back_button_interceptor: ^4.3.1
 
 dev_dependencies:
   flutter_test:

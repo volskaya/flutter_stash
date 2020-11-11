@@ -11,6 +11,9 @@ class _DirectSelectTap extends _DirectSelectBase {
     DirectSelectMode mode,
     Color backgroundColor,
     HitTestBehavior hitTestBehavior,
+    bool allowScrollEnd,
+    List<Widget> overlayChildren,
+    bool ignoreInput,
     Key key,
   }) : super(
           selectedIndex: selectedIndex,
@@ -21,22 +24,26 @@ class _DirectSelectTap extends _DirectSelectBase {
           itemExtent: itemExtent,
           backgroundColor: backgroundColor,
           child: child,
-          key: key,
           hitTestBehavior: hitTestBehavior,
+          overlayChildren: overlayChildren,
+          ignoreInput: ignoreInput,
+          key: key,
         );
 
   @override
-  _DirectSelectTapState createState() => _DirectSelectTapState();
+  DirectSelectTapState createState() => DirectSelectTapState();
 }
 
-class _DirectSelectTapState extends _DirectSelectBaseState<_DirectSelectTap> {
+class DirectSelectTapState extends DirectSelectBaseState<_DirectSelectTap> {
   bool _dialogShowing;
 
   @override
-  Future<void> _createOverlay() async {
+  Future<int> _createOverlay() async {
     if (mounted) {
+      assert(completer == null);
       _dialogShowing = true;
-      await showGeneralDialog(
+      completer = Completer<int>();
+      showGeneralDialog(
         context: context,
         useRootNavigator: true,
         barrierDismissible: false,
@@ -53,13 +60,17 @@ class _DirectSelectTapState extends _DirectSelectBaseState<_DirectSelectTap> {
         pageBuilder: (context, animation, secondaryAnimation) => WillPopScope(
           onWillPop: () async {
             _dialogShowing = false;
-            _notifySelectedItem();
+            final index = _notifySelectedItem();
+            completer?.complete(index);
+            completer = null;
             return true;
           },
           child: _overlayWidget(),
         ),
       );
+      return completer.future;
     }
+    return null;
   }
 
   @override
@@ -71,9 +82,14 @@ class _DirectSelectTapState extends _DirectSelectBaseState<_DirectSelectTap> {
           _notifySelectedItem();
         }
       } else {
-        _notifySelectedItem();
+        final index = _notifySelectedItem();
+        completer?.complete(index);
+        completer = null;
       }
       _dialogShowing = false;
+    } else {
+      completer?.complete(null);
+      completer = null;
     }
   }
 

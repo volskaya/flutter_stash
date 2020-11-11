@@ -28,6 +28,18 @@ class DirectSelect extends StatelessWidget {
   /// [HitTestBehavior] of the gesture detector that's gonna wrap the child.
   final HitTestBehavior hitTestBehavior;
 
+  /// Key of either [DirectSelectTapState] / [DirectSelectDragState].
+  final GlobalKey<dynamic> stateKey;
+
+  /// Whether to close the overlay, when scroll ends.
+  final bool allowScrollEnd;
+
+  /// Overlay children above the picker.
+  final List<Widget> overlayChildren;
+
+  /// Unassign gesture handlers from the internal [GestureDetector].
+  final bool ignoreInput;
+
   const DirectSelect({
     @required this.items,
     @required this.onSelectedItemChanged,
@@ -38,6 +50,10 @@ class DirectSelect extends StatelessWidget {
     this.itemMagnification = 1.15,
     this.backgroundColor = Colors.white,
     this.hitTestBehavior = HitTestBehavior.opaque,
+    this.allowScrollEnd = false,
+    this.overlayChildren = const <Widget>[],
+    this.stateKey,
+    this.ignoreInput = false,
     Key key,
   })  : assert(items != null && items.length > 0),
         assert(onSelectedItemChanged != null),
@@ -52,19 +68,9 @@ class DirectSelect extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (mode) {
       case DirectSelectMode.drag:
-        return _DirectSelectDrag(
-          selectedIndex: selectedIndex,
-          mode: mode,
-          itemMagnification: itemMagnification,
-          items: items,
-          onSelectedItemChanged: onSelectedItemChanged,
-          itemExtent: itemExtent,
-          backgroundColor: backgroundColor,
-          child: child,
-          hitTestBehavior: hitTestBehavior,
-        );
       case DirectSelectMode.tap:
-        return _DirectSelectTap(
+        return _DirectSelectDrag(
+          key: stateKey,
           selectedIndex: selectedIndex,
           mode: mode,
           itemMagnification: itemMagnification,
@@ -74,7 +80,26 @@ class DirectSelect extends StatelessWidget {
           backgroundColor: backgroundColor,
           child: child,
           hitTestBehavior: hitTestBehavior,
+          allowScrollEnd: allowScrollEnd,
+          overlayChildren: overlayChildren,
+          ignoreInput: ignoreInput,
         );
+      // case DirectSelectMode.tap:
+      //   return _DirectSelectTap(
+      //     key: stateKey,
+      //     selectedIndex: selectedIndex,
+      //     mode: mode,
+      //     itemMagnification: itemMagnification,
+      //     items: items,
+      //     onSelectedItemChanged: onSelectedItemChanged,
+      //     itemExtent: itemExtent,
+      //     backgroundColor: backgroundColor,
+      //     child: child,
+      //     hitTestBehavior: hitTestBehavior,
+      //     allowScrollEnd: allowScrollEnd,
+      //     overlayChildren: overlayChildren,
+      //     ignoreInput: ignoreInput,
+      //   );
     }
     throw UnimplementedError('Unknown DirectSelectMode provided: $mode');
   }
