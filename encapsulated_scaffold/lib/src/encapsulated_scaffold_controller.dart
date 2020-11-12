@@ -11,7 +11,6 @@ class EncapsulatedScaffoldController<T extends EncapsulatedScaffoldDataBase> ext
   const EncapsulatedScaffoldController({
     Key key,
     @required this.child,
-    @required this.navigator,
     this.onInit,
     this.onDispose,
   }) : super(key: key);
@@ -24,9 +23,6 @@ class EncapsulatedScaffoldController<T extends EncapsulatedScaffoldDataBase> ext
 
   /// Callback when the widget is disposed.
   final ValueChanged<EncapsulatedScaffoldStore> onDispose;
-
-  /// Navigator global key, that's shared with [MaterialApp].
-  final GlobalKey<NavigatorState> navigator;
 
   /// Get the nearest [EncapsulatedScaffoldStore].
   static EncapsulatedScaffoldStore<T> of<T extends EncapsulatedScaffoldDataBase>(BuildContext context) =>
@@ -42,7 +38,7 @@ class _EncapsulatedScaffoldControllerState<T extends EncapsulatedScaffoldDataBas
 
   @override
   void initState() {
-    _store = EncapsulatedScaffoldStore<T>(navigator: widget.navigator);
+    _store = EncapsulatedScaffoldStore<T>();
     widget.onInit?.call(_store);
     super.initState();
   }
