@@ -18,19 +18,51 @@ class EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase> extends 
 }
 
 abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase> with Store {
+  _EncapsulatedScaffoldStore() {
+    _visibleNotificationReactionDisposer = reaction<EncapsulatedNotificationItem>(
+      (_) => notification,
+      _handleNotificationChange,
+      fireImmediately: true,
+    );
+  }
+
   /// Capsules are added and popped as the navigator routes.
   ///
   /// NOTE: .linkedHashSetFrom, to preserve order of insertion
   final capsules = ObservableSet<EncapsulatedScaffoldState<T>>.linkedHashSetFrom([]);
   final notifications = ObservableList<EncapsulatedNotificationItem>();
   final importantNotifications = ObservableList<EncapsulatedNotificationItem>();
-  final _notificationTimers = <EncapsulatedNotificationItem, Timer>{};
+
+  Timer _timer; // Active notification timeout timer.
+  ReactionDisposer _visibleNotificationReactionDisposer;
 
   @computed
   EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase> get capsule => capsules.isNotEmpty ? capsules.last : null;
 
+  @computed
+  EncapsulatedNotificationItem get notification =>
+      importantNotifications.isNotEmpty // Prioritize important notifications.
+          ? importantNotifications.last
+          : notifications.isNotEmpty
+              ? notifications.last
+              : null;
+
   ObservableList<EncapsulatedNotificationItem> _getAppropriateNotificationList(EncapsulatedNotificationItem item) =>
       item.important ? importantNotifications : notifications;
+
+  void _handleNotificationChange(EncapsulatedNotificationItem notification) {
+    // Cancel previous timeout.
+    _timer?.cancel();
+    _timer = null;
+
+    // Start the timer for the current notifications timeout.
+    if (notification.timeout != null && !notification.important) {
+      _timer = Timer(notification.timeout * timeDilation, () {
+        _timer = null;
+        dismissNotification(notification);
+      });
+    }
+  }
 
   /// Push an [EncapsulatedNotificationItem] to the overlay.
   ///
@@ -42,15 +74,6 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
     if (replacements.isNotEmpty) {
       notifications.removeWhere((item) => replacements.contains(item.tag));
       importantNotifications.removeWhere((item) => replacements.contains(item.tag));
-    }
-
-    if (item.timeout != null) {
-      assert(!item.important);
-      _notificationTimers[item]?.cancel();
-      _notificationTimers[item] = Timer(item.timeout * timeDilation, () {
-        _notificationTimers.remove(item);
-        dismissNotification(item);
-      });
     }
   }
 
@@ -67,5 +90,9 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
   void dismissAllNotifications({bool includingUndismissible = false}) {
     notifications.removeWhere((item) => item.dismissible ? true : includingUndismissible);
     importantNotifications.removeWhere((item) => item.dismissible ? true : includingUndismissible);
+  }
+
+  void dispose() {
+    _visibleNotificationReactionDisposer?.call();
   }
 }

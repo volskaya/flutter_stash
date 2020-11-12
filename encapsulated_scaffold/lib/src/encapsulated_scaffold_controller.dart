@@ -46,6 +46,7 @@ class _EncapsulatedScaffoldControllerState<T extends EncapsulatedScaffoldDataBas
   @override
   void dispose() {
     widget.onDispose?.call(_store);
+    _store?.dispose();
     super.dispose();
   }
 

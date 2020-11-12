@@ -100,12 +100,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
       name: 'encapsulated_notification_overlay_notifications',
       builder: (context) {
         final showScrim = _store.importantNotifications.isNotEmpty;
-        final item = _store.importantNotifications.isNotEmpty // Prioritize important notifications.
-            ? _store.importantNotifications.last
-            : _store.notifications.isNotEmpty
-                ? _store.notifications.last
-                : null;
-
+        final item = _store.notification;
         return EncapsulatedNotificationOverlayScrim(
           toggled: showScrim,
           onDismissed: () =>
