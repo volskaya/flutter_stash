@@ -111,7 +111,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
                 ? _NotificationItem(
                     key: ObjectKey(item),
                     store: _store,
-                    important: item.important,
+                    item: item,
                     padding: _padding,
                     duration: item.timeout,
                     builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
@@ -142,15 +142,15 @@ class _NotificationItem extends StatefulObserverWidget {
     @required this.builder,
     @required this.duration,
     @required this.store,
+    @required this.item,
     this.padding,
-    this.important = false,
   }) : super(key: key, name: 'notification_item');
 
   final Widget Function(BuildContext context, Animation<double> animation) builder;
   final Duration duration;
   final EncapsulatedScaffoldStore store;
   final Observable<EdgeInsets> padding;
-  final bool important;
+  final EncapsulatedNotificationItem item;
 
   @override
   __NotificationItemState createState() => __NotificationItemState();
@@ -179,14 +179,17 @@ class __NotificationItemState extends State<_NotificationItem> with SingleTicker
   @override
   Widget build(BuildContext context) {
     final notification = widget.builder(context, _controller?.view);
-    final padding = (widget.important || widget.padding == null ? EdgeInsets.zero : widget.padding.value) +
+    final padding = (widget.item.important || widget.padding == null ? EdgeInsets.zero : widget.padding.value) +
         MediaQuery.of(context).viewInsets;
 
-    return AnimatedPadding(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.fastOutSlowIn,
-      padding: EdgeInsets.only(bottom: padding.bottom),
-      child: notification,
+    return IgnorePointer(
+      ignoring: widget.item != widget.store.notification,
+      child: AnimatedPadding(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.fastOutSlowIn,
+        padding: EdgeInsets.only(bottom: padding.bottom),
+        child: notification,
+      ),
     );
   }
 }
