@@ -84,6 +84,16 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
     if (didRemove) item.onDismissed?.call();
   }
 
+  @action
+  void dismissNotificationsWhere(
+    bool Function(EncapsulatedNotificationItem item) conditional, {
+    bool includeImportant = true,
+  }) =>
+      [
+        ...notifications.where(conditional).toList(growable: false),
+        if (includeImportant) ...importantNotifications.where(conditional).toList(growable: false),
+      ].forEach(dismissNotification);
+
   /// Dismiss all notifications.
   /// Dismissing them like this won't call [EncapsulatedNotificationItem.onDismissed].
   @action

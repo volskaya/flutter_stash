@@ -20,6 +20,13 @@ mixin _$EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase>
                   () => super.capsule,
                   name: '_EncapsulatedScaffoldStore.capsule'))
           .value;
+  Computed<EncapsulatedNotificationItem> _$notificationComputed;
+
+  @override
+  EncapsulatedNotificationItem get notification => (_$notificationComputed ??=
+          Computed<EncapsulatedNotificationItem>(() => super.notification,
+              name: '_EncapsulatedScaffoldStore.notification'))
+      .value;
 
   final _$_EncapsulatedScaffoldStoreActionController =
       ActionController(name: '_EncapsulatedScaffoldStore');
@@ -48,6 +55,21 @@ mixin _$EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase>
   }
 
   @override
+  void dismissNotificationsWhere(
+      bool Function(EncapsulatedNotificationItem) conditional,
+      {bool includeImportant = true}) {
+    final _$actionInfo =
+        _$_EncapsulatedScaffoldStoreActionController.startAction(
+            name: '_EncapsulatedScaffoldStore.dismissNotificationsWhere');
+    try {
+      return super.dismissNotificationsWhere(conditional,
+          includeImportant: includeImportant);
+    } finally {
+      _$_EncapsulatedScaffoldStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void dismissAllNotifications({bool includingUndismissible = false}) {
     final _$actionInfo =
         _$_EncapsulatedScaffoldStoreActionController.startAction(
@@ -63,7 +85,8 @@ mixin _$EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase>
   @override
   String toString() {
     return '''
-capsule: ${capsule}
+capsule: ${capsule},
+notification: ${notification}
     ''';
   }
 }
