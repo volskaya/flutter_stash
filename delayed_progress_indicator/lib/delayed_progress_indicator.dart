@@ -10,7 +10,7 @@ class DelayedProgressIndicator extends StatefulWidget {
   const DelayedProgressIndicator({
     Key key,
     this.delay = const Duration(seconds: 3),
-    this.size = 20,
+    this.size = 16,
     this.center = true,
     this.color,
   }) : super(key: key);
@@ -56,7 +56,7 @@ class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator> wit
 
   @override
   Widget build(BuildContext context) {
-    final color = widget.color ?? Theme.of(context).accentColor;
+    final color = widget.color ?? Theme.of(context).indicatorColor;
     final indicator = RepaintBoundary(
       child: SizedBox.fromSize(
         size: Size.square(widget.size),
