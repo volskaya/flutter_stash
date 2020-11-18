@@ -123,7 +123,7 @@ class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
 
       switch (animationStatus) {
         case AnimationStatus.completed:
-          widget.onEnd?.call();
+          if (mounted) widget.onEnd?.call();
           break;
         default:
           break; // Do nothing
