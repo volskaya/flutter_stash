@@ -62,7 +62,10 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: _notifier,
-        builder: (context, __) => widget.builder(context, !_notifier.value ? _handleOnPressed : null),
+        builder: (context, __) => widget.builder(
+          context,
+          !_notifier.value && widget.onPressed != null ? _handleOnPressed : null,
+        ),
       );
 }
 
