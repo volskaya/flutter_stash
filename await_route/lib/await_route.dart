@@ -18,22 +18,24 @@ abstract class AwaitRoute {
     final completer = Completer<void>();
     final timeout = Timer(const Duration(seconds: 1), completer.complete);
 
-    ValueChanged<AnimationStatus> listener;
+    ValueChanged<AnimationStatus>? listener;
     listener = (AnimationStatus status) {
       if (status == AnimationStatus.completed && !completer.isCompleted) {
         if (timeout.isActive) timeout.cancel();
         completer.complete();
-        if (listener != null) route.animation.removeStatusListener(listener);
+        if (listener != null) route!.animation!.removeStatusListener(listener);
       }
     };
 
-    route.animation.addStatusListener(listener);
+    route!.animation!.addStatusListener(listener);
     return completer.future;
   }
 
   static Future<void> _awaitInPostFrame(BuildContext context) {
+    if (WidgetsBinding.instance == null) return SynchronousFuture<void>(null);
+
     final completer = Completer<void>();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _awaitNow(context).then(completer.complete));
+    WidgetsBinding.instance!.addPostFrameCallback((_) => _awaitNow(context).then(completer.complete));
     return completer.future;
   }
 
