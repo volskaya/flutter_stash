@@ -1,4 +1,3 @@
-// ignore_for_file: avoid_classes_with_only_static_members
 library await_route;
 
 import 'dart:async';
@@ -11,7 +10,7 @@ import 'package:flutter/material.dart';
 ///
 /// Useful for views with input fields, where the auto focus should only fire
 /// after the route has finished its animation.
-class AwaitRoute {
+abstract class AwaitRoute {
   static Future<void> _awaitNow(BuildContext context) {
     final route = ModalRoute.of(context);
     if (route?.animation?.isCompleted ?? true) return SynchronousFuture<void>(null);
