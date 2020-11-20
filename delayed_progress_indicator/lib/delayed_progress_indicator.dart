@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 /// Material Design concepts.
 class DelayedProgressIndicator extends StatefulWidget {
   const DelayedProgressIndicator({
-    Key key,
+    Key? key,
     this.delay = const Duration(seconds: 3),
     this.size = 16,
     this.center = true,
@@ -22,7 +22,7 @@ class DelayedProgressIndicator extends StatefulWidget {
   final double size;
 
   /// Color of the indicator.
-  final Color color;
+  final Color? color;
 
   /// Wrap the indicator in a [Center] widget.
   final bool center;
@@ -32,8 +32,8 @@ class DelayedProgressIndicator extends StatefulWidget {
 }
 
 class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator> with SingleTickerProviderStateMixin {
-  Timer _timer;
-  AnimationController _controller;
+  late final Timer _timer;
+  late final AnimationController _controller;
 
   void _setVisible() {
     assert(mounted);
@@ -49,8 +49,8 @@ class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator> wit
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _controller?.dispose();
+    _timer.cancel();
+    _controller.dispose();
     super.dispose();
   }
 
