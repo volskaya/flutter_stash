@@ -7,14 +7,10 @@ class EncapsulatedNotificationOverlayScrim extends StatefulWidget {
   /// Creates [EncapsulatedNotificationOverlayScrim].
   const EncapsulatedNotificationOverlayScrim({
     Key key,
-    @required this.child,
     @required this.onDismissed,
     this.toggled = false,
     this.duration = kThemeAnimationDuration,
   }) : super(key: key);
-
-  /// Widget to build above the overlay.
-  final Widget child;
 
   /// Toggle of the scrim
   final bool toggled;
@@ -92,19 +88,16 @@ class _EncapsulatedNotificationOverlayScrimState extends State<EncapsulatedNotif
   }
 
   @override
-  Widget build(BuildContext context) => Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          if (_buildScrim)
-            IgnorePointer(
-              ignoring: !widget.toggled,
-              child: AnimatedModalBarrier(
-                color: _colorAnimation,
-                dismissible: true,
-                willDismiss: _handleBarrierDissmiss,
-              ),
+  Widget build(BuildContext context) => _buildScrim
+      ? SizedBox.expand(
+          child: IgnorePointer(
+            ignoring: !widget.toggled,
+            child: AnimatedModalBarrier(
+              color: _colorAnimation,
+              dismissible: true,
+              willDismiss: _handleBarrierDissmiss,
             ),
-          widget.child,
-        ],
-      );
+          ),
+        )
+      : const SizedBox.shrink();
 }
