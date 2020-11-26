@@ -69,12 +69,18 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
   /// Pass tags as [replacements] to pop existing notifications as the new one is added.
   ///
   @action
-  void pushNotification(EncapsulatedNotificationItem item, [Set<String> replacements = const <String>{}]) {
-    _getAppropriateNotificationList(item).add(item);
+  void pushNotification(EncapsulatedNotificationItem item, [Set<String> _replacements = const <String>{}]) {
+    final replacements = [
+      if (item.tag != null) item.tag,
+      ..._replacements,
+    ];
+
     if (replacements.isNotEmpty) {
       notifications.removeWhere((item) => replacements.contains(item.tag));
       importantNotifications.removeWhere((item) => replacements.contains(item.tag));
     }
+
+    _getAppropriateNotificationList(item).add(item);
   }
 
   /// Remove an [EncapsulatedNotificationItem] from the overlay.
