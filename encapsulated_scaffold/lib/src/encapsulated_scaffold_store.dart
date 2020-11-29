@@ -9,22 +9,35 @@ import 'package:provider/provider.dart';
 
 part 'encapsulated_scaffold_store.g.dart';
 
+/// Callback that is called before an [EncapsulatedNotificationItem] is added to the [EncapsulatedScaffoldStore].
+typedef EncapsulatedNotificationPushCallback = void Function(EncapsulatedNotificationItem notification);
+
 /// Store of [EncapsulatedScaffold].
 class EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase> extends _EncapsulatedScaffoldStore<T>
     with _$EncapsulatedScaffoldStore<T> {
+  /// Creates [EncapsulatedScaffoldStore].
+  EncapsulatedScaffoldStore({
+    EncapsulatedNotificationPushCallback onPushingNotification,
+  }) : super(onPushingNotification: onPushingNotification);
+
   /// Get the nearest [EncapsulatedScaffoldStore].
   static EncapsulatedScaffoldStore<D> of<D extends EncapsulatedScaffoldDataBase>(BuildContext context) =>
       Provider.of<EncapsulatedScaffoldStore>(context, listen: false) as EncapsulatedScaffoldStore<D>;
 }
 
 abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase> with Store {
-  _EncapsulatedScaffoldStore() {
+  _EncapsulatedScaffoldStore({
+    this.onPushingNotification,
+  }) {
     _visibleNotificationReactionDisposer = reaction<EncapsulatedNotificationItem>(
       (_) => notification,
       _handleNotificationChange,
       fireImmediately: true,
     );
   }
+
+  /// Callback that is called before a notification is added to the store.
+  final EncapsulatedNotificationPushCallback onPushingNotification;
 
   /// Capsules are added and popped as the navigator routes.
   ///
@@ -70,6 +83,10 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
   ///
   @action
   void pushNotification(EncapsulatedNotificationItem item, [Set<String> _replacements = const <String>{}]) {
+    try {
+      onPushingNotification?.call(item);
+    } catch (_) {}
+
     final replacements = [
       if (item.tag != null) item.tag,
       ..._replacements,

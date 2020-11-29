@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:encapsulated_scaffold/src/encapsulated_notification_item.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_notification_overlay_scrim.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
