@@ -45,6 +45,7 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
     Key key,
     this.body,
     this.children = const <Widget>[],
+    this.onEnd,
   }) : super(key: key);
 
   /// Body widget, preferably child of [MaterialApp.builder].
@@ -52,6 +53,9 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
 
   /// Children items to build in the overlay stack, above the [body] and below the notifications.
   final Iterable<Widget> children;
+
+  /// Called when the notification item transition ends.
+  final VoidCallback onEnd;
 
   @override
   EncapsulatedNotificationOverlayController createState() => EncapsulatedNotificationOverlayController();
@@ -115,6 +119,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
               // Notification item switcher.
               FancySwitcher(
                 alignment: Alignment.bottomCenter,
+                onEnd: widget.onEnd,
                 child: item != null
                     ? _NotificationItem(
                         key: ObjectKey(item),
