@@ -214,7 +214,7 @@ class FadeThroughTransition extends StatelessWidget {
     );
 
     if (fillColor != Colors.transparent) {
-      _widget = Container(
+      _widget = ColoredBox(
         color: fillColor ?? Theme.of(context).canvasColor,
         child: _widget,
       );

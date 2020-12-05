@@ -52,7 +52,7 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
     try {
       await widget.onPressed?.call();
     } finally {
-      _notifier.value = false;
+      if (mounted) _notifier.value = false;
     }
   }
 
@@ -190,7 +190,7 @@ class FutureCardButtonState extends State<FutureCardButton> {
     try {
       await widget.onPressed?.call();
     } finally {
-      _notifier.value = false;
+      if (mounted) _notifier.value = false;
     }
   }
 
