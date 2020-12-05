@@ -5,3 +5,4 @@
 export 'src/item_positions_listener.dart';
 export 'src/scrollable_positioned_list.dart';
 export 'src/performant_list.dart';
+export 'src/scroll_view.dart';

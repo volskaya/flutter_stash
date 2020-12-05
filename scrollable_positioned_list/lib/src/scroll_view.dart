@@ -13,7 +13,7 @@ class UnboundedCustomScrollView extends CustomScrollView {
     bool reverse = false,
     ScrollController controller,
     bool primary,
-    ScrollPhysics physics,
+    ScrollPhysics physics = const AlwaysScrollableScrollPhysics(),
     bool shrinkWrap = false,
     Key center,
     double anchor = 0.0,
@@ -21,6 +21,7 @@ class UnboundedCustomScrollView extends CustomScrollView {
     List<Widget> slivers = const <Widget>[],
     int semanticChildCount,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
+    Clip clipBehavior = Clip.hardEdge,
   })  : _anchor = anchor,
         super(
           key: key,
@@ -35,6 +36,7 @@ class UnboundedCustomScrollView extends CustomScrollView {
           semanticChildCount: semanticChildCount,
           dragStartBehavior: dragStartBehavior,
           slivers: slivers,
+          clipBehavior: clipBehavior,
         );
 
   // [CustomScrollView] enforces constraints on [CustomScrollView.anchor], so
@@ -58,6 +60,7 @@ class UnboundedCustomScrollView extends CustomScrollView {
         axisDirection: axisDirection,
         offset: offset,
         slivers: slivers,
+        clipBehavior: clipBehavior,
       );
     }
     return UnboundedViewport(
@@ -67,6 +70,7 @@ class UnboundedCustomScrollView extends CustomScrollView {
       cacheExtent: cacheExtent,
       center: center,
       anchor: anchor,
+      clipBehavior: clipBehavior,
     );
   }
 }
