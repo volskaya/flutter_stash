@@ -1,7 +1,10 @@
 // ignore_for_file:avoid_classes_with_only_static_members
 
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:refresh_storage/src/refresh_builder.dart';
 
 class _RefreshStorageItem<T> {
@@ -28,9 +31,21 @@ class _RefreshStorageItem<T> {
 
 /// [RefreshStorage] abstracts [PageStorage], allowing to dispose data manually and
 /// being aware of refreshes.
-class RefreshStorage {
-  /// Route -> Identifier -> Refresh count.
-  static final _disposedRefreshes = <ModalRoute, Map<String, int>>{};
+///
+/// This widget is intended to be wrapped around a [Page] to allow the widgets
+/// within to cache and refresh their data with [RefreshBuilder].
+class RefreshStorage extends StatefulWidget {
+  /// Creates [RefreshStorage].
+  const RefreshStorage({
+    Key key,
+    @required this.child,
+  }) : super(key: key);
+
+  /// The child of [RefreshStorage]. All descending widgets will cache their data in the state here.
+  final Widget child;
+
+  /// Gets the nearest [RefreshStorageState].
+  static RefreshStorageState of(BuildContext context) => Provider.of<RefreshStorageState>(context, listen: false);
 
   /// Write and get a value from [PageStorage]. Data are built with `builder`
   /// and are built only once.
@@ -46,54 +61,49 @@ class RefreshStorage {
     @required T Function() builder,
     ValueChanged<T> dispose,
     int refreshes,
-    PageStorageBucket storage,
+    RefreshStorageState storage,
     ModalRoute route,
   }) {
     final _refreshes = refreshes ?? RefreshController.of(context)?.refreshes ?? 0;
-    final targetStorage = storage ?? PageStorage.of(context);
-    final targetRoute = route ?? ModalRoute.of(context);
-    final id = '$_refreshes-$identifier';
+    final targetStorage = storage ?? RefreshStorage.of(context);
 
-    var item = targetStorage.readState(context, identifier: id) as _RefreshStorageItem<T>;
+    var item = targetStorage._cache[identifier] as MapEntry<int, _RefreshStorageItem<T>>;
 
-    if (item == null) {
-      _disposedRefreshes[targetRoute] ??= <String, int>{};
-      _disposedRefreshes[targetRoute][identifier] ??= 0;
-      item = _RefreshStorageItem<T>(data: builder(), dispose: dispose);
-      if (item.isDisposable) targetRoute.completed.then(item.dispose);
-      targetStorage.writeState(context, item, identifier: id);
-
-      assert(_disposedRefreshes.containsKey(targetRoute) && _disposedRefreshes[targetRoute][identifier] != null);
-
-      // Dispose storages of the previous refresh number.
-      //
-      // Disposed refresh count is persistent, in case some storages were not
-      // accessed, during nth refresh. This makes sure, when they're seen again,
-      // that any old storages are disposed till the current refresh.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        while (_disposedRefreshes[targetRoute][identifier] < _refreshes) {
-          final oldRefresh = _disposedRefreshes[targetRoute][identifier];
-          final oldId = '$oldRefresh-$identifier';
-          final oldItem = targetStorage.readState(context, identifier: oldId) as _RefreshStorageItem<T>;
-          _disposedRefreshes[targetRoute][identifier] += 1;
-          targetStorage.writeState(context, null, identifier: oldId);
-          if (oldItem?.isDisposable == true) oldItem.dispose();
+    if ((item?.key ?? -1) < _refreshes) {
+      // Dispose the previous refresh.
+      if (_refreshes > 1) {
+        assert(item?.value != null);
+        if (item?.value?.isDisposable == true) {
+          // FIXME: This might dispose too early, if there's something like a fade out animation.
+          WidgetsBinding.instance.addPostFrameCallback((_) => item.value.dispose());
         }
+      }
 
-        assert((() {
-          for (var i = 0; i < (_refreshes - 1); i++) {
-            final id = '$i-$identifier';
-            final item = targetStorage.readState(context, identifier: id) as _RefreshStorageItem<T>;
-
-            // This storage was supposed to be deleted already.
-            if (item != null) return false;
-          }
-
-          return true;
-        })(), 'Page storage contains undisposed refresh data');
-      });
+      item = MapEntry(_refreshes, _RefreshStorageItem<T>(data: builder(), dispose: dispose));
+      targetStorage._cache[identifier] = item;
     }
 
-    return item.data;
+    return item.value.data;
   }
+
+  @override
+  RefreshStorageState createState() => RefreshStorageState();
+}
+
+/// Persistent state cache of [RefreshStorage] items that should be disposed along with a [Page].
+class RefreshStorageState extends State<RefreshStorage> {
+  /// Keyed by identifier string -> refresh count and the item.
+  final _cache = HashMap<String, MapEntry<int, _RefreshStorageItem>>();
+
+  @override
+  void dispose() {
+    for (final item in _cache.values) if (item.value.isDisposable) item.value.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Provider<RefreshStorageState>.value(
+        value: this,
+        child: widget.child,
+      );
 }

@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_realtime_chat/src/firebase_realtime_chat_impl.dart';
 import 'package:firebase_realtime_chat/src/firebase_realtime_chat_mirror_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:log/log.dart';
 import 'package:mobx/mobx.dart';
@@ -176,7 +178,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
       _log.wtf('Got ${offlineSnapshots.length} items from offline storage');
 
       // If offlineSnapshots are not empty, map them to items.
-      items = Map<String, dynamic>.fromEntries(
+      items = HashMap<String, dynamic>.fromEntries(
         offlineSnapshots.map(
           (record) => MapEntry<String, dynamic>(record.key, record.value),
         ),
@@ -191,7 +193,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
       try {
         final onlineSnapshots = await query.once();
         if (onlineSnapshots.value != null) {
-          items = Map<String, dynamic>.from(onlineSnapshots.value as Map);
+          items = HashMap<String, dynamic>.from(onlineSnapshots.value as Map);
         }
       } catch (e) {
         _log.e(e);
@@ -199,26 +201,29 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     }
 
     try {
-      messages = items.entries.where((entry) {
-        final isSeen = _seenItems.contains(entry.key);
-        if (isSeen) _log.w('${chatReference.path} paginated a redundant item: ${entry.key}');
-        return !isSeen;
-      }).map((entry) {
-        _seenItems.add(entry.key);
+      messages = await SchedulerBinding.instance.scheduleTask(
+        () => items.entries.where((entry) {
+          final isSeen = _seenItems.contains(entry.key);
+          if (isSeen) _log.w('${chatReference.path} paginated a redundant item: ${entry.key}');
+          return !isSeen;
+        }).map((entry) {
+          _seenItems.add(entry.key);
 
-        // HACK: Forges a [DataSnapshot] with a custom patch.
-        final snapshot = DataSnapshot.fake(entry.key, entry.value as Map);
-        final message = messageBuilder(entry.value as Map)
-          ..reference = messageCollection.child(entry.key)
-          ..snapshot = snapshot
-          ..list = FirebaseRealtimeChatMessageList.paginated
-          ..source = usedSource;
+          // HACK: Forges a [DataSnapshot] with a custom patch.
+          final snapshot = DataSnapshot.fake(entry.key, entry.value as Map);
+          final message = messageBuilder(entry.value as Map)
+            ..reference = messageCollection.child(entry.key)
+            ..snapshot = snapshot
+            ..list = FirebaseRealtimeChatMessageList.paginated
+            ..source = usedSource;
 
-        if (message.source == FirebaseRealtimeChatMessageSource.realtimeDatabase) message.updateMirror();
-        return message;
-      }).toList(growable: false)
-        // NOTE: Firebase query returns the documents unordered.
-        ..sort((a, b) => b.createTime.compareTo(a.createTime));
+          if (message.source == FirebaseRealtimeChatMessageSource.realtimeDatabase) message.updateMirror();
+          return message;
+        }).toList(growable: false)
+          // NOTE: Firebase query returns the documents unordered.
+          ..sort((a, b) => b.createTime.compareTo(a.createTime)),
+        Priority.touch,
+      );
     } catch (e) {
       _log.e(e);
     }
@@ -371,7 +376,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
       try {
         await participantsCollection.child(senderId).update(<String, dynamic>{
-          ...Map<String, dynamic>.from(presence.toJson()),
+          ...HashMap<String, dynamic>.from(presence.toJson()),
           'updateTime': ServerValue.timestamp,
         });
       } on PlatformException catch (e) {

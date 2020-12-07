@@ -81,7 +81,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
   void initState() {
     super.initState();
     BackButtonInterceptor.add(_handleBackButton);
-    _store = EncapsulatedScaffoldStore.of<EncapsulatedScaffoldDataBase>(context);
+    _store = EncapsulatedScaffoldStore.of(context);
 
     // Reaction to adjust screen padding based on the last encapsulated scaffold.
     _capsuleReactionDisposer = autorun((_) {

@@ -8,18 +8,14 @@ part of 'encapsulated_scaffold_store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase>
-    on _EncapsulatedScaffoldStore<T>, Store {
-  Computed<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>>
-      _$capsuleComputed;
+mixin _$EncapsulatedScaffoldStore on _EncapsulatedScaffoldStore, Store {
+  Computed<EncapsulatedScaffoldState> _$capsuleComputed;
 
   @override
-  EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase> get capsule =>
-      (_$capsuleComputed ??=
-              Computed<EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>>(
-                  () => super.capsule,
-                  name: '_EncapsulatedScaffoldStore.capsule'))
-          .value;
+  EncapsulatedScaffoldState get capsule => (_$capsuleComputed ??=
+          Computed<EncapsulatedScaffoldState>(() => super.capsule,
+              name: '_EncapsulatedScaffoldStore.capsule'))
+      .value;
   Computed<EncapsulatedNotificationItem> _$notificationComputed;
 
   @override
@@ -33,11 +29,11 @@ mixin _$EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase>
 
   @override
   void pushNotification(EncapsulatedNotificationItem item,
-      [Set<String> replacements = const <String>{}]) {
+      [Set<String> _replacements = const <String>{}]) {
     final _$actionInfo = _$_EncapsulatedScaffoldStoreActionController
         .startAction(name: '_EncapsulatedScaffoldStore.pushNotification');
     try {
-      return super.pushNotification(item, replacements);
+      return super.pushNotification(item, _replacements);
     } finally {
       _$_EncapsulatedScaffoldStoreActionController.endAction(_$actionInfo);
     }

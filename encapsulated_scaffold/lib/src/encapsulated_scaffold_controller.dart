@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 /// [EncapsulatedScaffoldStore] provider used by descending [EncapsulatedScaffolds].
 ///
 /// Place this above [MaterialApp].
-class EncapsulatedScaffoldController<T extends EncapsulatedScaffoldDataBase> extends StatefulWidget {
+class EncapsulatedScaffoldController extends StatefulWidget {
   /// Creates [EncapsulatedScaffoldController].
   const EncapsulatedScaffoldController({
     Key key,
@@ -25,20 +25,19 @@ class EncapsulatedScaffoldController<T extends EncapsulatedScaffoldDataBase> ext
   final ValueChanged<EncapsulatedScaffoldStore> onDispose;
 
   /// Get the nearest [EncapsulatedScaffoldStore].
-  static EncapsulatedScaffoldStore<T> of<T extends EncapsulatedScaffoldDataBase>(BuildContext context) =>
-      Provider.of<EncapsulatedScaffoldStore>(context, listen: false) as EncapsulatedScaffoldStore<T>;
+  static EncapsulatedScaffoldStore of(BuildContext context) =>
+      Provider.of<EncapsulatedScaffoldStore>(context, listen: false);
 
   @override
-  _EncapsulatedScaffoldControllerState<T> createState() => _EncapsulatedScaffoldControllerState<T>();
+  _EncapsulatedScaffoldControllerState createState() => _EncapsulatedScaffoldControllerState();
 }
 
-class _EncapsulatedScaffoldControllerState<T extends EncapsulatedScaffoldDataBase>
-    extends State<EncapsulatedScaffoldController<T>> {
-  EncapsulatedScaffoldStore<T> _store;
+class _EncapsulatedScaffoldControllerState extends State<EncapsulatedScaffoldController> {
+  EncapsulatedScaffoldStore _store;
 
   @override
   void initState() {
-    _store = EncapsulatedScaffoldStore<T>();
+    _store = EncapsulatedScaffoldStore();
     widget.onInit?.call(_store);
     super.initState();
   }

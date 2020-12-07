@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
 
+/// Scaffold wrap of [EncapsulatedScaffold].
 typedef EncapsulatedScaffoldCustomBuilder = Widget Function(BuildContext context, Scaffold scaffold);
-
-/// Base class to extend for [EncapsulatedScaffoldData] data.
-abstract class EncapsulatedScaffoldDataBase {
-  /// Creates [EncapsulatedScaffoldDataBase].
-  const EncapsulatedScaffoldDataBase();
-}
 
 /// Route aware capsule for [Scaffold] which exposes convenience methods for
 /// easier deep links and reactions to created scaffolds troughout the app.
@@ -25,7 +20,6 @@ class EncapsulatedScaffold extends StatefulWidget {
     this.floatingActionButtonLocation,
     this.floatingActionButton,
     this.resizeToAvoidBottomInset = true,
-    this.cargo,
     this.customBuilder,
   }) : super(key: key);
 
@@ -125,25 +119,18 @@ class EncapsulatedScaffold extends StatefulWidget {
   /// Defaults to true.
   final bool resizeToAvoidBottomInset;
 
-  /// Optional cargo to conveniently reference elsewhere in the code, trough
-  /// [EncapsulatedScaffoldState].
-  final dynamic cargo;
-
   /// Optional builder which passess [Scaffold] as child.
   final EncapsulatedScaffoldCustomBuilder customBuilder;
 
-  /// Get arguments from [ModalRoute] as [T].
-  static T dataOf<T>(BuildContext context) => ModalRoute.of(context).settings.arguments as T;
-
   @override
-  EncapsulatedScaffoldState createState() => EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase>();
+  EncapsulatedScaffoldState createState() => EncapsulatedScaffoldState();
 }
 
 /// Public state of [EncapsulatedScaffold].
 ///
 /// [EncapsulatedScaffold] is added/removed from [EncapsulatedScaffoldStore] as
 /// it's built or destroyed.
-class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends State<EncapsulatedScaffold> {
+class EncapsulatedScaffoldState extends State<EncapsulatedScaffold> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   EncapsulatedScaffoldStore _store;
   BuildContext _bodyBuildContext;
@@ -155,37 +142,25 @@ class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends 
   ScaffoldState get scaffold => (widget.scaffoldKey ?? _scaffoldKey).currentState;
   bool _capsuleWasUpdated = false;
 
-  /// Cargo of [EncapsulatedScaffold] that built this [EncapsulatedScaffoldState].
-  dynamic get cargo => widget.cargo;
-
   /// [EncapsulatedScaffold] tag or named route name, if tag is not set.
   String get tag => widget.tag ?? route.settings.name;
 
   /// [MediaQueryData] of the body widget. Useful for reaction to page padding changes.
-  MediaQueryData get bodyMediaQuery => _bodyBuildContext != null ? MediaQuery.of(_bodyBuildContext) : null;
-
-  /// [EncapsulatedScaffoldState] arguments. Cast as [T].
-  T get arguments {
-    if (route?.settings?.arguments == null) return null;
-    assert(
-      route.settings.arguments is T,
-      'Encapsulated scaffold route holds unrecognized data',
-    );
-    return route.settings.arguments as T;
-  }
+  MediaQueryData get bodyMediaQuery =>
+      (_bodyBuildContext?.getElementForInheritedWidgetOfExactType<MediaQuery>()?.widget as MediaQuery)?.data;
 
   @override
   void initState() {
-    _store = EncapsulatedScaffoldStore.of<T>(context);
+    _store = EncapsulatedScaffoldStore.of(context);
 
-    // Defer to a post frame callback, to ensure route is ready, when
-    // the _store.capsule observer fires
+    // Defer to a post frame callback, to ensure route and the `_bodyBuildContext`
+    // is ready, when the _store.capsule observer fires.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      assert(_bodyBuildContext != null);
       route = ModalRoute.of(context);
       _store.capsules.add(this);
       _capsuleWasUpdated = true;
-      route.popped.then((dynamic _) => _capsuleWasUpdated ? _store.capsules.remove(this) : null);
     });
 
     super.initState();
@@ -193,9 +168,12 @@ class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends 
 
   @override
   void dispose() {
-    // Avoid calling this while the widget tree is locked
-    if (_capsuleWasUpdated) WidgetsBinding.instance.addPostFrameCallback((_) => _store.capsules.remove(this));
+    _detatchCapsule(postFrame: true);
     super.dispose();
+  }
+
+  void _detatchCapsule({bool postFrame = false}) {
+    if (_capsuleWasUpdated) _store.capsules.remove(this);
   }
 
   @override
@@ -209,11 +187,21 @@ class EncapsulatedScaffoldState<T extends EncapsulatedScaffoldDataBase> extends 
       resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
       bottomNavigationBar: widget.bottomNavigationBar,
       appBar: widget.appBar,
-      body: Builder(builder: (context) {
-        _bodyBuildContext = context;
-        return widget.body ?? const SizedBox();
-      }),
+      body: Builder(
+        builder: (context) {
+          _bodyBuildContext = context; // FIXME: Memory leak.
+          return widget.body ?? const SizedBox();
+        },
+      ),
     );
-    return widget.customBuilder?.call(context, scaffold) ?? scaffold;
+
+    return WillPopScope(
+      onWillPop: () async {
+        // Remove the capsule early so the observers can react as before the route animation.
+        _detatchCapsule();
+        return true;
+      },
+      child: widget.customBuilder?.call(context, scaffold) ?? scaffold,
+    );
   }
 }

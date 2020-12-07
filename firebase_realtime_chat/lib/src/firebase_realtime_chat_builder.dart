@@ -56,12 +56,8 @@ class _FirebaseRealtimeChatBuilderState<T extends FirebaseRealtimeChatMessageImp
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    super.initState();
-  }
 
-  @override
-  void didChangeDependencies() {
-    _chat ??= FirebaseRealtimeChat<T, D>(
+    _chat = FirebaseRealtimeChat<T, D>(
       collection: FirebaseDatabase.instance.reference().child('chats'),
       messageBuilder: widget.messageBuilder,
       participantBuilder: widget.participantBuilder,
@@ -74,7 +70,8 @@ class _FirebaseRealtimeChatBuilderState<T extends FirebaseRealtimeChatMessageImp
         chatId: widget.room,
       )
       ..reportPresence();
-    super.didChangeDependencies();
+
+    super.initState();
   }
 
   @override

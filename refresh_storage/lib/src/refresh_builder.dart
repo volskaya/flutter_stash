@@ -77,14 +77,14 @@ class RefreshController extends State<RefreshBuilder> {
       );
 
   @override
-  void didChangeDependencies() {
-    _storage ??= RefreshStorage.write(
+  void initState() {
+    _storage = RefreshStorage.write(
       context: context,
       identifier: widget.bucket + '_refresh_builder',
-      refreshes: 0,
+      refreshes: 0, // Never refresh this storage.
       builder: () => _Storage(),
     );
-    super.didChangeDependencies();
+    super.initState();
   }
 
   @override

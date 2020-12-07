@@ -13,19 +13,18 @@ part 'encapsulated_scaffold_store.g.dart';
 typedef EncapsulatedNotificationPushCallback = void Function(EncapsulatedNotificationItem notification);
 
 /// Store of [EncapsulatedScaffold].
-class EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase> extends _EncapsulatedScaffoldStore<T>
-    with _$EncapsulatedScaffoldStore<T> {
+class EncapsulatedScaffoldStore extends _EncapsulatedScaffoldStore with _$EncapsulatedScaffoldStore {
   /// Creates [EncapsulatedScaffoldStore].
   EncapsulatedScaffoldStore({
     EncapsulatedNotificationPushCallback onPushingNotification,
   }) : super(onPushingNotification: onPushingNotification);
 
   /// Get the nearest [EncapsulatedScaffoldStore].
-  static EncapsulatedScaffoldStore<D> of<D extends EncapsulatedScaffoldDataBase>(BuildContext context) =>
-      Provider.of<EncapsulatedScaffoldStore>(context, listen: false) as EncapsulatedScaffoldStore<D>;
+  static EncapsulatedScaffoldStore of(BuildContext context) =>
+      Provider.of<EncapsulatedScaffoldStore>(context, listen: false);
 }
 
-abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase> with Store {
+abstract class _EncapsulatedScaffoldStore with Store {
   _EncapsulatedScaffoldStore({
     this.onPushingNotification,
   }) {
@@ -42,7 +41,7 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
   /// Capsules are added and popped as the navigator routes.
   ///
   /// NOTE: .linkedHashSetFrom, to preserve order of insertion
-  final capsules = ObservableSet<EncapsulatedScaffoldState<T>>.linkedHashSetFrom([]);
+  final capsules = ObservableSet<EncapsulatedScaffoldState>.linkedHashSetFrom([]);
   final notifications = ObservableList<EncapsulatedNotificationItem>();
   final importantNotifications = ObservableList<EncapsulatedNotificationItem>();
 
@@ -50,7 +49,7 @@ abstract class _EncapsulatedScaffoldStore<T extends EncapsulatedScaffoldDataBase
   ReactionDisposer _visibleNotificationReactionDisposer;
 
   @computed
-  EncapsulatedScaffoldState<EncapsulatedScaffoldDataBase> get capsule => capsules.isNotEmpty ? capsules.last : null;
+  EncapsulatedScaffoldState get capsule => capsules.isNotEmpty ? capsules.last : null;
 
   @computed
   EncapsulatedNotificationItem get notification =>
