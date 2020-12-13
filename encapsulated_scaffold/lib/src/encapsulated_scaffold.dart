@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
 
@@ -11,7 +12,6 @@ class EncapsulatedScaffold extends StatefulWidget {
   const EncapsulatedScaffold({
     Key key,
     this.scaffoldKey,
-    this.tag,
     this.appBar,
     this.bottomNavigationBar,
     this.body,
@@ -21,15 +21,11 @@ class EncapsulatedScaffold extends StatefulWidget {
     this.floatingActionButton,
     this.resizeToAvoidBottomInset = true,
     this.customBuilder,
+    this.bottomInset = 0,
   }) : super(key: key);
 
   /// Optional key of the inner scaffold.
   final GlobalKey<ScaffoldState> scaffoldKey;
-
-  /// Optional [EncapsulatedScaffoldTag] tag.
-  ///
-  /// Defaults to named ruote name.
-  final String tag;
 
   /// An app bar to display at the top of the scaffold.
   final PreferredSizeWidget appBar;
@@ -122,6 +118,10 @@ class EncapsulatedScaffold extends StatefulWidget {
   /// Optional builder which passess [Scaffold] as child.
   final EncapsulatedScaffoldCustomBuilder customBuilder;
 
+  /// The height of the navigation bar. This will inset encapsulated notifications, when the
+  /// scaffold is in foreground.
+  final double bottomInset;
+
   @override
   EncapsulatedScaffoldState createState() => EncapsulatedScaffoldState();
 }
@@ -131,55 +131,36 @@ class EncapsulatedScaffold extends StatefulWidget {
 /// [EncapsulatedScaffold] is added/removed from [EncapsulatedScaffoldStore] as
 /// it's built or destroyed.
 class EncapsulatedScaffoldState extends State<EncapsulatedScaffold> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  /// User defined bottom inset of this scaffold. Usually the height of the navigation bar.
+  double get bottomInset => widget.bottomInset;
+
   EncapsulatedScaffoldStore _store;
-  BuildContext _bodyBuildContext;
-
-  /// [ModalRoute] where this [EncapsulatedScaffoldState] is built in.
-  ModalRoute route;
-
-  /// [ScaffoldState] of [Scaffold] built by this [EncapsulatedScaffold].
-  ScaffoldState get scaffold => (widget.scaffoldKey ?? _scaffoldKey).currentState;
   bool _capsuleWasUpdated = false;
-
-  /// [EncapsulatedScaffold] tag or named route name, if tag is not set.
-  String get tag => widget.tag ?? route.settings.name;
-
-  /// [MediaQueryData] of the body widget. Useful for reaction to page padding changes.
-  MediaQueryData get bodyMediaQuery =>
-      (_bodyBuildContext?.getElementForInheritedWidgetOfExactType<MediaQuery>()?.widget as MediaQuery)?.data;
 
   @override
   void initState() {
     _store = EncapsulatedScaffoldStore.of(context);
-
-    // Defer to a post frame callback, to ensure route and the `_bodyBuildContext`
-    // is ready, when the _store.capsule observer fires.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      assert(_bodyBuildContext != null);
-      route = ModalRoute.of(context);
-      _store.capsules.add(this);
-      _capsuleWasUpdated = true;
-    });
-
+    _capsuleWasUpdated = _store.capsules.add(this);
     super.initState();
   }
 
   @override
   void dispose() {
-    _detatchCapsule(postFrame: true);
+    _detatchCapsule();
     super.dispose();
   }
 
-  void _detatchCapsule({bool postFrame = false}) {
-    if (_capsuleWasUpdated) _store.capsules.remove(this);
+  void _detatchCapsule() {
+    if (_capsuleWasUpdated) {
+      final removed = _store.capsules.remove(this);
+      if (removed) _capsuleWasUpdated = false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final scaffold = Scaffold(
-      key: widget.scaffoldKey ?? _scaffoldKey,
+      key: widget.scaffoldKey,
       extendBodyBehindAppBar: widget.extendBodyBehindAppBar,
       extendBody: widget.extendBody,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
@@ -187,12 +168,7 @@ class EncapsulatedScaffoldState extends State<EncapsulatedScaffold> {
       resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
       bottomNavigationBar: widget.bottomNavigationBar,
       appBar: widget.appBar,
-      body: Builder(
-        builder: (context) {
-          _bodyBuildContext = context; // FIXME: Memory leak.
-          return widget.body ?? const SizedBox();
-        },
-      ),
+      body: widget.body,
     );
 
     return WillPopScope(

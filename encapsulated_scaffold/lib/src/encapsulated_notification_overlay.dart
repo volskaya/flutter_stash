@@ -46,6 +46,7 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
     this.body,
     this.children = const <Widget>[],
     this.onEnd,
+    this.insetNotifications = true,
   }) : super(key: key);
 
   /// Body widget, preferably child of [MaterialApp.builder].
@@ -57,14 +58,15 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
   /// Called when the notification item transition ends.
   final VoidCallback onEnd;
 
+  /// Whether to use [EncapsulatedScaffoldState.bottomInset] on the notification items.
+  final bool insetNotifications;
+
   @override
   EncapsulatedNotificationOverlayController createState() => EncapsulatedNotificationOverlayController();
 }
 
 /// Provider of [EncapsulatedNotificationOverlayController].
 class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotificationOverlay> {
-  final _padding = Observable<EdgeInsets>(EdgeInsets.zero);
-
   EncapsulatedScaffoldStore _store;
   ReactionDisposer _capsuleReactionDisposer;
 
@@ -82,12 +84,6 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
     super.initState();
     BackButtonInterceptor.add(_handleBackButton);
     _store = EncapsulatedScaffoldStore.of(context);
-
-    // Reaction to adjust screen padding based on the last encapsulated scaffold.
-    _capsuleReactionDisposer = autorun((_) {
-      final onScreenCapsule = _store.capsule;
-      _padding.value = onScreenCapsule.bodyMediaQuery?.padding ?? EdgeInsets.zero;
-    });
   }
 
   @override
@@ -109,6 +105,26 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
             clipBehavior: Clip.none,
             children: <Widget>[
               if (widget.body != null) widget.body,
+              // Switcher for unimportant notifications.
+              FancySwitcher(
+                alignment: Alignment.bottomCenter,
+                onEnd: widget.onEnd,
+                child: item?.important == false
+                    ? FancySwitcherTag(
+                        tag: item,
+                        child: _NotificationItem(
+                          store: _store,
+                          item: item,
+                          duration: item.timeout,
+                          useInset: widget.insetNotifications,
+                          builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
+                            value: EncapsulatedNotificationProps(item.dismiss, animation, item),
+                            child: item.builder(context, item.dismiss, animation),
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(key: ValueKey('idle')),
+              ),
               ...widget.children,
               // Notification scrim.
               EncapsulatedNotificationOverlayScrim(
@@ -120,19 +136,21 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
               FancySwitcher(
                 alignment: Alignment.bottomCenter,
                 onEnd: widget.onEnd,
-                child: item != null
-                    ? _NotificationItem(
-                        key: ObjectKey(item),
-                        store: _store,
-                        item: item,
-                        padding: _padding,
-                        duration: item.timeout,
-                        builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
-                          value: EncapsulatedNotificationProps(item.dismiss, animation, item),
-                          child: item.builder(context, item.dismiss, animation),
+                child: item?.important == true
+                    ? FancySwitcherTag(
+                        tag: item,
+                        child: _NotificationItem(
+                          store: _store,
+                          item: item,
+                          duration: item.timeout,
+                          useInset: false,
+                          builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
+                            value: EncapsulatedNotificationProps(item.dismiss, animation, item),
+                            child: item.builder(context, item.dismiss, animation),
+                          ),
                         ),
                       )
-                    : const SizedBox(key: ValueKey('idle')),
+                    : const SizedBox.shrink(key: ValueKey('idle')),
               ),
             ],
           );
@@ -147,14 +165,14 @@ class _NotificationItem extends StatefulObserverWidget {
     @required this.duration,
     @required this.store,
     @required this.item,
-    this.padding,
+    this.useInset = true,
   }) : super(key: key, name: 'notification_item');
 
   final Widget Function(BuildContext context, Animation<double> animation) builder;
   final Duration duration;
   final EncapsulatedScaffoldStore store;
-  final Observable<EdgeInsets> padding;
   final EncapsulatedNotificationItem item;
+  final bool useInset;
 
   @override
   __NotificationItemState createState() => __NotificationItemState();
@@ -170,6 +188,7 @@ class __NotificationItemState extends State<_NotificationItem> with SingleTicker
         ? (AnimationController(
             vsync: this,
             duration: widget.duration,
+            animationBehavior: AnimationBehavior.preserve,
           )..forward())
         : null;
   }
@@ -184,8 +203,11 @@ class __NotificationItemState extends State<_NotificationItem> with SingleTicker
   Widget build(BuildContext context) {
     final notification = widget.builder(context, _controller?.view);
     final mediaQuery = MediaQuery.of(context);
-    final padding = (widget.item.important || widget.padding == null ? mediaQuery.padding : widget.padding.value) +
-        mediaQuery.viewInsets;
+    final padding = mediaQuery.padding +
+        mediaQuery.viewInsets +
+        (!widget.item.important && widget.useInset
+            ? EdgeInsets.only(bottom: widget.store.capsule?.bottomInset ?? 0)
+            : EdgeInsets.zero);
 
     return IgnorePointer(
       ignoring: widget.item != widget.store.notification,
