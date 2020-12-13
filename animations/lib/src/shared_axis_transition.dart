@@ -204,11 +204,15 @@ class SharedAxisTransition extends StatelessWidget {
     this.fillColor,
     this.child,
     this.onEnd,
+    this.onStatusChanged,
   })  : assert(transitionType != null),
         super(key: key);
 
   /// Callback to be called when the animation ends.
   final VoidCallback onEnd;
+
+  /// Callback when the animation status changes. This is called before [onEnd].
+  final ValueChanged<AnimationStatus> onStatusChanged;
 
   /// The animation that drives the [child]'s entrance and exit.
   ///
@@ -252,6 +256,7 @@ class SharedAxisTransition extends StatelessWidget {
     return dual_transition_builder.DualTransitionBuilder(
       animation: animation,
       onEnd: onEnd,
+      onStatusChanged: onStatusChanged,
       forwardBuilder: (
         BuildContext context,
         Animation<double> animation,
@@ -442,7 +447,7 @@ class _ExitTransition extends StatelessWidget {
         );
 
         if (fillColor != Colors.transparent) {
-          _widget = Container(color: fillColor, child: _widget);
+          _widget = ColoredBox(color: fillColor, child: _widget);
         }
 
         return FadeTransition(
@@ -468,7 +473,7 @@ class _ExitTransition extends StatelessWidget {
         );
 
         if (fillColor != Colors.transparent) {
-          _widget = Container(color: fillColor, child: _widget);
+          _widget = ColoredBox(color: fillColor, child: _widget);
         }
 
         return FadeTransition(
@@ -483,7 +488,7 @@ class _ExitTransition extends StatelessWidget {
         );
 
         if (fillColor != Colors.transparent) {
-          _widget = Container(color: fillColor, child: _widget);
+          _widget = ColoredBox(color: fillColor, child: _widget);
         }
 
         return FadeTransition(

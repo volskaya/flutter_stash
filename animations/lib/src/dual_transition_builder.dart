@@ -44,6 +44,7 @@ class DualTransitionBuilder extends StatefulWidget {
     @required this.reverseBuilder,
     this.child,
     this.onEnd,
+    this.onStatusChanged,
   })  : assert(animation != null),
         assert(forwardBuilder != null),
         assert(reverseBuilder != null),
@@ -51,6 +52,9 @@ class DualTransitionBuilder extends StatefulWidget {
 
   /// Callback to run when the forward builder finishes animating.
   final VoidCallback onEnd;
+
+  /// Callback to run when the animation status changes.
+  final ValueChanged<AnimationStatus> onStatusChanged;
 
   /// The animation that drives the [child]'s transition.
   ///
@@ -120,13 +124,15 @@ class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
     );
     if (oldEffective != _effectiveAnimationStatus) {
       _updateAnimations();
-
-      switch (animationStatus) {
-        case AnimationStatus.completed:
-          if (mounted) widget.onEnd?.call();
-          break;
-        default:
-          break; // Do nothing
+      if (mounted) {
+        widget.onStatusChanged?.call(_effectiveAnimationStatus);
+        switch (_effectiveAnimationStatus) {
+          case AnimationStatus.completed:
+            widget.onEnd?.call();
+            break;
+          default:
+            break; // Do nothing
+        }
       }
     }
   }
@@ -180,6 +186,10 @@ class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
   }
 
   void _updateAnimations() {
+    if (mounted && _effectiveAnimationStatus != AnimationStatus.completed) {
+      widget.onStatusChanged?.call(_effectiveAnimationStatus);
+    }
+
     switch (_effectiveAnimationStatus) {
       case AnimationStatus.dismissed:
       case AnimationStatus.forward:

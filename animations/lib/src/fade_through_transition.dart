@@ -171,11 +171,15 @@ class FadeThroughTransition extends StatelessWidget {
     this.fillColor,
     this.child,
     this.onEnd,
+    this.onStatusChanged,
   })  : assert(animation != null),
         assert(secondaryAnimation != null);
 
   /// Callback to be called when the animation ends.
   final VoidCallback onEnd;
+
+  /// Callback when the animation status changes.
+  final ValueChanged<AnimationStatus> onStatusChanged;
 
   /// The animation that drives the [child]'s entrance and exit.
   ///
@@ -229,17 +233,25 @@ class FadeThroughTransition extends StatelessWidget {
 }
 
 class _ZoomedFadeInFadeOut extends StatelessWidget {
-  const _ZoomedFadeInFadeOut({Key key, this.animation, this.child, this.onEnd}) : super(key: key);
+  const _ZoomedFadeInFadeOut({
+    Key key,
+    this.animation,
+    this.child,
+    this.onEnd,
+    this.onStatusChanged,
+  }) : super(key: key);
 
   final Animation<double> animation;
   final Widget child;
   final VoidCallback onEnd;
+  final ValueChanged<AnimationStatus> onStatusChanged;
 
   @override
   Widget build(BuildContext context) {
     return dual_transition_builder.DualTransitionBuilder(
       animation: animation,
       onEnd: onEnd,
+      onStatusChanged: onStatusChanged,
       forwardBuilder: (
         BuildContext context,
         Animation<double> animation,
