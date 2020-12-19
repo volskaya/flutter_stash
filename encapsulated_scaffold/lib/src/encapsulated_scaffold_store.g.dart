@@ -16,6 +16,13 @@ mixin _$EncapsulatedScaffoldStore on _EncapsulatedScaffoldStore, Store {
           Computed<EncapsulatedScaffoldState>(() => super.capsule,
               name: '_EncapsulatedScaffoldStore.capsule'))
       .value;
+  Computed<EncapsulatedSheetItem<dynamic>> _$sheetComputed;
+
+  @override
+  EncapsulatedSheetItem<dynamic> get sheet => (_$sheetComputed ??=
+          Computed<EncapsulatedSheetItem<dynamic>>(() => super.sheet,
+              name: '_EncapsulatedScaffoldStore.sheet'))
+      .value;
   Computed<EncapsulatedNotificationItem> _$notificationComputed;
 
   @override
@@ -45,6 +52,28 @@ mixin _$EncapsulatedScaffoldStore on _EncapsulatedScaffoldStore, Store {
         .startAction(name: '_EncapsulatedScaffoldStore.dismissNotification');
     try {
       return super.dismissNotification(item);
+    } finally {
+      _$_EncapsulatedScaffoldStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void pushSheet(EncapsulatedSheetItem<dynamic> item) {
+    final _$actionInfo = _$_EncapsulatedScaffoldStoreActionController
+        .startAction(name: '_EncapsulatedScaffoldStore.pushSheet');
+    try {
+      return super.pushSheet(item);
+    } finally {
+      _$_EncapsulatedScaffoldStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeSheet(EncapsulatedSheetItem<dynamic> item) {
+    final _$actionInfo = _$_EncapsulatedScaffoldStoreActionController
+        .startAction(name: '_EncapsulatedScaffoldStore.removeSheet');
+    try {
+      return super.removeSheet(item);
     } finally {
       _$_EncapsulatedScaffoldStoreActionController.endAction(_$actionInfo);
     }
@@ -82,6 +111,7 @@ mixin _$EncapsulatedScaffoldStore on _EncapsulatedScaffoldStore, Store {
   String toString() {
     return '''
 capsule: ${capsule},
+sheet: ${sheet},
 notification: ${notification}
     ''';
   }

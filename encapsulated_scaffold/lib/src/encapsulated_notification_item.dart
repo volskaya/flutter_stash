@@ -2,11 +2,45 @@ import 'package:encapsulated_scaffold/src/encapsulated_notification_overlay.dart
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 part 'encapsulated_notification_item.freezed.dart';
 
+/// [EncapsulatedNotificationItem] body builder.
 typedef EncapsulatedNotificationItemBuilder = Widget Function(
-    BuildContext context, VoidCallback dismiss, Animation<double> timeoutAnimation);
+  BuildContext overlayContext,
+  VoidCallback dismiss,
+  Animation<double> timeoutAnimation,
+);
+
+/// Props provided to descending notifications.
+@freezed
+abstract class EncapsulatedNotificationProps with _$EncapsulatedNotificationProps {
+  /// Creates [EncapsulatedNotificationProps].
+  const factory EncapsulatedNotificationProps({
+    /// Callable to dismiss the notification.
+    @required VoidCallback dismiss,
+
+    /// Progress animation of the notifications dismiss timeout.
+    /// Is null when the notification is built without a timeout.
+    Animation<double> dismissAnimation,
+
+    /// Reference to the [EncapsulatedNotificationItem] these props belong to.
+    @required EncapsulatedNotificationItem reference,
+  }) = _EncapsulatedNotificationProps;
+  // const EncapsulatedNotificationProps(this.dismiss, this.dismissAnimation, this.reference);
+
+  /// Get [EncapsulatedNotificationProps] provided through the [BuildContext].
+  static EncapsulatedNotificationProps of(BuildContext context) {
+    try {
+      return Provider.of<EncapsulatedNotificationProps>(context, listen: false);
+    } catch (e) {
+      print('No EncapsulatedNotificationProps found in the build context.'
+          'Built widget is not a descendant of an EncapsulatedScaffoldOverlay notification?');
+      rethrow;
+    }
+  }
+}
 
 /// [EncapsulatedNotificationItem] that's used for [EncapsulatedNotificationOverlay]
 /// overlay entries.

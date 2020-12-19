@@ -10,6 +10,224 @@ part of 'encapsulated_notification_item.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+class _$EncapsulatedNotificationPropsTearOff {
+  const _$EncapsulatedNotificationPropsTearOff();
+
+// ignore: unused_element
+  _EncapsulatedNotificationProps call(
+      {@required void Function() dismiss,
+      Animation<double> dismissAnimation,
+      @required EncapsulatedNotificationItem reference}) {
+    return _EncapsulatedNotificationProps(
+      dismiss: dismiss,
+      dismissAnimation: dismissAnimation,
+      reference: reference,
+    );
+  }
+}
+
+/// @nodoc
+// ignore: unused_element
+const $EncapsulatedNotificationProps = _$EncapsulatedNotificationPropsTearOff();
+
+/// @nodoc
+mixin _$EncapsulatedNotificationProps {
+  /// Callable to dismiss the notification.
+  void Function() get dismiss;
+
+  /// Progress animation of the notifications dismiss timeout.
+  /// Is null when the notification is built without a timeout.
+  Animation<double> get dismissAnimation;
+
+  /// Reference to the [EncapsulatedNotificationItem] these props belong to.
+  EncapsulatedNotificationItem get reference;
+
+  $EncapsulatedNotificationPropsCopyWith<EncapsulatedNotificationProps>
+      get copyWith;
+}
+
+/// @nodoc
+abstract class $EncapsulatedNotificationPropsCopyWith<$Res> {
+  factory $EncapsulatedNotificationPropsCopyWith(
+          EncapsulatedNotificationProps value,
+          $Res Function(EncapsulatedNotificationProps) then) =
+      _$EncapsulatedNotificationPropsCopyWithImpl<$Res>;
+  $Res call(
+      {void Function() dismiss,
+      Animation<double> dismissAnimation,
+      EncapsulatedNotificationItem reference});
+
+  $EncapsulatedNotificationItemCopyWith<$Res> get reference;
+}
+
+/// @nodoc
+class _$EncapsulatedNotificationPropsCopyWithImpl<$Res>
+    implements $EncapsulatedNotificationPropsCopyWith<$Res> {
+  _$EncapsulatedNotificationPropsCopyWithImpl(this._value, this._then);
+
+  final EncapsulatedNotificationProps _value;
+  // ignore: unused_field
+  final $Res Function(EncapsulatedNotificationProps) _then;
+
+  @override
+  $Res call({
+    Object dismiss = freezed,
+    Object dismissAnimation = freezed,
+    Object reference = freezed,
+  }) {
+    return _then(_value.copyWith(
+      dismiss: dismiss == freezed ? _value.dismiss : dismiss as void Function(),
+      dismissAnimation: dismissAnimation == freezed
+          ? _value.dismissAnimation
+          : dismissAnimation as Animation<double>,
+      reference: reference == freezed
+          ? _value.reference
+          : reference as EncapsulatedNotificationItem,
+    ));
+  }
+
+  @override
+  $EncapsulatedNotificationItemCopyWith<$Res> get reference {
+    if (_value.reference == null) {
+      return null;
+    }
+    return $EncapsulatedNotificationItemCopyWith<$Res>(_value.reference,
+        (value) {
+      return _then(_value.copyWith(reference: value));
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$EncapsulatedNotificationPropsCopyWith<$Res>
+    implements $EncapsulatedNotificationPropsCopyWith<$Res> {
+  factory _$EncapsulatedNotificationPropsCopyWith(
+          _EncapsulatedNotificationProps value,
+          $Res Function(_EncapsulatedNotificationProps) then) =
+      __$EncapsulatedNotificationPropsCopyWithImpl<$Res>;
+  @override
+  $Res call(
+      {void Function() dismiss,
+      Animation<double> dismissAnimation,
+      EncapsulatedNotificationItem reference});
+
+  @override
+  $EncapsulatedNotificationItemCopyWith<$Res> get reference;
+}
+
+/// @nodoc
+class __$EncapsulatedNotificationPropsCopyWithImpl<$Res>
+    extends _$EncapsulatedNotificationPropsCopyWithImpl<$Res>
+    implements _$EncapsulatedNotificationPropsCopyWith<$Res> {
+  __$EncapsulatedNotificationPropsCopyWithImpl(
+      _EncapsulatedNotificationProps _value,
+      $Res Function(_EncapsulatedNotificationProps) _then)
+      : super(_value, (v) => _then(v as _EncapsulatedNotificationProps));
+
+  @override
+  _EncapsulatedNotificationProps get _value =>
+      super._value as _EncapsulatedNotificationProps;
+
+  @override
+  $Res call({
+    Object dismiss = freezed,
+    Object dismissAnimation = freezed,
+    Object reference = freezed,
+  }) {
+    return _then(_EncapsulatedNotificationProps(
+      dismiss: dismiss == freezed ? _value.dismiss : dismiss as void Function(),
+      dismissAnimation: dismissAnimation == freezed
+          ? _value.dismissAnimation
+          : dismissAnimation as Animation<double>,
+      reference: reference == freezed
+          ? _value.reference
+          : reference as EncapsulatedNotificationItem,
+    ));
+  }
+}
+
+/// @nodoc
+class _$_EncapsulatedNotificationProps
+    implements _EncapsulatedNotificationProps {
+  const _$_EncapsulatedNotificationProps(
+      {@required this.dismiss, this.dismissAnimation, @required this.reference})
+      : assert(dismiss != null),
+        assert(reference != null);
+
+  @override
+
+  /// Callable to dismiss the notification.
+  final void Function() dismiss;
+  @override
+
+  /// Progress animation of the notifications dismiss timeout.
+  /// Is null when the notification is built without a timeout.
+  final Animation<double> dismissAnimation;
+  @override
+
+  /// Reference to the [EncapsulatedNotificationItem] these props belong to.
+  final EncapsulatedNotificationItem reference;
+
+  @override
+  String toString() {
+    return 'EncapsulatedNotificationProps(dismiss: $dismiss, dismissAnimation: $dismissAnimation, reference: $reference)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other is _EncapsulatedNotificationProps &&
+            (identical(other.dismiss, dismiss) ||
+                const DeepCollectionEquality()
+                    .equals(other.dismiss, dismiss)) &&
+            (identical(other.dismissAnimation, dismissAnimation) ||
+                const DeepCollectionEquality()
+                    .equals(other.dismissAnimation, dismissAnimation)) &&
+            (identical(other.reference, reference) ||
+                const DeepCollectionEquality()
+                    .equals(other.reference, reference)));
+  }
+
+  @override
+  int get hashCode =>
+      runtimeType.hashCode ^
+      const DeepCollectionEquality().hash(dismiss) ^
+      const DeepCollectionEquality().hash(dismissAnimation) ^
+      const DeepCollectionEquality().hash(reference);
+
+  @override
+  _$EncapsulatedNotificationPropsCopyWith<_EncapsulatedNotificationProps>
+      get copyWith => __$EncapsulatedNotificationPropsCopyWithImpl<
+          _EncapsulatedNotificationProps>(this, _$identity);
+}
+
+abstract class _EncapsulatedNotificationProps
+    implements EncapsulatedNotificationProps {
+  const factory _EncapsulatedNotificationProps(
+          {@required void Function() dismiss,
+          Animation<double> dismissAnimation,
+          @required EncapsulatedNotificationItem reference}) =
+      _$_EncapsulatedNotificationProps;
+
+  @override
+
+  /// Callable to dismiss the notification.
+  void Function() get dismiss;
+  @override
+
+  /// Progress animation of the notifications dismiss timeout.
+  /// Is null when the notification is built without a timeout.
+  Animation<double> get dismissAnimation;
+  @override
+
+  /// Reference to the [EncapsulatedNotificationItem] these props belong to.
+  EncapsulatedNotificationItem get reference;
+  @override
+  _$EncapsulatedNotificationPropsCopyWith<_EncapsulatedNotificationProps>
+      get copyWith;
+}
+
+/// @nodoc
 class _$EncapsulatedNotificationItemTearOff {
   const _$EncapsulatedNotificationItemTearOff();
 

@@ -9,33 +9,6 @@ import 'package:mobx/mobx.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:provider/provider.dart';
 
-/// Props provided to descending notifications.
-class EncapsulatedNotificationProps {
-  /// Creates [EncapsulatedNotificationProps].
-  const EncapsulatedNotificationProps(this.dismiss, this.dismissAnimation, this.reference);
-
-  /// Callable to dismiss the notification.
-  final VoidCallback dismiss;
-
-  /// Progress animation of the notifications dismiss timeout.
-  /// Is null when the notification is built without a timeout.
-  final Animation<double> dismissAnimation;
-
-  /// Reference to the [EncapsulatedNotificatoinItem] these props belong to.
-  final EncapsulatedNotificationItem reference;
-
-  /// Get [EncapsulatedNotificationProps] provided trough the [BuildContext].
-  static EncapsulatedNotificationProps of(BuildContext context) {
-    try {
-      return Provider.of<EncapsulatedNotificationProps>(context, listen: false);
-    } catch (e) {
-      print('No EncapsulatedNotificationProps found in the build context.'
-          'Built widget is not a descendant of an EncapsulatedScaffoldOverlay notification?');
-      rethrow;
-    }
-  }
-}
-
 /// [EncapsulatedNotificationOverlay] provides [EncapsulatedNotificationOverlayController].
 ///
 /// This widget is intended to be nested within [MaterialApp.builder].
@@ -118,8 +91,12 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
                           duration: item.timeout,
                           useInset: widget.insetNotifications,
                           builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
-                            value: EncapsulatedNotificationProps(item.dismiss, animation, item),
                             child: item.builder(context, item.dismiss, animation),
+                            value: EncapsulatedNotificationProps(
+                              dismiss: item.dismiss,
+                              dismissAnimation: animation,
+                              reference: item,
+                            ),
                           ),
                         ),
                       )
@@ -145,8 +122,12 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
                           duration: item.timeout,
                           useInset: false,
                           builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
-                            value: EncapsulatedNotificationProps(item.dismiss, animation, item),
                             child: item.builder(context, item.dismiss, animation),
+                            value: EncapsulatedNotificationProps(
+                              dismiss: item.dismiss,
+                              dismissAnimation: animation,
+                              reference: item,
+                            ),
                           ),
                         ),
                       )

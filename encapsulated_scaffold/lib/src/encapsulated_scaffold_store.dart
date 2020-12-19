@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:encapsulated_scaffold/src/encapsulated_notification_item.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
+import 'package:encapsulated_scaffold/src/encapsulated_sheet_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:mobx/mobx.dart';
@@ -44,12 +45,16 @@ abstract class _EncapsulatedScaffoldStore with Store {
   final capsules = ObservableSet<EncapsulatedScaffoldState>.linkedHashSetFrom([]);
   final notifications = ObservableList<EncapsulatedNotificationItem>();
   final importantNotifications = ObservableList<EncapsulatedNotificationItem>();
+  final sheets = ObservableList<EncapsulatedSheetItem>();
 
   Timer _timer; // Active notification timeout timer.
   ReactionDisposer _visibleNotificationReactionDisposer;
 
   @computed
   EncapsulatedScaffoldState get capsule => capsules.isNotEmpty ? capsules.last : null;
+
+  @computed
+  EncapsulatedSheetItem get sheet => sheets.isNotEmpty ? sheets.last : null;
 
   @computed
   EncapsulatedNotificationItem get notification =>
@@ -103,6 +108,19 @@ abstract class _EncapsulatedScaffoldStore with Store {
   @action
   void dismissNotification(EncapsulatedNotificationItem item) {
     final didRemove = _getAppropriateNotificationList(item).remove(item);
+    if (didRemove) item.onDismissed?.call();
+  }
+
+  @action
+  void pushSheet(EncapsulatedSheetItem item) {
+    assert(sheets.isEmpty); // Only allow 1 sheet for the sake of better UI.
+    assert(sheets.where((sheet) => sheet.tag != item.tag).isEmpty);
+    sheets.add(item);
+  }
+
+  @action
+  void removeSheet(EncapsulatedSheetItem item) {
+    final didRemove = sheets.remove(item);
     if (didRemove) item.onDismissed?.call();
   }
 
