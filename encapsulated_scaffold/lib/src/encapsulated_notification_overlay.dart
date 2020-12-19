@@ -209,12 +209,11 @@ class __NotificationItemState extends State<_NotificationItem> with SingleTicker
             ? EdgeInsets.only(bottom: widget.store.capsule?.bottomInset ?? 0)
             : EdgeInsets.zero);
 
+    // Provide the child with correctly insetted padding.
     return IgnorePointer(
       ignoring: widget.item != widget.store.notification,
-      child: AnimatedPadding(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.fastOutSlowIn,
-        padding: EdgeInsets.only(bottom: padding.bottom),
+      child: MediaQuery(
+        data: mediaQuery.copyWith(padding: padding),
         child: notification,
       ),
     );
