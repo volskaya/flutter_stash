@@ -1,4 +1,13 @@
-part of direct_select_plugin;
+import 'package:flutter/material.dart';
+import 'package:direct_select/src/widget_drag.dart';
+
+enum DirectSelectMode {
+  /// The [DirectSelect] is engaged by dragging on it.
+  drag,
+
+  /// The [DirectSelect] is engaged by tapping on it.
+  tap,
+}
 
 class DirectSelect extends StatelessWidget {
   /// Widget child you'll tap to display the Selection List.
@@ -69,7 +78,7 @@ class DirectSelect extends StatelessWidget {
     switch (mode) {
       case DirectSelectMode.drag:
       case DirectSelectMode.tap:
-        return _DirectSelectDrag(
+        return DirectSelectDrag(
           key: stateKey,
           selectedIndex: selectedIndex,
           mode: mode,
@@ -84,22 +93,6 @@ class DirectSelect extends StatelessWidget {
           overlayChildren: overlayChildren,
           ignoreInput: ignoreInput,
         );
-      // case DirectSelectMode.tap:
-      //   return _DirectSelectTap(
-      //     key: stateKey,
-      //     selectedIndex: selectedIndex,
-      //     mode: mode,
-      //     itemMagnification: itemMagnification,
-      //     items: items,
-      //     onSelectedItemChanged: onSelectedItemChanged,
-      //     itemExtent: itemExtent,
-      //     backgroundColor: backgroundColor,
-      //     child: child,
-      //     hitTestBehavior: hitTestBehavior,
-      //     allowScrollEnd: allowScrollEnd,
-      //     overlayChildren: overlayChildren,
-      //     ignoreInput: ignoreInput,
-      //   );
     }
     throw UnimplementedError('Unknown DirectSelectMode provided: $mode');
   }

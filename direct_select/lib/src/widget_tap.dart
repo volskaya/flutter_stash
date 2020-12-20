@@ -1,6 +1,10 @@
-part of direct_select_plugin;
+import 'dart:async';
 
-class _DirectSelectTap extends _DirectSelectBase {
+import 'package:flutter/material.dart';
+import 'package:direct_select/src/base.dart';
+import 'package:direct_select/src/widget.dart';
+
+class _DirectSelectTap extends DirectSelectBase {
   const _DirectSelectTap({
     Widget child,
     List<Widget> items,
@@ -27,6 +31,7 @@ class _DirectSelectTap extends _DirectSelectBase {
           hitTestBehavior: hitTestBehavior,
           overlayChildren: overlayChildren,
           ignoreInput: ignoreInput,
+          allowScrollEnd: allowScrollEnd,
           key: key,
         );
 
@@ -38,7 +43,7 @@ class DirectSelectTapState extends DirectSelectBaseState<_DirectSelectTap> {
   bool _dialogShowing;
 
   @override
-  Future<int> _createOverlay() async {
+  Future<int> createOverlay() async {
     if (mounted) {
       assert(completer == null);
       _dialogShowing = true;
@@ -60,12 +65,12 @@ class DirectSelectTapState extends DirectSelectBaseState<_DirectSelectTap> {
         pageBuilder: (context, animation, secondaryAnimation) => WillPopScope(
           onWillPop: () async {
             _dialogShowing = false;
-            final index = _notifySelectedItem();
+            final index = notifySelectedItem();
             completer?.complete(index);
             completer = null;
             return true;
           },
-          child: _overlayWidget(),
+          child: overlayWidget(),
         ),
       );
       return completer.future;
@@ -74,15 +79,15 @@ class DirectSelectTapState extends DirectSelectBaseState<_DirectSelectTap> {
   }
 
   @override
-  Future<void> _removeOverlay() async {
+  Future<void> removeOverlay() async {
     if (mounted) {
       final navigator = Navigator.of(context);
       if (_dialogShowing && navigator != null) {
         if (!await navigator.maybePop()) {
-          _notifySelectedItem();
+          notifySelectedItem();
         }
       } else {
-        final index = _notifySelectedItem();
+        final index = notifySelectedItem();
         completer?.complete(index);
         completer = null;
       }

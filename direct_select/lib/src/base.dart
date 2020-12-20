@@ -1,6 +1,34 @@
-part of direct_select_plugin;
+import 'dart:async';
 
-abstract class _DirectSelectBase extends StatefulWidget {
+import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:flutter/material.dart';
+import 'package:direct_select/src/widget.dart';
+import 'package:direct_select/src/overlay.dart';
+
+class _FixedExtentScrollController extends FixedExtentScrollController {
+  _FixedExtentScrollController(int initialItem) : super(initialItem: initialItem);
+
+  /// Allow us to access the protected getter [ScrollController.positions].
+  bool get hasScrollPositions => positions.isNotEmpty;
+}
+
+abstract class DirectSelectBase extends StatefulWidget {
+  const DirectSelectBase({
+    this.child,
+    this.items,
+    this.onSelectedItemChanged,
+    this.itemExtent,
+    this.itemMagnification,
+    this.selectedIndex,
+    this.mode,
+    this.backgroundColor,
+    this.hitTestBehavior,
+    this.allowScrollEnd,
+    this.overlayChildren,
+    this.ignoreInput,
+    Key key,
+  }) : super(key: key);
+
   /// See: [DirectSelect.child]
   final Widget child;
 
@@ -37,44 +65,28 @@ abstract class _DirectSelectBase extends StatefulWidget {
   /// See: [DirectSelect.ignoreInput].
   final bool ignoreInput;
 
-  const _DirectSelectBase({
-    this.child,
-    this.items,
-    this.onSelectedItemChanged,
-    this.itemExtent,
-    this.itemMagnification,
-    this.selectedIndex,
-    this.mode,
-    this.backgroundColor,
-    this.hitTestBehavior,
-    this.allowScrollEnd,
-    this.overlayChildren,
-    this.ignoreInput,
-    Key key,
-  }) : super(key: key);
-
   @override
   DirectSelectBaseState createState();
 }
 
-abstract class DirectSelectBaseState<T extends _DirectSelectBase> extends State<T> {
+abstract class DirectSelectBaseState<T extends DirectSelectBase> extends State<T> {
   _FixedExtentScrollController _controller;
   GlobalKey _key = GlobalKey();
   int _currentIndex;
   Completer<int> completer;
 
-  Future<void> _createOverlay();
-  Future<void> _removeOverlay();
+  Future<void> createOverlay();
+  Future<void> removeOverlay();
 
-  Future<int> open() => _createOverlay();
+  Future<int> open() => createOverlay();
   Future<void> close([int index]) async {
     if (index != null) _currentIndex = index;
-    await _removeOverlay();
+    await removeOverlay();
   }
 
   bool _handleBackButton(bool intercepted, RouteInfo _) {
     if (intercepted || (completer?.isCompleted ?? true)) return false;
-    _removeOverlay();
+    removeOverlay();
     return true;
   }
 
@@ -90,12 +102,12 @@ abstract class DirectSelectBaseState<T extends _DirectSelectBase> extends State<
   void dispose() {
     BackButtonInterceptor.remove(_handleBackButton);
     _controller.dispose();
-    if (completer != null) _removeOverlay();
+    if (completer != null) removeOverlay();
     super.dispose();
   }
 
   @override
-  void didUpdateWidget(_DirectSelectBase oldWidget) {
+  void didUpdateWidget(DirectSelectBase oldWidget) {
     if (widget.selectedIndex != oldWidget.selectedIndex) {
       _currentIndex = widget.selectedIndex;
       _controller.dispose();
@@ -104,44 +116,32 @@ abstract class DirectSelectBaseState<T extends _DirectSelectBase> extends State<
     super.didUpdateWidget(oldWidget);
   }
 
-  int _notifySelectedItem() {
+  int notifySelectedItem() {
     widget.onSelectedItemChanged(_currentIndex);
     return _currentIndex;
   }
 
-  Widget _overlayWidget([Key key]) {
-    final RenderBox box = _key.currentContext.findRenderObject();
+  Widget overlayWidget([Key key]) {
+    final box = _key.currentContext.findRenderObject() as RenderBox;
     final position = box.localToGlobal(Offset.zero);
     final mediaQuery = MediaQuery.of(context);
     final half = mediaQuery.size.height / 2;
     final result = position.dy - mediaQuery.padding.top - half;
-    return _MySelectionOverlay(
+
+    return MySelectionOverlay(
       key: key,
       top: result + widget.itemExtent * widget.itemMagnification,
       backgroundColor: widget.backgroundColor,
       overlayChildren: widget.overlayChildren,
-      child: _MySelectionList(
+      child: MySelectionList(
+        controller: _controller,
         itemExtent: widget.itemExtent,
         itemMagnification: widget.itemMagnification,
         childCount: widget.items != null ? widget.items.length : 0,
         allowScrollEnd: widget.allowScrollEnd,
-        onItemChanged: (index) {
-          if (index != null) {
-            _currentIndex = index;
-          }
-        },
-        onItemSelected: () {
-          if (widget.mode == DirectSelectMode.tap) {
-            _removeOverlay();
-          }
-        },
-        builder: (context, index) {
-          if (widget.items != null) {
-            return widget.items[index];
-          }
-          return const SizedBox.shrink();
-        },
-        controller: _controller,
+        onItemSelected: () => widget.mode == DirectSelectMode.tap ? removeOverlay() : null,
+        builder: (_, index) => widget.items != null ? widget.items[index] : const SizedBox.shrink(),
+        onItemChanged: (index) => _currentIndex = index ?? _currentIndex,
       ),
     );
   }
@@ -150,18 +150,15 @@ abstract class DirectSelectBaseState<T extends _DirectSelectBase> extends State<
   Widget build(BuildContext context) {
     final preferTapMode = widget.mode == DirectSelectMode.tap;
     return GestureDetector(
+      child: KeyedSubtree(key: _key, child: widget.child),
       behavior: widget.hitTestBehavior,
-      onTap: !widget.ignoreInput && preferTapMode ? _createOverlay : null,
-      onVerticalDragStart: widget.ignoreInput || preferTapMode ? null : (_) => _createOverlay(),
-      onVerticalDragEnd: widget.ignoreInput || preferTapMode ? null : (_) => _removeOverlay(),
+      onTap: !widget.ignoreInput && preferTapMode ? createOverlay : null,
+      onVerticalDragStart: widget.ignoreInput || preferTapMode ? null : (_) => createOverlay(),
+      onVerticalDragEnd: widget.ignoreInput || preferTapMode ? null : (_) => removeOverlay(),
       onVerticalDragUpdate: widget.ignoreInput || preferTapMode
           ? null
           : (details) =>
               _controller.hasScrollPositions ? _controller.jumpTo(_controller.offset - details.primaryDelta) : null,
-      child: Container(
-        key: _key,
-        child: widget.child,
-      ),
     );
   }
 }

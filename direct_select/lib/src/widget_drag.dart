@@ -1,7 +1,12 @@
-part of direct_select_plugin;
+import 'dart:async';
 
-class _DirectSelectDrag extends _DirectSelectBase {
-  const _DirectSelectDrag({
+import 'package:flutter/material.dart';
+import 'package:direct_select/src/base.dart';
+import 'package:direct_select/src/widget.dart';
+import 'package:direct_select/src/overlay.dart';
+
+class DirectSelectDrag extends DirectSelectBase {
+  const DirectSelectDrag({
     Widget child,
     List<Widget> items,
     ValueChanged<int> onSelectedItemChanged,
@@ -35,18 +40,18 @@ class _DirectSelectDrag extends _DirectSelectBase {
   DirectSelectDragState createState() => DirectSelectDragState();
 }
 
-class DirectSelectDragState extends DirectSelectBaseState<_DirectSelectDrag> {
+class DirectSelectDragState extends DirectSelectBaseState<DirectSelectDrag> {
   OverlayEntry _overlayEntry;
-  GlobalKey<_MySelectionOverlayState> _keyOverlay;
+  GlobalKey<MySelectionOverlayState> _keyOverlay;
 
   @override
-  Future<int> _createOverlay() async {
+  Future<int> createOverlay() async {
     if (mounted) {
       OverlayState overlayState = Overlay.of(context);
       if (overlayState != null) {
         assert(completer == null);
         completer = Completer<int>();
-        _overlayEntry = OverlayEntry(builder: (_) => _overlayWidget(_keyOverlay));
+        _overlayEntry = OverlayEntry(builder: (_) => overlayWidget(_keyOverlay));
         overlayState.insert(_overlayEntry);
         return completer.future;
       }
@@ -55,12 +60,12 @@ class DirectSelectDragState extends DirectSelectBaseState<_DirectSelectDrag> {
   }
 
   @override
-  Future<void> _removeOverlay() async {
+  Future<void> removeOverlay() async {
     final currentState = _keyOverlay.currentState;
     if (currentState != null) {
       currentState.reverse(_overlayEntry);
     }
-    final index = mounted ? _notifySelectedItem() : null;
+    final index = mounted ? notifySelectedItem() : null;
     completer?.complete(index);
     completer = null;
   }
