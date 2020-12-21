@@ -23,12 +23,18 @@ class EncapsulatedScaffoldStore extends _EncapsulatedScaffoldStore with _$Encaps
   /// Get the nearest [EncapsulatedScaffoldStore].
   static EncapsulatedScaffoldStore of(BuildContext context) =>
       Provider.of<EncapsulatedScaffoldStore>(context, listen: false);
+
+  /// Attempts to find the overlay that's used to build [EncapsulatedScaffoldOverlay],
+  /// if the [EncapsulatedScaffoldStore.overlayKey] is used, else lookup regular root overlay.
+  static OverlayState overlayOf(BuildContext context) =>
+      EncapsulatedScaffoldStore.of(context).overlayKey.currentState ?? Overlay.of(context, rootOverlay: true);
 }
 
 abstract class _EncapsulatedScaffoldStore with Store {
   _EncapsulatedScaffoldStore({
     this.onPushingNotification,
-  }) {
+    GlobalKey<OverlayState> overlayKey,
+  }) : overlayKey = overlayKey ?? GlobalKey<OverlayState>() {
     _visibleNotificationReactionDisposer = reaction<EncapsulatedNotificationItem>(
       (_) => notification,
       _handleNotificationChange,
@@ -38,6 +44,7 @@ abstract class _EncapsulatedScaffoldStore with Store {
 
   /// Callback that is called before a notification is added to the store.
   final EncapsulatedNotificationPushCallback onPushingNotification;
+  final GlobalKey<OverlayState> overlayKey;
 
   /// Capsules are added and popped as the navigator routes.
   ///

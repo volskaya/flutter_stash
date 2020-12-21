@@ -54,9 +54,9 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
 
   @override
   void initState() {
-    super.initState();
     BackButtonInterceptor.add(_handleBackButton);
     _store = EncapsulatedScaffoldStore.of(context);
+    super.initState();
   }
 
   @override
