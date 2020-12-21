@@ -14,18 +14,16 @@ class _$EncapsulatedSheetItemTearOff {
   const _$EncapsulatedSheetItemTearOff();
 
 // ignore: unused_element
-  _EncapsulatedSheetItem<T> call<T>(
+  _EncapsulatedSheetItem call(
       {String tag,
       @required Widget Function(BuildContext, void Function()) builder,
       Widget Function(BuildContext, Animation<double>, Widget) containerBuilder,
-      List<T> Function(BuildContext) buttons,
       void Function() onDismissed,
       bool dismissible = true}) {
-    return _EncapsulatedSheetItem<T>(
+    return _EncapsulatedSheetItem(
       tag: tag,
       builder: builder,
       containerBuilder: containerBuilder,
-      buttons: buttons,
       onDismissed: onDismissed,
       dismissible: dismissible,
     );
@@ -37,7 +35,7 @@ class _$EncapsulatedSheetItemTearOff {
 const $EncapsulatedSheetItem = _$EncapsulatedSheetItemTearOff();
 
 /// @nodoc
-mixin _$EncapsulatedSheetItem<T> {
+mixin _$EncapsulatedSheetItem {
   /// Tag to differentiate multiple active notifications.
   String get tag;
 
@@ -47,47 +45,42 @@ mixin _$EncapsulatedSheetItem<T> {
   /// Sheet body's container builder.
   Widget Function(BuildContext, Animation<double>, Widget) get containerBuilder;
 
-  /// List of buttons.
-  List<T> Function(BuildContext) get buttons;
-
   /// Callback on dismiss.
   void Function() get onDismissed;
 
   /// Wether the user is allowed to manually dismiss this notification.
   bool get dismissible;
 
-  $EncapsulatedSheetItemCopyWith<T, EncapsulatedSheetItem<T>> get copyWith;
+  $EncapsulatedSheetItemCopyWith<EncapsulatedSheetItem> get copyWith;
 }
 
 /// @nodoc
-abstract class $EncapsulatedSheetItemCopyWith<T, $Res> {
-  factory $EncapsulatedSheetItemCopyWith(EncapsulatedSheetItem<T> value,
-          $Res Function(EncapsulatedSheetItem<T>) then) =
-      _$EncapsulatedSheetItemCopyWithImpl<T, $Res>;
+abstract class $EncapsulatedSheetItemCopyWith<$Res> {
+  factory $EncapsulatedSheetItemCopyWith(EncapsulatedSheetItem value,
+          $Res Function(EncapsulatedSheetItem) then) =
+      _$EncapsulatedSheetItemCopyWithImpl<$Res>;
   $Res call(
       {String tag,
       Widget Function(BuildContext, void Function()) builder,
       Widget Function(BuildContext, Animation<double>, Widget) containerBuilder,
-      List<T> Function(BuildContext) buttons,
       void Function() onDismissed,
       bool dismissible});
 }
 
 /// @nodoc
-class _$EncapsulatedSheetItemCopyWithImpl<T, $Res>
-    implements $EncapsulatedSheetItemCopyWith<T, $Res> {
+class _$EncapsulatedSheetItemCopyWithImpl<$Res>
+    implements $EncapsulatedSheetItemCopyWith<$Res> {
   _$EncapsulatedSheetItemCopyWithImpl(this._value, this._then);
 
-  final EncapsulatedSheetItem<T> _value;
+  final EncapsulatedSheetItem _value;
   // ignore: unused_field
-  final $Res Function(EncapsulatedSheetItem<T>) _then;
+  final $Res Function(EncapsulatedSheetItem) _then;
 
   @override
   $Res call({
     Object tag = freezed,
     Object builder = freezed,
     Object containerBuilder = freezed,
-    Object buttons = freezed,
     Object onDismissed = freezed,
     Object dismissible = freezed,
   }) {
@@ -100,9 +93,6 @@ class _$EncapsulatedSheetItemCopyWithImpl<T, $Res>
           ? _value.containerBuilder
           : containerBuilder as Widget Function(
               BuildContext, Animation<double>, Widget),
-      buttons: buttons == freezed
-          ? _value.buttons
-          : buttons as List<T> Function(BuildContext),
       onDismissed: onDismissed == freezed
           ? _value.onDismissed
           : onDismissed as void Function(),
@@ -113,43 +103,40 @@ class _$EncapsulatedSheetItemCopyWithImpl<T, $Res>
 }
 
 /// @nodoc
-abstract class _$EncapsulatedSheetItemCopyWith<T, $Res>
-    implements $EncapsulatedSheetItemCopyWith<T, $Res> {
-  factory _$EncapsulatedSheetItemCopyWith(_EncapsulatedSheetItem<T> value,
-          $Res Function(_EncapsulatedSheetItem<T>) then) =
-      __$EncapsulatedSheetItemCopyWithImpl<T, $Res>;
+abstract class _$EncapsulatedSheetItemCopyWith<$Res>
+    implements $EncapsulatedSheetItemCopyWith<$Res> {
+  factory _$EncapsulatedSheetItemCopyWith(_EncapsulatedSheetItem value,
+          $Res Function(_EncapsulatedSheetItem) then) =
+      __$EncapsulatedSheetItemCopyWithImpl<$Res>;
   @override
   $Res call(
       {String tag,
       Widget Function(BuildContext, void Function()) builder,
       Widget Function(BuildContext, Animation<double>, Widget) containerBuilder,
-      List<T> Function(BuildContext) buttons,
       void Function() onDismissed,
       bool dismissible});
 }
 
 /// @nodoc
-class __$EncapsulatedSheetItemCopyWithImpl<T, $Res>
-    extends _$EncapsulatedSheetItemCopyWithImpl<T, $Res>
-    implements _$EncapsulatedSheetItemCopyWith<T, $Res> {
-  __$EncapsulatedSheetItemCopyWithImpl(_EncapsulatedSheetItem<T> _value,
-      $Res Function(_EncapsulatedSheetItem<T>) _then)
-      : super(_value, (v) => _then(v as _EncapsulatedSheetItem<T>));
+class __$EncapsulatedSheetItemCopyWithImpl<$Res>
+    extends _$EncapsulatedSheetItemCopyWithImpl<$Res>
+    implements _$EncapsulatedSheetItemCopyWith<$Res> {
+  __$EncapsulatedSheetItemCopyWithImpl(_EncapsulatedSheetItem _value,
+      $Res Function(_EncapsulatedSheetItem) _then)
+      : super(_value, (v) => _then(v as _EncapsulatedSheetItem));
 
   @override
-  _EncapsulatedSheetItem<T> get _value =>
-      super._value as _EncapsulatedSheetItem<T>;
+  _EncapsulatedSheetItem get _value => super._value as _EncapsulatedSheetItem;
 
   @override
   $Res call({
     Object tag = freezed,
     Object builder = freezed,
     Object containerBuilder = freezed,
-    Object buttons = freezed,
     Object onDismissed = freezed,
     Object dismissible = freezed,
   }) {
-    return _then(_EncapsulatedSheetItem<T>(
+    return _then(_EncapsulatedSheetItem(
       tag: tag == freezed ? _value.tag : tag as String,
       builder: builder == freezed
           ? _value.builder
@@ -158,9 +145,6 @@ class __$EncapsulatedSheetItemCopyWithImpl<T, $Res>
           ? _value.containerBuilder
           : containerBuilder as Widget Function(
               BuildContext, Animation<double>, Widget),
-      buttons: buttons == freezed
-          ? _value.buttons
-          : buttons as List<T> Function(BuildContext),
       onDismissed: onDismissed == freezed
           ? _value.onDismissed
           : onDismissed as void Function(),
@@ -171,12 +155,11 @@ class __$EncapsulatedSheetItemCopyWithImpl<T, $Res>
 }
 
 /// @nodoc
-class _$_EncapsulatedSheetItem<T> extends _EncapsulatedSheetItem<T> {
+class _$_EncapsulatedSheetItem extends _EncapsulatedSheetItem {
   _$_EncapsulatedSheetItem(
       {this.tag,
       @required this.builder,
       this.containerBuilder,
-      this.buttons,
       this.onDismissed,
       this.dismissible = true})
       : assert(builder != null),
@@ -198,10 +181,6 @@ class _$_EncapsulatedSheetItem<T> extends _EncapsulatedSheetItem<T> {
       containerBuilder;
   @override
 
-  /// List of buttons.
-  final List<T> Function(BuildContext) buttons;
-  @override
-
   /// Callback on dismiss.
   final void Function() onDismissed;
   @JsonKey(defaultValue: true)
@@ -212,13 +191,13 @@ class _$_EncapsulatedSheetItem<T> extends _EncapsulatedSheetItem<T> {
 
   @override
   String toString() {
-    return 'EncapsulatedSheetItem<$T>(tag: $tag, builder: $builder, containerBuilder: $containerBuilder, buttons: $buttons, onDismissed: $onDismissed, dismissible: $dismissible)';
+    return 'EncapsulatedSheetItem(tag: $tag, builder: $builder, containerBuilder: $containerBuilder, onDismissed: $onDismissed, dismissible: $dismissible)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _EncapsulatedSheetItem<T> &&
+        (other is _EncapsulatedSheetItem &&
             (identical(other.tag, tag) ||
                 const DeepCollectionEquality().equals(other.tag, tag)) &&
             (identical(other.builder, builder) ||
@@ -227,9 +206,6 @@ class _$_EncapsulatedSheetItem<T> extends _EncapsulatedSheetItem<T> {
             (identical(other.containerBuilder, containerBuilder) ||
                 const DeepCollectionEquality()
                     .equals(other.containerBuilder, containerBuilder)) &&
-            (identical(other.buttons, buttons) ||
-                const DeepCollectionEquality()
-                    .equals(other.buttons, buttons)) &&
             (identical(other.onDismissed, onDismissed) ||
                 const DeepCollectionEquality()
                     .equals(other.onDismissed, onDismissed)) &&
@@ -244,25 +220,23 @@ class _$_EncapsulatedSheetItem<T> extends _EncapsulatedSheetItem<T> {
       const DeepCollectionEquality().hash(tag) ^
       const DeepCollectionEquality().hash(builder) ^
       const DeepCollectionEquality().hash(containerBuilder) ^
-      const DeepCollectionEquality().hash(buttons) ^
       const DeepCollectionEquality().hash(onDismissed) ^
       const DeepCollectionEquality().hash(dismissible);
 
   @override
-  _$EncapsulatedSheetItemCopyWith<T, _EncapsulatedSheetItem<T>> get copyWith =>
-      __$EncapsulatedSheetItemCopyWithImpl<T, _EncapsulatedSheetItem<T>>(
+  _$EncapsulatedSheetItemCopyWith<_EncapsulatedSheetItem> get copyWith =>
+      __$EncapsulatedSheetItemCopyWithImpl<_EncapsulatedSheetItem>(
           this, _$identity);
 }
 
-abstract class _EncapsulatedSheetItem<T> extends EncapsulatedSheetItem<T> {
+abstract class _EncapsulatedSheetItem extends EncapsulatedSheetItem {
   _EncapsulatedSheetItem._() : super._();
   factory _EncapsulatedSheetItem(
       {String tag,
       @required Widget Function(BuildContext, void Function()) builder,
       Widget Function(BuildContext, Animation<double>, Widget) containerBuilder,
-      List<T> Function(BuildContext) buttons,
       void Function() onDismissed,
-      bool dismissible}) = _$_EncapsulatedSheetItem<T>;
+      bool dismissible}) = _$_EncapsulatedSheetItem;
 
   @override
 
@@ -278,10 +252,6 @@ abstract class _EncapsulatedSheetItem<T> extends EncapsulatedSheetItem<T> {
   Widget Function(BuildContext, Animation<double>, Widget) get containerBuilder;
   @override
 
-  /// List of buttons.
-  List<T> Function(BuildContext) get buttons;
-  @override
-
   /// Callback on dismiss.
   void Function() get onDismissed;
   @override
@@ -289,5 +259,5 @@ abstract class _EncapsulatedSheetItem<T> extends EncapsulatedSheetItem<T> {
   /// Wether the user is allowed to manually dismiss this notification.
   bool get dismissible;
   @override
-  _$EncapsulatedSheetItemCopyWith<T, _EncapsulatedSheetItem<T>> get copyWith;
+  _$EncapsulatedSheetItemCopyWith<_EncapsulatedSheetItem> get copyWith;
 }

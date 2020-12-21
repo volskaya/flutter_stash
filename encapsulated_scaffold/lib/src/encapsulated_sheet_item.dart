@@ -16,15 +16,12 @@ typedef EncapsulatedSheetItemBuilder = Widget Function(BuildContext context, Voi
 typedef EncapsulatedSheetItemContainerBuilder = Widget Function(
     BuildContext context, Animation<double> routeAnimation, Widget sheetWidget);
 
-/// Dyamic button builder of [EncapsulatedSheetItem].
-typedef EncapsulatedSheetButtonBuilder<T> = List<T> Function(BuildContext context);
-
 /// [EncapsulatedSheetItem]s aren't build the [EncapsulatedScaffoldOverlay], instead
 /// a reaction is supposed to be implemented in the apps navigator, that will build
 /// the sheet from observing [EncapsulatedScaffoldStore]. This is sort of a convenience
 /// class for my own apps.
 @freezed
-abstract class EncapsulatedSheetItem<T> implements _$EncapsulatedSheetItem<T> {
+abstract class EncapsulatedSheetItem implements _$EncapsulatedSheetItem {
   /// Creates [EncapsulatedSheetItem].
   factory EncapsulatedSheetItem({
     /// Tag to differentiate multiple active notifications.
@@ -36,15 +33,12 @@ abstract class EncapsulatedSheetItem<T> implements _$EncapsulatedSheetItem<T> {
     /// Sheet body's container builder.
     EncapsulatedSheetItemContainerBuilder containerBuilder,
 
-    /// List of buttons.
-    EncapsulatedSheetButtonBuilder<T> buttons,
-
     /// Callback on dismiss.
     VoidCallback onDismissed,
 
     /// Wether the user is allowed to manually dismiss this notification.
     @Default(true) bool dismissible,
-  }) = _EncapsulatedSheetItem<T>;
+  }) = _EncapsulatedSheetItem;
 
   EncapsulatedSheetItem._();
   EncapsulatedScaffoldStore _store;

@@ -60,7 +60,7 @@ abstract class _EncapsulatedScaffoldStore with Store {
   EncapsulatedNotificationItem get notification =>
       importantNotifications.isNotEmpty // Prioritize important notifications.
           ? importantNotifications.last
-          : notifications.isNotEmpty
+          : notifications.isNotEmpty && sheet == null // Hide while there's a registered sheet.
               ? notifications.last
               : null;
 
@@ -113,7 +113,6 @@ abstract class _EncapsulatedScaffoldStore with Store {
 
   @action
   void pushSheet(EncapsulatedSheetItem item) {
-    assert(sheets.isEmpty); // Only allow 1 sheet for the sake of better UI.
     assert(sheets.where((sheet) => sheet.tag != item.tag).isEmpty);
     sheets.add(item);
   }
