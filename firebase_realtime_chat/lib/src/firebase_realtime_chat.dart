@@ -85,7 +85,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   StreamSubscription<Event> _onAddedSubscription;
   StreamSubscription<Event> _onDisconnectReaction;
   StreamSubscription<Event> _participantsSubscription;
-  Timestamp subscriptionTime;
+  DateTime subscriptionTime;
 
   final scrollController = ScrollController();
   final _seenItems = <String>{};
@@ -464,6 +464,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   }
 
   Future _startListening() async {
+    // Using utc [Timestamp], since this time is used for firebase queries.
     final now = Timestamp.now().millisecondsSinceEpoch;
 
     // First page will always attempt to fetch from offline.
@@ -474,7 +475,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
     // Try to reacquire subscription timestamp, if offline pagination returned results.
     final timestamp = _subscriptionTimestamp ?? now;
-    subscriptionTime = Timestamp.fromMillisecondsSinceEpoch(timestamp);
+    subscriptionTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
     _startSubscription(timestamp: timestamp);
     if (paginatedItems.isEmpty) await fetchPage(1, timestamp);
     if (!_disposed) await _startParticipating();
