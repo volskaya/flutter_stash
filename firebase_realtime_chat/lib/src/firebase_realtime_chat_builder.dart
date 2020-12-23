@@ -3,6 +3,7 @@ import 'package:firebase_realtime_chat/src/firebase_realtime_chat.dart';
 import 'package:firebase_realtime_chat/src/firebase_realtime_chat_impl.dart';
 import 'package:flutter/material.dart';
 
+/// [FirebaseRealtimeChatBuilder] child widget's builder.
 typedef FirebaseRealtimeChatBuilderCallback<T extends FirebaseRealtimeChatMessageImpl,
         D extends FirebaseRealtimeChatParticipantImpl>
     = Widget Function(BuildContext context, FirebaseRealtimeChat<T, D> chat);

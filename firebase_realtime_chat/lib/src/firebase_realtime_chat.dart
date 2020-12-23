@@ -12,10 +12,14 @@ import 'package:mobx/mobx.dart';
 import 'package:quiver/strings.dart';
 import 'package:refresh_storage/refresh_storage.dart';
 import 'package:sembast/sembast.dart';
+import 'package:sembast/timestamp.dart';
 
 part 'firebase_realtime_chat.g.dart';
 
+/// [FirebaseRealtimeChat]'s message model's factory.
 typedef FirebaseRealtimeChatMessageBuilder<T extends FirebaseRealtimeChatMessageImpl> = T Function(Map value);
+
+/// [FirebaseRealtimeChat]'s participant model's factory.
 typedef FirebaseRealtimeChatParticipantBuilder<T extends FirebaseRealtimeChatParticipantImpl> = T Function();
 
 class _FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatMessageImpl> = __FirebaseRealtimeChatPageStorage<T>
@@ -81,7 +85,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   StreamSubscription<Event> _onAddedSubscription;
   StreamSubscription<Event> _onDisconnectReaction;
   StreamSubscription<Event> _participantsSubscription;
-  DateTime subscriptionTime;
+  Timestamp subscriptionTime;
 
   final scrollController = ScrollController();
   final _seenItems = <String>{};
@@ -106,17 +110,28 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
   /// Uses cursor only from the nearest online confirmed document.
   /// Pagination timestamps don't care about the online confirmation.
-  int get _paginationTimestamp =>
-      paginatedItems.reversed.firstWhere((item) => item.createTime != null, orElse: () => null)?.createTime;
+  int get _paginationTimestamp => paginatedItems.reversed
+      .firstWhere(
+        (item) => item.createTime != null,
+        orElse: () => null,
+      )
+      ?.createTime;
 
   /// Uses cursor only from the nearest online confirmed document.
   int get _subscriptionTimestamp => paginatedItems
-      .firstWhere((item) => (item.online || item.readBy.isNotEmpty) && item.createTime != null, orElse: () => null)
+      .firstWhere(
+        (item) => (item.online || item.readBy.isNotEmpty) && item.createTime != null,
+        orElse: () => null,
+      )
       ?.createTime;
 
-  /// Call pagination on either the last item or 1 page in advance.
-  bool shouldPaginate(int paginatedItemIndex) =>
-      paginatedItemIndex == paginatedItems.length - 1 || paginatedItemIndex == paginatedItems.length - itemsPerPage;
+  /// Start calling paginators with all items on the last page.
+  /// Make sure the redundant calls are dropped though.
+  bool shouldPaginate(int paginatedItemIndex) => paginatedItemIndex > (paginatedItems.length - itemsPerPage);
+
+  /// Get the paginator callback for a paginated documents widget, according to its index within a list.
+  VoidCallback getPaginator(int paginatedItemIndex) =>
+      shouldPaginate(paginatedItemIndex) ? () => fetchPage(page + 1) : null;
 
   /// Get an item by its N index across both `subscribedItems` & `paginatedItems`.
   T getItem(int index) =>
@@ -129,18 +144,13 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     // `_paginationTimestamp` will be available too.
     assert(paginatedItems.isNotEmpty || timestamp != null);
 
-    if (_fetchingPage) return;
+    if (_fetchingPage || page <= this.page || _storage.isEndReached) return;
     _fetchingPage = true;
-
-    if (page <= this.page || _storage.isEndReached) {
-      _log.d('Skipping redundant pagination for page: $page');
-      return;
-    }
 
     try {
       await _paginate(timestamp);
-    } catch (e) {
-      _log.e(e);
+    } catch (e, s) {
+      _log.e('Failed to paginate ${chatReference.path} page ${page + 1}', e, s);
     } finally {
       _fetchingPage = false;
     }
@@ -195,37 +205,33 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         if (onlineSnapshots.value != null) {
           items = HashMap<String, dynamic>.from(onlineSnapshots.value as Map);
         }
-      } catch (e) {
-        _log.e(e);
+      } catch (e, s) {
+        _log.e('Failed to query online snapshots of ${chatReference.path} page ${page + 1}', e, s);
       }
     }
 
     try {
-      messages = await SchedulerBinding.instance.scheduleTask(
-        () => items.entries.where((entry) {
-          final isSeen = _seenItems.contains(entry.key);
-          if (isSeen) _log.w('${chatReference.path} paginated a redundant item: ${entry.key}');
-          return !isSeen;
-        }).map((entry) {
-          _seenItems.add(entry.key);
+      messages = items.entries.where((entry) {
+        final isSeen = _seenItems.contains(entry.key);
+        if (isSeen) _log.w('${chatReference.path} paginated a redundant item: ${entry.key}');
+        return !isSeen;
+      }).map((entry) {
+        _seenItems.add(entry.key);
 
-          // HACK: Forges a [DataSnapshot] with a custom patch.
-          final snapshot = DataSnapshot.fake(entry.key, entry.value as Map);
-          final message = messageBuilder(entry.value as Map)
-            ..reference = messageCollection.child(entry.key)
-            ..snapshot = snapshot
-            ..list = FirebaseRealtimeChatMessageList.paginated
-            ..source = usedSource;
+        // HACK: Forges a [DataSnapshot] with a custom patch.
+        final snapshot = DataSnapshot.fake(entry.key, entry.value as Map);
+        final message = messageBuilder(entry.value as Map)
+          ..reference = messageCollection.child(entry.key)
+          ..snapshot = snapshot
+          ..list = FirebaseRealtimeChatMessageList.paginated
+          ..source = usedSource;
 
-          if (message.source == FirebaseRealtimeChatMessageSource.realtimeDatabase) message.updateMirror();
-          return message;
-        }).toList(growable: false)
-          // NOTE: Firebase query returns the documents unordered.
-          ..sort((a, b) => b.createTime.compareTo(a.createTime)),
-        Priority.touch,
-      );
-    } catch (e) {
-      _log.e(e);
+        if (message.source == FirebaseRealtimeChatMessageSource.realtimeDatabase) message.updateMirror();
+        return message;
+      }).toList(growable: false)
+        ..sort((a, b) => b.createTime.compareTo(a.createTime)); // NOTE: Firebase DB returns the documents unordered.
+    } catch (e, s) {
+      _log.e('Failed to build models of paginated messages for ${chatReference.path} page ${page + 1}', e, s);
     }
 
     // Assert order is correct, by making sure document timestamps
@@ -245,7 +251,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     switch (usedSource) {
       case FirebaseRealtimeChatMessageSource.realtimeDatabase:
         if (messages.length < itemsPerPage) {
-          _log.v('Collection end reached');
+          _log.d('Collection end reached');
           isEndReached = true;
         }
         break;
@@ -279,6 +285,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         // This shouldn't normally happen.
         if (_seenItems.contains(child.snapshot.key)) {
           _log.e(' - Key ${child.snapshot.key} has already been added');
+          // FIXME: Still push an update to the relevant cached model.
           return;
         }
 
@@ -464,7 +471,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   }
 
   Future _startListening() async {
-    final now = DateTime.now().toUtc().millisecondsSinceEpoch;
+    final now = Timestamp.now().millisecondsSinceEpoch;
 
     // First page will always attempt to fetch from offline.
     // If offline storage has items, use their newest timestamp
@@ -474,7 +481,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
     // Try to reacquire subscription timestamp, if offline pagination returned results.
     final timestamp = _subscriptionTimestamp ?? now;
-    subscriptionTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    subscriptionTime = Timestamp.fromMillisecondsSinceEpoch(timestamp);
     _startSubscription(timestamp: timestamp);
     if (paginatedItems.isEmpty) await fetchPage(1, timestamp);
     if (!_disposed) await _startParticipating();
@@ -495,7 +502,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   void handleAppLifecycleStatus(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        _startSubscription(timestamp: _subscriptionTimestamp ?? DateTime.now().toUtc().millisecondsSinceEpoch);
+        _startSubscription(timestamp: _subscriptionTimestamp ?? Timestamp.now().millisecondsSinceEpoch);
         _startParticipating();
         break;
       case AppLifecycleState.inactive:
