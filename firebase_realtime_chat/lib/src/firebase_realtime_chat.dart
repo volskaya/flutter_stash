@@ -110,19 +110,12 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
   /// Uses cursor only from the nearest online confirmed document.
   /// Pagination timestamps don't care about the online confirmation.
-  int get _paginationTimestamp => paginatedItems.reversed
-      .firstWhere(
-        (item) => item.createTime != null,
-        orElse: () => null,
-      )
-      ?.createTime;
+  int get _paginationTimestamp =>
+      paginatedItems.reversed.firstWhere((item) => item.createTime != null, orElse: () => null)?.createTime;
 
   /// Uses cursor only from the nearest online confirmed document.
   int get _subscriptionTimestamp => paginatedItems
-      .firstWhere(
-        (item) => (item.online || item.readBy.isNotEmpty) && item.createTime != null,
-        orElse: () => null,
-      )
+      .firstWhere((item) => item.isServerTimestamp && item.createTime != null, orElse: () => null)
       ?.createTime;
 
   /// Start calling paginators with all items on the last page.

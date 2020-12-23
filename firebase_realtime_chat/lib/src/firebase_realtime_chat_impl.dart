@@ -49,6 +49,10 @@ abstract class FirebaseRealtimeChatMessageImpl {
 
   /// When the chat fetches an item, it's mirror storage needs to be updated as well.
   Future updateMirror();
+
+  /// Whether to assume the timestamp is correct with the server and
+  /// can be used for pagination & subscription.
+  bool get isServerTimestamp;
 }
 
 /// Implementation required by the [FirebaseFirebaseRealtimeChat] participants.
