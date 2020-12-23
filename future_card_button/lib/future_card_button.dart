@@ -52,19 +52,25 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
     try {
       await widget.onPressed?.call();
     } finally {
-      if (mounted) _notifier.value = false;
+      _notifier.value = false;
     }
+  }
+
+  @override
+  void dispose() {
+    _privateNotifier.dispose();
+    super.dispose();
   }
 
   /// Trigger buttons press event.
   Future press() => _handleOnPressed();
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _notifier,
-        builder: (context, __) => widget.builder(
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+        valueListenable: _notifier,
+        builder: (context, locked, __) => widget.builder(
           context,
-          !_notifier.value && widget.onPressed != null ? _handleOnPressed : null,
+          !locked && widget.onPressed != null ? _handleOnPressed : null,
         ),
       );
 }
