@@ -26,6 +26,8 @@ class _FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatMessageImpl
     with _$_FirebaseRealtimeChatPageStorage<T>;
 
 abstract class __FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatMessageImpl> with Store {
+  final _seenItems = <String>{};
+
   final paginatedItems = ObservableList<T>();
   final subscribedItems = ObservableList<T>();
   final pendingItems = ObservableList<T>();
@@ -88,7 +90,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   DateTime subscriptionTime;
 
   final scrollController = ScrollController();
-  final _seenItems = <String>{};
+  Set<String> get _seenItems => _storage._seenItems;
   ObservableList<T> get paginatedItems => _storage.paginatedItems;
   ObservableList<T> get subscribedItems => _storage.subscribedItems;
   ObservableList<T> get pendingItems => _storage.pendingItems;
@@ -265,34 +267,32 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
     // If timestamp exists.
     if (timestamp != null) {
-      _log.v('Subscribing with a timestamp @ $timestamp');
+      _log.d('Subscribing with a timestamp @ $timestamp');
       query = query.startAt(timestamp + 1, key: 'createTime');
     } else {
-      _log.v('Subscribing with no timestamp');
+      _log.d('Subscribing with no timestamp');
     }
 
     _onAddedSubscription = query.onChildAdded.listen(
       (child) {
-        _log.wtf('New subscribed message: $child - ${child.snapshot.value}');
-
         // This shouldn't normally happen.
         if (_seenItems.contains(child.snapshot.key)) {
-          _log.e(' - Key ${child.snapshot.key} has already been added');
-          // FIXME: Still push an update to the relevant cached model.
+          _log.d('${child.snapshot.key} has already been added, skipping…');
           return;
         }
 
-        // When the list is scrolled, new items are pushed to pending items.
+        _log.d('New subscribed message $child');
+
         final list = _isScrolled ? FirebaseRealtimeChatMessageList.pending : FirebaseRealtimeChatMessageList.subscribed;
-        final targetList = _isScrolled ? pendingItems : subscribedItems;
+        final message = messageBuilder(child.snapshot.value as Map)
+          ..reference = messageCollection.child(child.snapshot.key)
+          ..snapshot = child.snapshot
+          ..list = list
+          ..updateMirror();
+
+        // When the list is scrolled, new items are pushed to pending items.
         _seenItems.add(child.snapshot.key);
-        targetList.add(
-          messageBuilder(child.snapshot.value as Map)
-            ..reference = messageCollection.child(child.snapshot.key)
-            ..snapshot = child.snapshot
-            ..list = list
-            ..updateMirror(),
-        );
+        (_isScrolled ? pendingItems : subscribedItems).add(message);
       },
     );
   }
@@ -310,7 +310,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     // NOTE: At the moment, rules enforce having an existing presence, to be allowed to read message documents.
     await reportPresence(online: true);
 
-    // Don't subscribe to the participant ID list, if the ID's were passed manually.
+    // Don't subscribe to the participant ID list, if the IDs were passed manually.
     if (_participants == null) {
       _participantsSubscription?.cancel();
       _participantsSubscription = participantListCollection.onValue.listen(
@@ -334,35 +334,36 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   }
 
   Future reportPresence({bool online = true, bool writing = false}) async {
+    final sendersParticipantRef = participantsCollection.child(senderId);
+
     // If reporting presence, add an `onDisconnect` reaction, to clean
     // this up, if the database loses connection with the client.
     if (_onDisconnectReaction == null) {
       _log.v('Registering an `onDisconnect` reaction, to reset senders participant data');
       _onDisconnectReaction = FirebaseDatabase.instance.reference().child('.info/connected').onValue.listen(
         (event) async {
-          // Not connected.
-          if (event.snapshot.value != true) return;
+          if (event.snapshot.value != true) return; // Not connected.
 
           try {
             // Auto notify of user being in the chat.
-            await participantsCollection.child(senderId).update(<String, dynamic>{
+            await sendersParticipantRef.update(<String, dynamic>{
               'online': true,
               'writing': false,
               'updateTime': ServerValue.timestamp,
             });
-          } on PlatformException catch (e) {
-            _log.e(e);
+          } on PlatformException catch (e, s) {
+            _log.e('Failed to notify ${sendersParticipantRef.path} of being online', e, s);
           }
 
           try {
             // Register a database disconnect event, for when the user loses connection.
-            await participantsCollection.child(senderId).onDisconnect().update(<String, dynamic>{
+            await sendersParticipantRef.onDisconnect().update(<String, dynamic>{
               'online': false,
               'writing': false,
               'updateTime': ServerValue.timestamp,
             });
-          } on PlatformException catch (e) {
-            _log.e(e);
+          } on PlatformException catch (e, s) {
+            _log.e('Failed to add a disconnect callback for ${sendersParticipantRef.path} ', e, s);
           }
         },
       );
@@ -375,12 +376,12 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
       _lastPresence = presence;
 
       try {
-        await participantsCollection.child(senderId).update(<String, dynamic>{
+        await sendersParticipantRef.update(<String, dynamic>{
           ...HashMap<String, dynamic>.from(presence.toJson()),
           'updateTime': ServerValue.timestamp,
         });
-      } on PlatformException catch (e) {
-        _log.e(e);
+      } on PlatformException catch (e, s) {
+        _log.e('Failed to to report presence for ${sendersParticipantRef.path} ', e, s);
       }
     }
   }
@@ -414,29 +415,15 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     }
 
     if (paginatedItems.isNotEmpty) {
-      _log.d('Reused ${paginatedItems.length} from page storage');
-
-      // Sort only subscribed items. Paginated items are sorted as they come in.
-      // I had some last minunte bugs up there, so put the sort here, for now
-      // paginatedItems.sort((a, b) => b.createTime.compareTo(a.createTime));
-
-      var index = 0;
-      for (final message in paginatedItems) {
-        _log.v('[$index] timestamp: ${message.createTime}');
-        index += 1;
-      }
+      _log.v('Reused ${paginatedItems.length}  ${messageCollection.path} messages from page storage');
 
       // Assert order is correct, by making sure document timestamps
       // are ordered newest to oldest.
       assert((() {
-        if (paginatedItems.length <= 1) {
-          return true; // Not enough items.
-        }
+        if (paginatedItems.length <= 1) return true; // Not enough items.
         var timestamp = paginatedItems.first.createTime;
         for (final message in paginatedItems.skip(1)) {
-          if (message.createTime > timestamp) {
-            return false; // Next timestamp is later than current message.
-          }
+          if (message.createTime > timestamp) return false; // Next timestamp is later than current message.
           timestamp = message.createTime;
         }
         return true;
@@ -458,7 +445,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     this.chatId = chatId;
     _setupPageStorage(context);
 
-    _log.wtf('Initializing with user: $senderId, chat $chatId');
+    _log.v('Initializing ${chatReference.path} with user: $senderId, chat $chatId');
     scrollController.addListener(_handleScroll);
     _startListening();
   }

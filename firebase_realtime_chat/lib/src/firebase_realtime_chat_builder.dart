@@ -84,7 +84,7 @@ class _FirebaseRealtimeChatBuilderState<T extends FirebaseRealtimeChatMessageImp
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _chat.dispose();
+    _chat?.dispose();
     super.dispose();
   }
 
