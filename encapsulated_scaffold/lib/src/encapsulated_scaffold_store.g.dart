@@ -9,11 +9,11 @@ part of 'encapsulated_scaffold_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$EncapsulatedScaffoldStore on _EncapsulatedScaffoldStore, Store {
-  Computed<EncapsulatedScaffoldState> _$capsuleComputed;
+  Computed<EncapsulatedCapsuleElement> _$capsuleComputed;
 
   @override
-  EncapsulatedScaffoldState get capsule => (_$capsuleComputed ??=
-          Computed<EncapsulatedScaffoldState>(() => super.capsule,
+  EncapsulatedCapsuleElement get capsule => (_$capsuleComputed ??=
+          Computed<EncapsulatedCapsuleElement>(() => super.capsule,
               name: '_EncapsulatedScaffoldStore.capsule'))
       .value;
   Computed<EncapsulatedSheetItem> _$sheetComputed;

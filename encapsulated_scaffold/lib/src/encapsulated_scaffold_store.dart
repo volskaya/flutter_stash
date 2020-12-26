@@ -49,7 +49,7 @@ abstract class _EncapsulatedScaffoldStore with Store {
   /// Capsules are added and popped as the navigator routes.
   ///
   /// NOTE: .linkedHashSetFrom, to preserve order of insertion
-  final capsules = ObservableSet<EncapsulatedScaffoldState>.linkedHashSetFrom([]);
+  final capsules = ObservableSet<EncapsulatedCapsuleElement>.linkedHashSetFrom([]);
   final notifications = ObservableList<EncapsulatedNotificationItem>();
   final importantNotifications = ObservableList<EncapsulatedNotificationItem>();
   final sheets = ObservableList<EncapsulatedSheetItem>();
@@ -58,7 +58,7 @@ abstract class _EncapsulatedScaffoldStore with Store {
   ReactionDisposer _visibleNotificationReactionDisposer;
 
   @computed
-  EncapsulatedScaffoldState get capsule => capsules.isNotEmpty ? capsules.last : null;
+  EncapsulatedCapsuleElement get capsule => capsules.isNotEmpty ? capsules.last : null;
 
   @computed
   EncapsulatedSheetItem get sheet => sheets.isNotEmpty ? sheets.last : null;

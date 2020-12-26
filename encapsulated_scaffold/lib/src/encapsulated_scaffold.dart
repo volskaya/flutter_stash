@@ -7,7 +7,75 @@ typedef EncapsulatedScaffoldCustomBuilder = Widget Function(BuildContext context
 
 /// Route aware capsule for [Scaffold] which exposes convenience methods for
 /// easier deep links and reactions to created scaffolds troughout the app.
-class EncapsulatedScaffold extends StatefulWidget {
+class EncapsulatedCapsule extends ProxyWidget {
+  /// Creates [EncapsulatedScaffold].
+  const EncapsulatedCapsule({
+    Key key,
+    @required Widget child,
+    this.bottomInset = 0,
+  }) : super(key: key, child: child);
+
+  /// The height of the navigation bar. This will inset encapsulated notifications, when the
+  /// scaffold is in foreground.
+  final double bottomInset;
+
+  @override
+  Element createElement() => EncapsulatedCapsuleElement(widget: this, bottomInset: bottomInset);
+}
+
+/// The [EncapsulatedCapsuleElement] that's pushed to [EncapsulatedScaffoldStore] when the
+/// element is mounted / unmounted.
+class EncapsulatedCapsuleElement extends ProxyElement {
+  /// Creates [EncapsulatedCapsuleElement].
+  EncapsulatedCapsuleElement({
+    @required ProxyWidget widget,
+    this.bottomInset = 0,
+  }) : super(widget);
+
+  /// The height of the navigation bar. This will inset encapsulated notifications, when the
+  /// scaffold is in foreground.
+  final double bottomInset;
+
+  @override
+  void notifyClients(ProxyWidget oldWidget) {}
+
+  EncapsulatedScaffoldStore _store;
+  bool _capsuleWasUpdated = false;
+
+  void _detatchCapsule() {
+    if (_capsuleWasUpdated) {
+      final removed = _store.capsules.remove(this);
+      if (removed) _capsuleWasUpdated = false;
+    }
+  }
+
+  @override
+  void mount(Element parent, dynamic newSlot) {
+    super.mount(parent, newSlot);
+    ModalRoute.of(this); // Register dependency.
+    _store = EncapsulatedScaffoldStore.of(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _capsuleWasUpdated = _store.capsules.add(this));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_capsuleWasUpdated && !ModalRoute.of(this).isActive) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _detatchCapsule());
+    }
+  }
+
+  @override
+  void unmount() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _detatchCapsule());
+    super.unmount();
+  }
+}
+
+/// Route aware capsule for [Scaffold] which exposes convenience methods for
+/// easier deep links and reactions to created scaffolds troughout the app.
+@Deprecated('Use default [Scaffold] and wrap it with [EncapsulatedCapsule]')
+class EncapsulatedScaffold extends StatelessWidget {
   /// Creates [EncapsulatedScaffold].
   const EncapsulatedScaffold({
     Key key,
@@ -123,61 +191,22 @@ class EncapsulatedScaffold extends StatefulWidget {
   final double bottomInset;
 
   @override
-  EncapsulatedScaffoldState createState() => EncapsulatedScaffoldState();
-}
-
-/// Public state of [EncapsulatedScaffold].
-///
-/// [EncapsulatedScaffold] is added/removed from [EncapsulatedScaffoldStore] as
-/// it's built or destroyed.
-class EncapsulatedScaffoldState extends State<EncapsulatedScaffold> {
-  /// User defined bottom inset of this scaffold. Usually the height of the navigation bar.
-  double get bottomInset => widget.bottomInset;
-
-  EncapsulatedScaffoldStore _store;
-  bool _capsuleWasUpdated = false;
-
-  @override
-  void initState() {
-    _store = EncapsulatedScaffoldStore.of(context);
-    _capsuleWasUpdated = _store.capsules.add(this);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _detatchCapsule();
-    super.dispose();
-  }
-
-  void _detatchCapsule() {
-    if (_capsuleWasUpdated) {
-      final removed = _store.capsules.remove(this);
-      if (removed) _capsuleWasUpdated = false;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final scaffold = Scaffold(
-      key: widget.scaffoldKey,
-      extendBodyBehindAppBar: widget.extendBodyBehindAppBar,
-      extendBody: widget.extendBody,
-      floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      floatingActionButton: widget.floatingActionButton,
-      resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
-      bottomNavigationBar: widget.bottomNavigationBar,
-      appBar: widget.appBar,
-      body: widget.body,
+      key: scaffoldKey,
+      extendBodyBehindAppBar: extendBodyBehindAppBar,
+      extendBody: extendBody,
+      floatingActionButtonLocation: floatingActionButtonLocation,
+      floatingActionButton: floatingActionButton,
+      resizeToAvoidBottomInset: resizeToAvoidBottomInset,
+      bottomNavigationBar: bottomNavigationBar,
+      appBar: appBar,
+      body: body,
     );
 
-    return WillPopScope(
-      onWillPop: () async {
-        // Remove the capsule early so the observers can react as before the route animation.
-        _detatchCapsule();
-        return true;
-      },
-      child: widget.customBuilder?.call(context, scaffold) ?? scaffold,
+    return EncapsulatedCapsule(
+      child: customBuilder?.call(context, scaffold) ?? scaffold,
+      bottomInset: bottomInset,
     );
   }
 }
