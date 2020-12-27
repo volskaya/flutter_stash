@@ -10,11 +10,37 @@ enum DirectSelectMode {
 }
 
 class DirectSelect extends StatelessWidget {
+  const DirectSelect({
+    @required this.itemBuilder,
+    @required this.itemCount,
+    @required this.onSelectedItemChanged,
+    @required this.itemExtent,
+    @required this.child,
+    this.selectedIndex = 0,
+    this.mode = DirectSelectMode.drag,
+    this.itemMagnification = 1.15,
+    this.backgroundColor = Colors.white,
+    this.hitTestBehavior = HitTestBehavior.opaque,
+    this.allowScrollEnd = false,
+    this.overlayChildren = const <Widget>[],
+    this.stateKey,
+    this.ignoreInput = false,
+    Key key,
+  })  : assert(onSelectedItemChanged != null),
+        assert(itemExtent != null),
+        assert(child != null),
+        assert(selectedIndex != null && selectedIndex >= 0 && selectedIndex < itemCount),
+        assert(mode != null),
+        assert(itemMagnification != null && itemMagnification >= 1.0),
+        super(key: key);
+
   /// Widget child you'll tap to display the Selection List.
   final Widget child;
 
   /// List of Widgets you'll display after you tap the child.
-  final List<Widget> items;
+  final IndexedWidgetBuilder itemBuilder;
+
+  final int itemCount;
 
   /// Listener when you select any item from the Selection List.
   final ValueChanged<int> onSelectedItemChanged;
@@ -49,30 +75,6 @@ class DirectSelect extends StatelessWidget {
   /// Unassign gesture handlers from the internal [GestureDetector].
   final bool ignoreInput;
 
-  const DirectSelect({
-    @required this.items,
-    @required this.onSelectedItemChanged,
-    @required this.itemExtent,
-    @required this.child,
-    this.selectedIndex = 0,
-    this.mode = DirectSelectMode.drag,
-    this.itemMagnification = 1.15,
-    this.backgroundColor = Colors.white,
-    this.hitTestBehavior = HitTestBehavior.opaque,
-    this.allowScrollEnd = false,
-    this.overlayChildren = const <Widget>[],
-    this.stateKey,
-    this.ignoreInput = false,
-    Key key,
-  })  : assert(items != null && items.length > 0),
-        assert(onSelectedItemChanged != null),
-        assert(itemExtent != null),
-        assert(child != null),
-        assert(selectedIndex != null && selectedIndex >= 0 && selectedIndex < items.length),
-        assert(mode != null),
-        assert(itemMagnification != null && itemMagnification >= 1.0),
-        super(key: key);
-
   @override
   Widget build(BuildContext context) {
     switch (mode) {
@@ -83,7 +85,8 @@ class DirectSelect extends StatelessWidget {
           selectedIndex: selectedIndex,
           mode: mode,
           itemMagnification: itemMagnification,
-          items: items,
+          itemBuilder: itemBuilder,
+          itemCount: itemCount,
           onSelectedItemChanged: onSelectedItemChanged,
           itemExtent: itemExtent,
           backgroundColor: backgroundColor,

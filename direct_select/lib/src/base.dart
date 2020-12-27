@@ -14,8 +14,9 @@ class _FixedExtentScrollController extends FixedExtentScrollController {
 
 abstract class DirectSelectBase extends StatefulWidget {
   const DirectSelectBase({
-    this.child,
-    this.items,
+    @required this.itemBuilder,
+    @required this.itemCount,
+    @required this.child,
     this.onSelectedItemChanged,
     this.itemExtent,
     this.itemMagnification,
@@ -29,40 +30,18 @@ abstract class DirectSelectBase extends StatefulWidget {
     Key key,
   }) : super(key: key);
 
-  /// See: [DirectSelect.child]
   final Widget child;
-
-  /// See: [DirectSelect.items]
-  final List<Widget> items;
-
-  /// See: [DirectSelect.onSelectedItemChanged]
+  final IndexedWidgetBuilder itemBuilder;
+  final int itemCount;
   final ValueChanged<int> onSelectedItemChanged;
-
-  /// See: [DirectSelect.itemExtent]
   final double itemExtent;
-
-  /// See: [DirectSelect.itemMagnification]
   final double itemMagnification;
-
-  /// See: [DirectSelect.selectedIndex]
   final int selectedIndex;
-
-  /// See: [DirectSelect.mode]
   final DirectSelectMode mode;
-
-  /// See: [DirectSelect.backgroundColor]
   final Color backgroundColor;
-
-  /// See: [DirectSelect.hitTestBehavior]
   final HitTestBehavior hitTestBehavior;
-
-  /// See: [DirectSelect.allowScrollEnd].
   final bool allowScrollEnd;
-
-  /// See: [DirectSelect.overlayChildren].
   final List<Widget> overlayChildren;
-
-  /// See: [DirectSelect.ignoreInput].
   final bool ignoreInput;
 
   @override
@@ -122,26 +101,30 @@ abstract class DirectSelectBaseState<T extends DirectSelectBase> extends State<T
   }
 
   Widget overlayWidget([Key key]) {
-    final box = _key.currentContext.findRenderObject() as RenderBox;
-    final position = box.localToGlobal(Offset.zero);
     final mediaQuery = MediaQuery.of(context);
-    final half = mediaQuery.size.height / 2;
-    final result = position.dy - mediaQuery.padding.top - half;
+    final box = _key.currentContext.findRenderObject() as RenderBox;
+    final offset = box?.localToGlobal(Offset.zero) ?? Offset.zero;
+    final anchor = Rect.fromCenter(
+      center: (offset & box.size).center,
+      width: mediaQuery.size.width,
+      height: widget.itemExtent * widget.itemMagnification,
+    );
 
     return MySelectionOverlay(
       key: key,
-      top: result + widget.itemExtent * widget.itemMagnification,
+      anchor: anchor,
       backgroundColor: widget.backgroundColor,
       overlayChildren: widget.overlayChildren,
       child: MySelectionList(
         controller: _controller,
         itemExtent: widget.itemExtent,
         itemMagnification: widget.itemMagnification,
-        childCount: widget.items != null ? widget.items.length : 0,
+        childCount: widget.itemCount,
         allowScrollEnd: widget.allowScrollEnd,
         onItemSelected: () => widget.mode == DirectSelectMode.tap ? removeOverlay() : null,
-        builder: (_, index) => widget.items != null ? widget.items[index] : const SizedBox.shrink(),
+        builder: widget.itemBuilder,
         onItemChanged: (index) => _currentIndex = index ?? _currentIndex,
+        anchor: anchor,
       ),
     );
   }

@@ -6,8 +6,9 @@ import 'package:direct_select/src/widget.dart';
 
 class _DirectSelectTap extends DirectSelectBase {
   const _DirectSelectTap({
-    Widget child,
-    List<Widget> items,
+    @required Widget child,
+    @required IndexedWidgetBuilder itemBuilder,
+    @required int itemCount,
     ValueChanged<int> onSelectedItemChanged,
     double itemExtent,
     double itemMagnification,
@@ -23,7 +24,8 @@ class _DirectSelectTap extends DirectSelectBase {
           selectedIndex: selectedIndex,
           mode: mode,
           itemMagnification: itemMagnification,
-          items: items,
+          itemBuilder: itemBuilder,
+          itemCount: itemCount,
           onSelectedItemChanged: onSelectedItemChanged,
           itemExtent: itemExtent,
           backgroundColor: backgroundColor,

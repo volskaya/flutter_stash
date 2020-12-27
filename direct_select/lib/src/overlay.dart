@@ -1,21 +1,21 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MySelectionOverlay extends StatefulWidget {
-  final double top;
-  final Widget child;
-  final double bottom;
-  final Color backgroundColor;
-  final List<Widget> overlayChildren;
-
   const MySelectionOverlay({
     Key key,
-    this.top,
-    this.bottom,
-    this.child,
-    this.backgroundColor,
+    @required this.child,
+    @required this.backgroundColor,
+    this.anchor,
     this.overlayChildren,
   }) : super(key: key);
+
+  final Rect anchor;
+  final Widget child;
+  final Color backgroundColor;
+  final List<Widget> overlayChildren;
 
   @override
   MySelectionOverlayState createState() {
@@ -49,6 +49,10 @@ class MySelectionOverlayState extends State<MySelectionOverlay> with SingleTicke
     _fadeAnimation = Tween(begin: 0.0, end: 1.0).chain(curveTween).animate(_controller);
   }
 
+  void reverse(OverlayEntry overlayEntry) {
+    _controller.reverse().whenComplete(() => overlayEntry.remove());
+  }
+
   @override
   void initState() {
     _controller = AnimationController(
@@ -70,31 +74,31 @@ class MySelectionOverlayState extends State<MySelectionOverlay> with SingleTicke
   }
 
   @override
-  Widget build(BuildContext context) => FadeTransition(
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final center = widget.anchor.center.dy / mediaQuery.size.height;
+    final centerAlignment = ui.lerpDouble(-1.0, 1.0, center);
+
+    return RepaintBoundary(
+      child: FadeTransition(
         opacity: _fadeAnimation,
         child: Stack(
           fit: StackFit.expand,
           clipBehavior: Clip.none,
           children: <Widget>[
             ColoredBox(color: widget.backgroundColor),
-            Positioned(
-              // top: widget.top - MediaQuery.of(context).size.height / 2,
-              top: widget.top,
-              left: 0.0,
-              right: 0.0,
-              bottom: widget.bottom,
+            RepaintBoundary(
               child: ScaleTransition(
                 scale: _scaleAnimation,
+                alignment: Alignment(0, centerAlignment),
                 child: widget.child,
               ),
             ),
             ...widget.overlayChildren,
           ],
         ),
-      );
-
-  void reverse(OverlayEntry overlayEntry) {
-    _controller.reverse().whenComplete(() => overlayEntry.remove());
+      ),
+    );
   }
 }
 
@@ -109,6 +113,7 @@ class MySelectionList extends StatelessWidget {
     @required this.itemExtent,
     @required this.itemMagnification,
     this.allowScrollEnd = true,
+    this.anchor,
   }) : super(key: key);
 
   final FixedExtentScrollController controller;
@@ -119,31 +124,30 @@ class MySelectionList extends StatelessWidget {
   final double itemExtent;
   final double itemMagnification;
   final bool allowScrollEnd;
+  final Rect anchor;
 
   @override
   Widget build(BuildContext context) => Material(
         type: MaterialType.transparency,
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (scrollNotification) {
-              if (!allowScrollEnd && scrollNotification is ScrollEndNotification) {
-                onItemSelected();
-              }
-              return false;
-            },
-            child: CupertinoPicker.builder(
-              scrollController: controller,
-              offAxisFraction: 0.0,
-              itemExtent: itemExtent,
-              childCount: childCount,
-              useMagnifier: true,
-              magnification: itemMagnification,
-              diameterRatio: 13.0,
-              // squeeze: 10,
-              onSelectedItemChanged: onItemChanged,
-              itemBuilder: builder,
-            ),
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (scrollNotification) {
+            if (!allowScrollEnd && scrollNotification is ScrollEndNotification) {
+              onItemSelected();
+            }
+            return false;
+          },
+          child: CupertinoPicker.builder(
+            scrollController: controller,
+            offAxisFraction: 0.0,
+            itemExtent: itemExtent,
+            childCount: childCount,
+            useMagnifier: true,
+            magnification: itemMagnification,
+            diameterRatio: 13.0,
+            squeeze: 1.2,
+            onSelectedItemChanged: onItemChanged,
+            itemBuilder: builder,
+            anchor: anchor,
           ),
         ),
       );

@@ -7,8 +7,9 @@ import 'package:direct_select/src/overlay.dart';
 
 class DirectSelectDrag extends DirectSelectBase {
   const DirectSelectDrag({
-    Widget child,
-    List<Widget> items,
+    @required Widget child,
+    @required IndexedWidgetBuilder itemBuilder,
+    @required int itemCount,
     ValueChanged<int> onSelectedItemChanged,
     double itemExtent,
     double itemMagnification,
@@ -24,7 +25,8 @@ class DirectSelectDrag extends DirectSelectBase {
           selectedIndex: selectedIndex,
           mode: mode,
           itemMagnification: itemMagnification,
-          items: items,
+          itemBuilder: itemBuilder,
+          itemCount: itemCount,
           onSelectedItemChanged: onSelectedItemChanged,
           itemExtent: itemExtent,
           backgroundColor: backgroundColor,
