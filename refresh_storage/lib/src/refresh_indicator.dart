@@ -47,9 +47,6 @@ enum _RefreshIndicatorMode {
   canceled, // Animating the indicator's fade-out after not arming.
 }
 
-/// Return true so that we can handle inner scroll notification
-bool nestedScrollViewScrollNotificationPredicate(ScrollNotification _) => true;
-
 /// A widget that supports the Material "swipe to refresh" idiom.
 ///
 /// When the child's [Scrollable] descendant overscrolls, an animated circular
@@ -107,6 +104,7 @@ class RefreshIndicator extends StatefulWidget {
     this.color,
     this.backgroundColor,
     this.notificationPredicate = defaultScrollNotificationPredicate,
+    this.overscrollPredicate = defaultOverscrollIndicatorNotificationPredicate,
     this.semanticsLabel,
     this.semanticsValue,
     this.offset = Offset.zero,
@@ -153,6 +151,13 @@ class RefreshIndicator extends StatefulWidget {
   /// By default, checks whether `notification.depth == 0`. Set it to something
   /// else for more complicated layouts.
   final ScrollNotificationPredicate notificationPredicate;
+
+  /// A check that specifies whether a [OverscrollNotification] should be
+  /// handled by this widget.
+  ///
+  /// By default, checks whether `notification.depth == 0`. Set it to something
+  /// else for more complicated layouts.
+  final OverscrollIndicatorNotificationPredicate overscrollPredicate;
 
   /// {@macro flutter.material.progressIndicator.semanticsLabel}
   ///
@@ -282,7 +287,7 @@ class RefreshIndicatorState extends State<RefreshIndicator> with TickerProviderS
   }
 
   bool _handleGlowNotification(OverscrollIndicatorNotification notification) {
-    if (notification.depth != 0 || !notification.leading) return false;
+    if (!widget.overscrollPredicate(notification) || !notification.leading) return false;
     if (_mode == _RefreshIndicatorMode.drag) {
       notification.disallowGlow();
       return true;

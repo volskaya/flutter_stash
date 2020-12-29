@@ -13,17 +13,11 @@ class RefreshContainer extends StatelessWidget {
     @required this.child,
     @required this.bucket,
     this.enforceSafeArea = false,
-  })  : _wrappedAroundNestedScrollview = false,
-        super(key: key);
-
-  /// Creates the [RefreshContainer] with support for [NestedScrollView].
-  const RefreshContainer.nested({
-    Key key,
-    @required this.child,
-    @required this.bucket,
-    this.enforceSafeArea = false,
-  })  : _wrappedAroundNestedScrollview = true,
-        super(key: key);
+    this.fillColor = Colors.transparent,
+    this.duration = const Duration(milliseconds: 300),
+    this.notificationPredicate = defaultScrollNotificationPredicate,
+    this.overscrollPredicate = defaultOverscrollIndicatorNotificationPredicate,
+  }) : super(key: key);
 
   /// Transform the refresh indicator under the top safe area.
   final bool enforceSafeArea;
@@ -37,18 +31,34 @@ class RefreshContainer extends StatelessWidget {
   /// counter state.
   final String bucket;
 
-  final bool _wrappedAroundNestedScrollview;
+  /// Switcher's background color.
+  final Color fillColor;
+
+  /// Switcher's animation duration.
+  final Duration duration;
+
+  /// A check that specifies whether a [ScrollNotification] should be
+  /// handled by this widget.
+  ///
+  /// By default, checks whether `notification.depth == 0`. Set it to something
+  /// else for more complicated layouts.
+  final ScrollNotificationPredicate notificationPredicate;
+
+  /// A check that specifies whether a [OverscrollNotification] should be
+  /// handled by this widget.
+  ///
+  /// By default, checks whether `notification.depth == 0`. Set it to something
+  /// else for more complicated layouts.
+  final OverscrollIndicatorNotificationPredicate overscrollPredicate;
 
   @override
-  Widget build(BuildContext context) => _wrappedAroundNestedScrollview
-      ? RefreshBuilder.nested(
-          builder: (_, __) => child,
-          enforceSafeArea: enforceSafeArea,
-          bucket: bucket,
-        )
-      : RefreshBuilder(
-          builder: (_, __) => child,
-          enforceSafeArea: enforceSafeArea,
-          bucket: bucket,
-        );
+  Widget build(BuildContext context) => RefreshBuilder(
+        builder: (_, __) => child,
+        enforceSafeArea: enforceSafeArea,
+        bucket: bucket,
+        fillColor: fillColor,
+        duration: duration,
+        notificationPredicate: notificationPredicate,
+        overscrollPredicate: overscrollPredicate,
+      );
 }
