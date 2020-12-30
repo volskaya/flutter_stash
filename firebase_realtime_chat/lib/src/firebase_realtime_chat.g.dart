@@ -70,6 +70,17 @@ mixin _$FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   }
 
   @override
+  void _setupPageStorage(BuildContext context) {
+    final _$actionInfo = _$_FirebaseRealtimeChatActionController.startAction(
+        name: '_FirebaseRealtimeChat._setupPageStorage');
+    try {
+      return super._setupPageStorage(context);
+    } finally {
+      _$_FirebaseRealtimeChatActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 

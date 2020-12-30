@@ -103,7 +103,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
                     : const SizedBox.shrink(key: ValueKey('idle')),
               ),
               ...widget.children,
-              // Notification scrim.
+              // Important notification scrim.
               EncapsulatedNotificationOverlayScrim(
                 toggled: showScrim,
                 onDismissed: () =>
