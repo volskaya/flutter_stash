@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:refresh_storage/src/refresh_indicator.dart' as my;
 import 'package:refresh_storage/src/refresh_storage.dart';
 
-class _Storage {
+/// Page storage of [RefreshController].
+class RefreshControllerStorage {
+  /// Which refresh is the [RefreshController] set at.
   int refreshes = 0;
 }
 
@@ -29,8 +30,6 @@ class RefreshBuilder extends StatefulWidget {
     @required this.builder,
     @required this.bucket,
     this.enforceSafeArea = false,
-    this.fillColor = Colors.transparent,
-    this.duration = const Duration(milliseconds: 300),
     this.notificationPredicate = defaultScrollNotificationPredicate,
     this.overscrollPredicate = defaultOverscrollIndicatorNotificationPredicate,
   }) : super(key: key);
@@ -45,12 +44,6 @@ class RefreshBuilder extends StatefulWidget {
   /// Page storage identifier, where this widget will preserve its refresh
   /// counter state.
   final String bucket;
-
-  /// Switcher's background color.
-  final Color fillColor;
-
-  /// Switcher's animation duration.
-  final Duration duration;
 
   /// A check that specifies whether a [ScrollNotification] should be
   /// handled by this widget.
@@ -72,6 +65,9 @@ class RefreshBuilder extends StatefulWidget {
 
 /// Provider of [RefreshController] and state of [RefreshBuilder].
 class RefreshController extends State<RefreshBuilder> {
+  /// [RefreshContrtoller] appends this to bucket strings to avoid collisions.
+  static const storageIdentifierPostfix = '_refresh_builder';
+
   /// Get a reference to above [RefrshController].
   /// Returns null, if there are none.
   static RefreshController of(BuildContext context) {
@@ -82,7 +78,7 @@ class RefreshController extends State<RefreshBuilder> {
     }
   }
 
-  _Storage _storage;
+  RefreshControllerStorage _storage;
 
   /// Number of times this container has been refreshed.
   int get refreshes => _storage?.refreshes ?? 0;
@@ -95,18 +91,13 @@ class RefreshController extends State<RefreshBuilder> {
 
   Future _futureRefresh() async => refresh();
 
-  Widget _buildChild(int refreshes) => KeyedSubtree(
-        key: ValueKey(refreshes),
-        child: widget.builder(context, refreshes),
-      );
-
   @override
   void initState() {
     _storage = RefreshStorage.write(
       context: context,
-      identifier: widget.bucket + '_refresh_builder',
+      identifier: widget.bucket + RefreshController.storageIdentifierPostfix,
       refreshes: 0, // Never refresh this storage.
-      builder: () => _Storage(),
+      builder: () => RefreshControllerStorage(),
     );
     super.initState();
   }
@@ -119,14 +110,7 @@ class RefreshController extends State<RefreshBuilder> {
         overscrollPredicate: widget.overscrollPredicate,
         child: Provider.value(
           value: this,
-          child: FancySwitcher.vertical(
-            fillColor: widget.fillColor,
-            duration: widget.duration,
-            child: FancySwitcherTag(
-              tag: -refreshes, // Have the switcher animate in reverse.
-              child: _buildChild(refreshes),
-            ),
-          ),
+          child: widget.builder(context, refreshes),
         ),
       );
 }

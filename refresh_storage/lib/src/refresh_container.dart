@@ -1,3 +1,4 @@
+import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:refresh_storage/src/refresh_builder.dart';
 
@@ -17,6 +18,7 @@ class RefreshContainer extends StatelessWidget {
     this.duration = const Duration(milliseconds: 300),
     this.notificationPredicate = defaultScrollNotificationPredicate,
     this.overscrollPredicate = defaultOverscrollIndicatorNotificationPredicate,
+    this.controllerKey,
   }) : super(key: key);
 
   /// Transform the refresh indicator under the top safe area.
@@ -44,6 +46,9 @@ class RefreshContainer extends StatelessWidget {
   /// else for more complicated layouts.
   final ScrollNotificationPredicate notificationPredicate;
 
+  /// Passes this key to the [RefreshBuilder], that this [RefreshContainer] wraps.
+  final GlobalKey<RefreshController> controllerKey;
+
   /// A check that specifies whether a [OverscrollNotification] should be
   /// handled by this widget.
   ///
@@ -53,12 +58,18 @@ class RefreshContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => RefreshBuilder(
-        builder: (_, __) => child,
+        key: controllerKey,
         enforceSafeArea: enforceSafeArea,
         bucket: bucket,
-        fillColor: fillColor,
-        duration: duration,
         notificationPredicate: notificationPredicate,
         overscrollPredicate: overscrollPredicate,
+        builder: (_, refresh) => FancySwitcher.vertical(
+          fillColor: fillColor,
+          duration: duration,
+          child: FancySwitcherTag(
+            tag: -refresh, // Have the switcher animate in reverse.
+            child: child,
+          ),
+        ),
       );
 }
