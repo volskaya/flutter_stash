@@ -1,6 +1,5 @@
 import 'package:encapsulated_scaffold/src/encapsulated_notification_item.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_notification_overlay_scrim.dart';
-import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:flutter/material.dart';
@@ -67,19 +66,16 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
   }
 
   @override
-  Widget build(BuildContext context) => Observer(
-        name: 'encapsulated_notification_overlay_notifications',
-        builder: (context) {
-          final showScrim = _store.importantNotifications.isNotEmpty;
-          final item = _store.notification;
-
-          return Stack(
-            fit: StackFit.expand,
-            clipBehavior: Clip.none,
-            children: <Widget>[
-              if (widget.body != null) widget.body,
-              // Switcher for unimportant notifications.
-              FancySwitcher(
+  Widget build(BuildContext context) => Stack(
+        fit: StackFit.expand,
+        clipBehavior: Clip.none,
+        children: <Widget>[
+          if (widget.body != null) widget.body,
+          // Switcher for unimportant notifications.
+          Observer(
+            builder: (_, __) {
+              final item = _store.notification;
+              return FancySwitcher(
                 alignment: Alignment.bottomCenter,
                 onEnd: widget.onEnd,
                 child: item?.important == false
@@ -101,16 +97,23 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
                         ),
                       )
                     : const SizedBox.shrink(key: ValueKey('idle')),
-              ),
-              ...widget.children,
-              // Important notification scrim.
-              EncapsulatedNotificationOverlayScrim(
-                toggled: showScrim,
-                onDismissed: () =>
-                    (_store.importantNotifications.isNotEmpty ? _store.importantNotifications.last : null)?.dismiss(),
-              ),
-              // Notification item switcher.
-              FancySwitcher(
+              );
+            },
+          ),
+          ...widget.children,
+          // Important notification scrim.
+          Observer(
+            builder: (_, __) => EncapsulatedNotificationOverlayScrim(
+              toggled: _store.importantNotifications.isNotEmpty,
+              onDismissed: () =>
+                  (_store.importantNotifications.isNotEmpty ? _store.importantNotifications.last : null)?.dismiss(),
+            ),
+          ),
+          // Notification item switcher.
+          Observer(
+            builder: (_, __) {
+              final item = _store.notification;
+              return FancySwitcher(
                 alignment: Alignment.bottomCenter,
                 onEnd: widget.onEnd,
                 child: item?.important == true
@@ -132,10 +135,10 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
                         ),
                       )
                     : const SizedBox.shrink(key: ValueKey('idle')),
-              ),
-            ],
-          );
-        },
+              );
+            },
+          ),
+        ],
       );
 }
 

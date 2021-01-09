@@ -277,6 +277,7 @@ class PageTransitionSwitcher extends StatefulWidget {
     return Stack(
       children: entries,
       alignment: alignment,
+      clipBehavior: Clip.none,
     );
   }
 
@@ -389,10 +390,7 @@ class _PageTransitionSwitcherState extends State<PageTransitionSwitcher> with Ti
     );
     final _ChildEntry entry = _ChildEntry(
       widgetChild: child,
-      transition: KeyedSubtree.wrap(
-        transition,
-        _childNumber,
-      ),
+      transition: KeyedSubtree.wrap(transition, _childNumber),
       primaryController: primaryController,
       secondaryController: secondaryController,
     );

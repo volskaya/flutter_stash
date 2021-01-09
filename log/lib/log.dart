@@ -30,6 +30,8 @@ class Log extends LogPrinter {
 
     return [
       color('$emoji $label: ${event.message}'),
+      if (event.error != null) color('$emoji | ${event.error}'),
+      if (event.stackTrace != null) color('\n${event.stackTrace}\n'),
     ];
   }
 }

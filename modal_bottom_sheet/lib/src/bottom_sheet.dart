@@ -338,7 +338,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet> with TickerProvider
                 delegate: _ModalBottomSheetBox(
                   topInset: mediaQuery.padding.top,
                   value: animationValue,
-                  statusBarColor: theme.colorScheme.surface,
+                  statusBarColor: theme.colorScheme.background,
                 ),
               );
             },
