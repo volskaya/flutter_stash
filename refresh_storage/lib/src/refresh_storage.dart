@@ -71,7 +71,7 @@ class RefreshStorage extends StatefulWidget {
 
     if ((item?.key ?? -1) < _refreshes) {
       // Dispose the previous refresh.
-      if (item?.value?.isDisposable == true) WidgetsBinding.instance.addPostFrameCallback((_) => item.value.dispose());
+      if (item?.value?.isDisposable == true) WidgetsBinding.instance.addPostFrameCallback(item.value.dispose);
 
       // Build the new item.
       item = MapEntry(_refreshes, _RefreshStorageItem<T>(data: builder(), dispose: dispose));

@@ -31,7 +31,8 @@ class DelayedProgressIndicator extends StatefulWidget {
   _DelayedProgressIndicatorState createState() => _DelayedProgressIndicatorState();
 }
 
-class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator> with SingleTickerProviderStateMixin {
+class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator>
+    with SingleTickerProviderStateMixin<DelayedProgressIndicator> {
   late final Timer _timer;
   late final AnimationController _controller;
 
@@ -42,9 +43,9 @@ class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator> wit
 
   @override
   void initState() {
-    super.initState();
     _controller = AnimationController(vsync: this, duration: kThemeChangeDuration);
     _timer = Timer(widget.delay, _setVisible);
+    super.initState();
   }
 
   @override

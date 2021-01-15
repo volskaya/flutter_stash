@@ -16,12 +16,16 @@ abstract class AwaitRoute {
     if (route?.animation?.isCompleted ?? true) return SynchronousFuture<void>(null);
 
     final completer = Completer<void>();
-    final timeout = Timer(const Duration(seconds: 1), completer.complete);
+    Timer? timeout;
+    timeout = Timer(const Duration(seconds: 1), () {
+      if (timeout?.isActive == true) timeout?.cancel();
+      completer.complete();
+    });
 
     ValueChanged<AnimationStatus>? listener;
     listener = (AnimationStatus status) {
       if (status == AnimationStatus.completed && !completer.isCompleted) {
-        if (timeout.isActive) timeout.cancel();
+        if (timeout?.isActive == true) timeout?.cancel();
         completer.complete();
         if (listener != null) route!.animation!.removeStatusListener(listener);
       }
