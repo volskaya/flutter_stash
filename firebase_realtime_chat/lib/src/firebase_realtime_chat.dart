@@ -7,6 +7,7 @@ import 'package:firebase_realtime_chat/src/firebase_realtime_chat_mirror_storage
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:loader_coordinator/loader_coordinator.dart';
 import 'package:log/log.dart';
 import 'package:mobx/mobx.dart';
 import 'package:quiver/strings.dart';
@@ -132,6 +133,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
       index > (subscribedItems.length - 1) ? paginatedItems[index - subscribedItems.length] : subscribedItems[index];
 
   Future fetchPage(int page, [int timestamp]) async {
+    assert(_mirrorStorage != null);
+
     // This method is called by lists, that use this chat class.
     // The pagination, without `timestamp`, can only be called, when
     // pagination already holds results, and when thats true,
@@ -140,6 +143,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
     if (_fetchingPage || page <= this.page || _storage.isEndReached) return;
     _fetchingPage = true;
+    final loader = LoaderCoordinator.instance.touch();
 
     try {
       await _paginate(timestamp);
@@ -147,6 +151,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
       _log.e('Failed to paginate ${chatReference.path} page ${page + 1}', e, s);
     } finally {
       _fetchingPage = false;
+      loader.dispose();
     }
 
     assert(page == this.page); // Double check page numbers.
@@ -154,6 +159,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
   /// NOTE: `_paginationTimestamp` will have priority over `timestamp`.
   Future _paginate([int timestamp]) async {
+    assert(_mirrorStorage != null);
+
     final oldestTimestamp = _paginationTimestamp ?? timestamp;
     _log.v('Paginating page ${page + 1}, startingAt: ${oldestTimestamp ?? "First item"}');
 
@@ -163,7 +170,10 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     var items = const <String, dynamic>{};
 
     // Initially try to paginate from the offline storage.
-    final offlineSnapshots = await FirebaseRealtimeChatMirrorStorage.instance.find(
+    //
+    // A mirror storage is initialized per each chat room, before the pagination starts,
+    // so this should be ready.
+    final offlineSnapshots = await _mirrorStorage?.find(
       messageCollection.path,
       oldestTimestamp != null
           ? Finder(
@@ -177,7 +187,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
             ),
     );
 
-    if (offlineSnapshots.isNotEmpty) {
+    if (offlineSnapshots?.isNotEmpty == true) {
       usedSource = FirebaseRealtimeChatMessageSource.mirrorStorage;
       _log.wtf('Got ${offlineSnapshots.length} items from offline storage');
 
@@ -428,7 +438,6 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     assert(!_disposed);
     assert(isNotEmpty(senderId));
     assert(isNotEmpty(chatId));
-    assert(FirebaseRealtimeChatMirrorStorage.instance.initialized);
 
     this.senderId = senderId;
     this.chatId = chatId;
@@ -439,7 +448,17 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     _startListening();
   }
 
+  FirebaseRealtimeChatMirrorStorage _mirrorStorage;
+  Future _initializeMirror() async {
+    // First prepare the mirror storage for offline documents.
+    _mirrorStorage = await FirebaseRealtimeChatMirrorStorage.initialize(chatReference);
+    if (_disposed) await _mirrorStorage.dispose();
+  }
+
   Future _startListening() async {
+    await _initializeMirror();
+    if (_disposed) return;
+
     // First page will always attempt to fetch from offline.
     // If offline storage has items, use their newest timestamp
     // to fetch any missed messages.
@@ -462,6 +481,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     _onDisconnectReaction?.cancel();
     _disposeSubscription();
     _participantsSubscription?.cancel();
+    _mirrorStorage?.dispose();
 
     // Send last presence, indicating the user is offline.
     reportPresence(writing: false, online: false);

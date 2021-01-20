@@ -57,7 +57,6 @@ class _FirebaseRealtimeChatBuilderState<T extends FirebaseRealtimeChatMessageImp
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-
     _chat = FirebaseRealtimeChat<T, D>(
       collection: FirebaseDatabase.instance.reference().child('chats'),
       messageBuilder: widget.messageBuilder,
