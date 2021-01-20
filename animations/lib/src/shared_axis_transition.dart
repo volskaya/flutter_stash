@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:animations/src/custom_widgets.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
@@ -205,6 +206,7 @@ class SharedAxisTransition extends StatelessWidget {
     this.child,
     this.onEnd,
     this.onStatusChanged,
+    this.sliver = false,
   })  : assert(transitionType != null),
         super(key: key);
 
@@ -250,6 +252,9 @@ class SharedAxisTransition extends StatelessWidget {
   /// [secondaryAnimation].
   final Widget child;
 
+  /// Whether to use sliver variants of animation widgets.
+  final bool sliver;
+
   @override
   Widget build(BuildContext context) {
     final Color color = fillColor ?? Theme.of(context).canvasColor;
@@ -266,6 +271,7 @@ class SharedAxisTransition extends StatelessWidget {
           animation: animation,
           transitionType: transitionType,
           child: child,
+          sliver: sliver,
         );
       },
       reverseBuilder: (
@@ -279,6 +285,7 @@ class SharedAxisTransition extends StatelessWidget {
           reverse: true,
           fillColor: color,
           child: child,
+          sliver: sliver,
         );
       },
       child: dual_transition_builder.DualTransitionBuilder(
@@ -293,6 +300,7 @@ class SharedAxisTransition extends StatelessWidget {
             transitionType: transitionType,
             reverse: true,
             child: child,
+            sliver: sliver,
           );
         },
         reverseBuilder: (
@@ -305,6 +313,7 @@ class SharedAxisTransition extends StatelessWidget {
             transitionType: transitionType,
             fillColor: color,
             child: child,
+            sliver: sliver,
           );
         },
         child: child,
@@ -319,12 +328,14 @@ class _EnterTransition extends StatelessWidget {
     this.transitionType,
     this.reverse = false,
     this.child,
+    this.sliver = false,
   });
 
   final Animation<double> animation;
   final SharedAxisTransitionType transitionType;
   final Widget child;
   final bool reverse;
+  final bool sliver;
 
   static final Animatable<double> _fadeInTransition = CurveTween(
     curve: decelerateEasing,
@@ -349,14 +360,16 @@ class _EnterTransition extends StatelessWidget {
           end: Offset.zero,
         ).chain(CurveTween(curve: standardEasing));
 
-        return FadeTransition(
+        return CustomWidgets.fade(
           opacity: _fadeInTransition.animate(animation),
+          sliver: sliver,
           child: AnimatedBuilder(
             animation: animation,
             builder: (BuildContext context, Widget child) {
-              return Transform.translate(
+              return CustomWidgets.translate(
                 offset: slideInTransition.evaluate(animation),
                 child: child,
+                sliver: sliver,
               );
             },
             child: child,
@@ -369,14 +382,16 @@ class _EnterTransition extends StatelessWidget {
           end: Offset.zero,
         ).chain(CurveTween(curve: standardEasing));
 
-        return FadeTransition(
+        return CustomWidgets.fade(
           opacity: _fadeInTransition.animate(animation),
+          sliver: sliver,
           child: AnimatedBuilder(
             animation: animation,
             builder: (BuildContext context, Widget child) {
-              return Transform.translate(
+              return CustomWidgets.translate(
                 offset: slideInTransition.evaluate(animation),
                 child: child,
+                sliver: sliver,
               );
             },
             child: child,
@@ -384,11 +399,13 @@ class _EnterTransition extends StatelessWidget {
         );
         break;
       case SharedAxisTransitionType.scaled:
-        return FadeTransition(
+        return CustomWidgets.fade(
           opacity: _fadeInTransition.animate(animation),
-          child: ScaleTransition(
+          sliver: sliver,
+          child: CustomWidgets.scale(
             scale: (!reverse ? _scaleUpTransition : _scaleDownTransition).animate(animation),
             child: child,
+            sliver: sliver,
           ),
         );
         break;
@@ -404,6 +421,7 @@ class _ExitTransition extends StatelessWidget {
     this.reverse = false,
     @required this.fillColor,
     this.child,
+    this.sliver = false,
   });
 
   final Animation<double> animation;
@@ -411,6 +429,7 @@ class _ExitTransition extends StatelessWidget {
   final bool reverse;
   final Color fillColor;
   final Widget child;
+  final bool sliver;
 
   static final Animatable<double> _fadeOutTransition = _FlippedCurveTween(
     curve: accelerateEasing,
@@ -438,9 +457,10 @@ class _ExitTransition extends StatelessWidget {
         Widget _widget = AnimatedBuilder(
           animation: animation,
           builder: (BuildContext context, Widget child) {
-            return Transform.translate(
+            return CustomWidgets.translate(
               offset: slideOutTransition.evaluate(animation),
               child: child,
+              sliver: sliver,
             );
           },
           child: child,
@@ -450,9 +470,10 @@ class _ExitTransition extends StatelessWidget {
           _widget = ColoredBox(color: fillColor, child: _widget);
         }
 
-        return FadeTransition(
+        return CustomWidgets.fade(
           opacity: _fadeOutTransition.animate(animation),
           child: _widget,
+          sliver: sliver,
         );
         break;
       case SharedAxisTransitionType.vertical:
@@ -464,9 +485,10 @@ class _ExitTransition extends StatelessWidget {
         Widget _widget = AnimatedBuilder(
           animation: animation,
           builder: (BuildContext context, Widget child) {
-            return Transform.translate(
+            return CustomWidgets.translate(
               offset: slideOutTransition.evaluate(animation),
               child: child,
+              sliver: sliver,
             );
           },
           child: child,
@@ -476,24 +498,27 @@ class _ExitTransition extends StatelessWidget {
           _widget = ColoredBox(color: fillColor, child: _widget);
         }
 
-        return FadeTransition(
+        return CustomWidgets.fade(
           opacity: _fadeOutTransition.animate(animation),
           child: _widget,
+          sliver: sliver,
         );
         break;
       case SharedAxisTransitionType.scaled:
-        Widget _widget = ScaleTransition(
+        Widget _widget = CustomWidgets.scale(
           scale: (!reverse ? _scaleUpTransition : _scaleDownTransition).animate(animation),
           child: child,
+          sliver: sliver,
         );
 
         if (fillColor != Colors.transparent) {
           _widget = ColoredBox(color: fillColor, child: _widget);
         }
 
-        return FadeTransition(
+        return CustomWidgets.fade(
           opacity: _fadeOutTransition.animate(animation),
           child: _widget,
+          sliver: sliver,
         );
         break;
     }

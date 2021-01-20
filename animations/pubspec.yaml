@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  sliver_transform:
+    path: /home/projects/packages/flutter_helpers/sliver_transform
 
 dev_dependencies:
   flutter_test:

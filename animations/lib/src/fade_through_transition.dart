@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:animations/src/custom_widgets.dart';
 import 'package:flutter/material.dart';
 
 // TODO(shihaohong): Remove DualTransitionBuilder once flutter/flutter's `stable`
@@ -172,6 +173,7 @@ class FadeThroughTransition extends StatelessWidget {
     this.child,
     this.onEnd,
     this.onStatusChanged,
+    this.sliver = false,
   })  : assert(animation != null),
         assert(secondaryAnimation != null);
 
@@ -209,12 +211,16 @@ class FadeThroughTransition extends StatelessWidget {
   /// [secondaryAnimation].
   final Widget child;
 
+  /// Whether to use sliver variants of animation widgets.
+  final bool sliver;
+
   @override
   Widget build(BuildContext context) {
     Widget _widget = _ZoomedFadeInFadeOut(
       animation: ReverseAnimation(secondaryAnimation),
       child: child,
       onEnd: onEnd,
+      sliver: sliver,
     );
 
     if (fillColor != Colors.transparent) {
@@ -228,6 +234,7 @@ class FadeThroughTransition extends StatelessWidget {
       animation: animation,
       child: _widget,
       onEnd: onEnd,
+      sliver: sliver,
     );
   }
 }
@@ -239,12 +246,14 @@ class _ZoomedFadeInFadeOut extends StatelessWidget {
     this.child,
     this.onEnd,
     this.onStatusChanged,
+    this.sliver = false,
   }) : super(key: key);
 
   final Animation<double> animation;
   final Widget child;
   final VoidCallback onEnd;
   final ValueChanged<AnimationStatus> onStatusChanged;
+  final bool sliver;
 
   @override
   Widget build(BuildContext context) {
@@ -260,6 +269,7 @@ class _ZoomedFadeInFadeOut extends StatelessWidget {
         return _ZoomedFadeIn(
           animation: animation,
           child: child,
+          sliver: sliver,
         );
       },
       reverseBuilder: (
@@ -270,6 +280,7 @@ class _ZoomedFadeInFadeOut extends StatelessWidget {
         return _FadeOut(
           child: child,
           animation: animation,
+          sliver: sliver,
         );
       },
       child: child,
@@ -281,10 +292,12 @@ class _ZoomedFadeIn extends StatelessWidget {
   const _ZoomedFadeIn({
     this.child,
     this.animation,
+    this.sliver = false,
   });
 
   final Widget child;
   final Animation<double> animation;
+  final bool sliver;
 
   static final CurveTween _inCurve = CurveTween(
     curve: const Cubic(0.0, 0.0, 0.2, 1.0),
@@ -316,11 +329,13 @@ class _ZoomedFadeIn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
+    return CustomWidgets.fade(
       opacity: _fadeInOpacity.animate(animation),
-      child: ScaleTransition(
+      sliver: sliver,
+      child: CustomWidgets.scale(
         scale: _scaleIn.animate(animation),
         child: child,
+        sliver: sliver,
       ),
     );
   }
@@ -330,10 +345,12 @@ class _FadeOut extends StatelessWidget {
   const _FadeOut({
     this.child,
     this.animation,
+    this.sliver = false,
   });
 
   final Widget child;
   final Animation<double> animation;
+  final bool sliver;
 
   static final CurveTween _outCurve = CurveTween(
     curve: const Cubic(0.4, 0.0, 1.0, 1.0),
@@ -353,9 +370,10 @@ class _FadeOut extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
+    return CustomWidgets.fade(
       opacity: _fadeOutOpacity.animate(animation),
       child: child,
+      sliver: sliver,
     );
   }
 }

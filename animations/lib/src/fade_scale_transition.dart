@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart'
-    hide decelerateEasing; // ignore: undefined_hidden_name
+import 'package:animations/src/custom_widgets.dart';
+import 'package:flutter/material.dart' hide decelerateEasing; // ignore: undefined_hidden_name
 // TODO(goderbauer): Remove implementation import when material properly exports the file.
 import 'package:flutter/src/material/curves.dart'; // ignore: implementation_imports
 
@@ -124,6 +124,7 @@ class FadeScaleTransition extends StatelessWidget {
     Key key,
     @required this.animation,
     this.child,
+    this.sliver = false,
   })  : assert(animation != null),
         super(key: key);
 
@@ -140,6 +141,9 @@ class FadeScaleTransition extends StatelessWidget {
   /// This widget will transition in and out as driven by [animation] and
   /// [secondaryAnimation].
   final Widget child;
+
+  /// Whether to use sliver variants of animation widgets.
+  final bool sliver;
 
   static final Animatable<double> _fadeInTransition = CurveTween(
     curve: const Interval(0.0, 0.3),
@@ -162,11 +166,13 @@ class FadeScaleTransition extends StatelessWidget {
         Animation<double> animation,
         Widget child,
       ) {
-        return FadeTransition(
+        return CustomWidgets.fade(
           opacity: _fadeInTransition.animate(animation),
-          child: ScaleTransition(
+          sliver: sliver,
+          child: CustomWidgets.scale(
             scale: _scaleInTransition.animate(animation),
             child: child,
+            sliver: sliver,
           ),
         );
       },
@@ -175,9 +181,10 @@ class FadeScaleTransition extends StatelessWidget {
         Animation<double> animation,
         Widget child,
       ) {
-        return FadeTransition(
+        return CustomWidgets.fade(
           opacity: _fadeOutTransition.animate(animation),
           child: child,
+          sliver: sliver,
         );
       },
       child: child,
