@@ -13,6 +13,8 @@ dependencies:
     sdk: flutter
   fancy_switcher:
     path: /home/projects/packages/fancy_switcher
+  loader_coordinator:
+    path: /home/projects/packages/flutter_helpers/loader_coordinator
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:loader_coordinator/loader_coordinator.dart';
 
 /// When the [callback] is null, the button is locked/loading.
 typedef FutureButtonChildBuilder = Widget Function(BuildContext context, VoidCallback callback);
@@ -42,10 +43,12 @@ class FutureButtonBuilder extends StatefulWidget {
     // Don't call if the notifier is locked.
     try {
       if (!notifier.value) {
+        final loader = LoaderCoordinator.instance.touch(instant: true);
         notifier.value = true;
         try {
           await callback();
         } finally {
+          loader.dispose();
           notifier.value = false;
         }
       }
@@ -91,10 +94,12 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
 
   Future _handleOnPressed() async {
     if (_notifier.value) return; // Redundant, the button should be locked.
+    final loader = LoaderCoordinator.instance.touch(instant: true);
     _notifier.value = true;
     try {
       await widget.onPressed?.call();
     } finally {
+      loader.dispose();
       if (mounted) _notifier.value = false;
     }
   }

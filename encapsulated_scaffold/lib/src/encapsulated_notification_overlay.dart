@@ -40,7 +40,6 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
 /// Provider of [EncapsulatedNotificationOverlayController].
 class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotificationOverlay> {
   EncapsulatedScaffoldStore _store;
-  ReactionDisposer _capsuleReactionDisposer;
 
   bool _handleBackButton(bool stopDefaultButtonEvent, RouteInfo _) {
     if (stopDefaultButtonEvent) return true;
@@ -61,7 +60,6 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
   @override
   void dispose() {
     BackButtonInterceptor.remove(_handleBackButton);
-    _capsuleReactionDisposer();
     super.dispose();
   }
 
