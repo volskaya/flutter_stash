@@ -16,6 +16,7 @@ class FutureButtonBuilder extends StatefulWidget {
     Key key,
     @required this.builder,
     @required this.onPressed,
+    this.question,
     this.family,
   }) : super(key: key);
 
@@ -24,6 +25,11 @@ class FutureButtonBuilder extends StatefulWidget {
 
   /// Future event, when the button is pressed.
   final Future Function() onPressed;
+
+  /// A question callback, like a modal that returns true, to call before the [onPressed].
+  ///
+  /// While this callback is awaited, the [FutureButtonBuilder] will not trigger [LoaderCoordinator].
+  final Future<bool> Function() question;
 
   /// If `family` is defined, the buttons will share the same notifiers
   /// and lock/unlock at the same time
@@ -94,8 +100,23 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
 
   Future _handleOnPressed() async {
     if (_notifier.value) return; // Redundant, the button should be locked.
-    final loader = LoaderCoordinator.instance.touch(instant: true);
     _notifier.value = true;
+
+    // If a question was defined, handle it first.
+    if (widget.question != null) {
+      try {
+        if (await widget.question() != true) {
+          _notifier.value = false;
+          return;
+        }
+      } catch (_) {
+        _notifier.value = false;
+        rethrow;
+      }
+    }
+
+    // Trigger the loader and handle the regular callback.
+    final loader = LoaderCoordinator.instance.touch(instant: true);
     try {
       await widget.onPressed?.call();
     } finally {
