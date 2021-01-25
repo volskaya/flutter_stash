@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
+/// A disposable reference counted object to track loaders in [LoaderCoordinator].
 class LoaderDisposer {
+  /// Removes the reference from the [LoaderCoordinator].
   void dispose() => LoaderCoordinator.instance._removeLoader(this);
 }
 
@@ -31,6 +32,7 @@ class LoaderCoordinator {
     if (!notifier.value) _timer ??= Timer(const Duration(seconds: 1), _maybeToggleNotifier);
   }
 
+  /// Get a reference conuted [LoaderDisposer] and trigger the [LoaderCoordinator] notifier.
   LoaderDisposer touch({bool instant = false}) {
     final disposer = LoaderDisposer();
     _loaders.add(disposer);

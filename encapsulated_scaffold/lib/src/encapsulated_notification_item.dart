@@ -58,7 +58,7 @@ abstract class EncapsulatedNotificationItem implements _$EncapsulatedNotificatio
 
     /// Fade out time of the notification. Set null to keep the item on screen
     /// till user interaction.
-    @Default(Duration(seconds: 10)) @nullable Duration timeout,
+    @Default(Duration(seconds: 5)) @nullable Duration timeout,
 
     /// Callback on dismiss.
     VoidCallback onDismissed,

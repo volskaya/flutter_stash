@@ -22,9 +22,11 @@ mixin _$_FirebaseRealtimeChatPageStorage<
 
   @override
   set isEndReached(bool value) {
-    _$isEndReachedAtom.reportWrite(value, super.isEndReached, () {
-      super.isEndReached = value;
-    });
+    if (super.isEndReached != value) {
+      _$isEndReachedAtom.reportWrite(value, super.isEndReached, () {
+        super.isEndReached = value;
+      });
+    }
   }
 
   final _$participantsAtom =
@@ -38,9 +40,11 @@ mixin _$_FirebaseRealtimeChatPageStorage<
 
   @override
   set participants(Set<String> value) {
-    _$participantsAtom.reportWrite(value, super.participants, () {
-      super.participants = value;
-    });
+    if (super.participants != value) {
+      _$participantsAtom.reportWrite(value, super.participants, () {
+        super.participants = value;
+      });
+    }
   }
 
   @override

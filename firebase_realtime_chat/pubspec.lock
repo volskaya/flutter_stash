@@ -369,9 +369,9 @@ packages:
   mobx_codegen:
     dependency: "direct main"
     description:
-      name: mobx_codegen
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "/home/projects/forks/mobx.dart/mobx_codegen"
+      relative: false
+    source: path
     version: "1.1.2"
   nested:
     dependency: transitive

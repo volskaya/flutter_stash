@@ -46,7 +46,7 @@ class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator>
   void _setVisible() {
     assert(mounted);
     _controller?.forward();
-    _visible = true;
+    setState(() => _visible = true);
   }
 
   @override

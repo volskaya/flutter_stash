@@ -21,6 +21,11 @@ dependencies:
   fancy_switcher:
     path: /home/projects/packages/fancy_switcher
 
+dependency_overrides:
+  # Conditionally checks if an observable should update.
+  mobx_codegen:
+    path: /home/projects/forks/mobx.dart/mobx_codegen
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

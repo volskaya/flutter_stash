@@ -73,8 +73,8 @@ class FadeScaleTransitionConfiguration extends ModalConfiguration {
   const FadeScaleTransitionConfiguration({
     Color barrierColor = Colors.black54,
     bool barrierDismissible = true,
-    Duration transitionDuration = const Duration(milliseconds: 150),
-    Duration reverseTransitionDuration = const Duration(milliseconds: 75),
+    Duration transitionDuration = const Duration(milliseconds: 250),
+    Duration reverseTransitionDuration = const Duration(milliseconds: 200),
     String barrierLabel = 'Dismiss',
   }) : super(
           barrierColor: barrierColor,
