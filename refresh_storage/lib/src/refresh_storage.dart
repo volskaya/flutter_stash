@@ -6,26 +6,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:refresh_storage/src/refresh_builder.dart';
+import 'package:refresh_storage/src/refresh_storage_entry.dart';
 
-class _RefreshStorageItem<T> {
-  _RefreshStorageItem({
-    @required this.data,
-    @required ValueChanged<T> dispose,
-  })  : _dispose = dispose,
-        isDisposable = dispose != null;
-
-  final T data;
-  final ValueChanged<T> _dispose;
-  final bool isDisposable;
-
+/// Implementation of [RefreshStorage] items.
+abstract class RefreshStorageItem {
   bool _isDisposed = false;
 
-  /// [WillPopCallback] compatible dispose.
+  /// Called when the [RefreshStorage] is being destroyed and its cached values with it.
+  @mustCallSuper
   void dispose([dynamic _]) {
-    if (!_isDisposed) {
-      _isDisposed = true;
-      _dispose?.call(data);
-    }
+    assert(!_isDisposed);
+    _isDisposed = true;
   }
 }
 
@@ -55,11 +46,10 @@ class RefreshStorage extends StatefulWidget {
   ///
   /// [RefreshStorage] will call dispose when a new refresh is used with the
   /// same identifier or when the route pops.
-  static T write<T>({
+  static RefreshStorageEntry<T> write<T extends RefreshStorageItem>({
     @required BuildContext context,
     @required String identifier,
     @required T Function() builder,
-    ValueChanged<T> dispose,
     int refreshes,
     RefreshStorageState storage,
     ModalRoute route,
@@ -67,18 +57,19 @@ class RefreshStorage extends StatefulWidget {
     final _refreshes = refreshes ?? RefreshController.of(context)?.refreshes ?? 0;
     final targetStorage = storage ?? RefreshStorage.of(context);
 
-    var item = targetStorage._cache[identifier] as MapEntry<int, _RefreshStorageItem<T>>;
+    assert(_refreshes >= 0);
+    var item = targetStorage._cache[identifier.hashCode] as MapEntry<int, T>;
 
     if ((item?.key ?? -1) < _refreshes) {
       // Dispose the previous refresh.
-      if (item?.value?.isDisposable == true) WidgetsBinding.instance.addPostFrameCallback(item.value.dispose);
+      if (item?.value != null) WidgetsBinding.instance.addPostFrameCallback(item.value.dispose);
 
       // Build the new item.
-      item = MapEntry(_refreshes, _RefreshStorageItem<T>(data: builder(), dispose: dispose));
-      targetStorage._cache[identifier] = item;
+      item = MapEntry(_refreshes, builder());
+      targetStorage._cache[identifier.hashCode] = item;
     }
 
-    return item.value.data;
+    return RefreshStorageEntry<T>(identifier, item.value);
   }
 
   @override
@@ -88,11 +79,11 @@ class RefreshStorage extends StatefulWidget {
 /// Persistent state cache of [RefreshStorage] items that should be disposed along with a [Page].
 class RefreshStorageState extends State<RefreshStorage> {
   /// Keyed by identifier string -> refresh count and the item.
-  final _cache = HashMap<String, MapEntry<int, _RefreshStorageItem>>();
+  final _cache = HashMap<int, MapEntry<int, RefreshStorageItem>>();
 
   @override
   void dispose() {
-    for (final item in _cache.values) if (item.value.isDisposable) item.value.dispose();
+    for (final item in _cache.values) item.value.dispose();
     super.dispose();
   }
 

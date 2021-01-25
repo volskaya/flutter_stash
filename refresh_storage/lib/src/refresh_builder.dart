@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:refresh_storage/src/refresh_indicator.dart' as my;
 import 'package:refresh_storage/src/refresh_storage.dart';
+import 'package:refresh_storage/src/refresh_storage_entry.dart';
 
 /// Page storage of [RefreshController].
-class RefreshControllerStorage {
+class RefreshControllerStorage extends RefreshStorageItem {
   /// Which refresh is the [RefreshController] set at.
   int refreshes = 0;
 }
@@ -78,14 +79,14 @@ class RefreshController extends State<RefreshBuilder> {
     }
   }
 
-  RefreshControllerStorage _storage;
+  RefreshStorageEntry<RefreshControllerStorage> _storage;
 
   /// Number of times this container has been refreshed.
-  int get refreshes => _storage?.refreshes ?? 0;
+  int get refreshes => _storage?.value?.refreshes ?? 0;
 
   /// Refresh the controller.
   void refresh() {
-    setState(() => _storage.refreshes += 1);
+    if (_storage?.value != null) setState(() => _storage.value.refreshes += 1);
     RefreshControllerNotication(refreshes).dispatch(context);
   }
 
@@ -100,6 +101,12 @@ class RefreshController extends State<RefreshBuilder> {
       builder: () => RefreshControllerStorage(),
     );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _storage?.dispose();
+    super.dispose();
   }
 
   @override

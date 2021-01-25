@@ -25,7 +25,8 @@ typedef FirebaseRealtimeChatParticipantBuilder<T extends FirebaseRealtimeChatPar
 class _FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatMessageImpl> = __FirebaseRealtimeChatPageStorage<T>
     with _$_FirebaseRealtimeChatPageStorage<T>;
 
-abstract class __FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatMessageImpl> with Store {
+abstract class __FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatMessageImpl> extends RefreshStorageItem
+    with Store {
   final paginatedItems = ObservableList<T>();
   final subscribedItems = ObservableList<T>();
   final pendingItems = ObservableList<T>();
@@ -68,7 +69,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   /// If the participant IDs are defined manually, there won't be any subscription observing
   /// user IDs in the database.
   final Set<String> _participants;
-  Set<String> get participants => _storage?.participants ?? const <String>{};
+  Set<String> get participants => _storage?.value?.participants ?? const <String>{};
 
   static final _log = Log.named('FirebaseRealtimeChat');
 
@@ -81,24 +82,24 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   String senderId;
   String chatId;
 
-  _FirebaseRealtimeChatPageStorage<T> _storage;
+  RefreshStorageEntry<_FirebaseRealtimeChatPageStorage<T>> _storage;
   D _lastPresence;
   StreamSubscription<Event> _onAddedSubscription;
   StreamSubscription<Event> _onDisconnectReaction;
   StreamSubscription<Event> _participantsSubscription;
 
   final scrollController = ScrollController();
-  Set<String> get _seenItems => _storage._seenItems;
-  ObservableList<T> get paginatedItems => _storage.paginatedItems;
-  ObservableList<T> get subscribedItems => _storage.subscribedItems;
-  ObservableList<T> get pendingItems => _storage.pendingItems;
+  Set<String> get _seenItems => _storage.value._seenItems;
+  ObservableList<T> get paginatedItems => _storage.value.paginatedItems;
+  ObservableList<T> get subscribedItems => _storage.value.subscribedItems;
+  ObservableList<T> get pendingItems => _storage.value.pendingItems;
   bool _fetchingPage = false;
 
   bool get _isSubscribed => _onAddedSubscription != null;
-  int get page => _storage.page;
-  set page(int val) => _storage.page = val;
-  bool get isEndReached => _storage.isEndReached;
-  set isEndReached(bool val) => _storage.isEndReached = val;
+  int get page => _storage.value.page;
+  set page(int val) => _storage.value.page = val;
+  bool get isEndReached => _storage.value.isEndReached;
+  set isEndReached(bool val) => _storage.value.isEndReached = val;
   DateTime pageTimestamp = DateTime.now();
   bool _disposed = false;
   int get length => subscribedItems.length + paginatedItems.length;
@@ -141,7 +142,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     // `_paginationTimestamp` will be available too.
     // assert(paginatedItems.isNotEmpty || timestamp != null);
 
-    if (_fetchingPage || page <= this.page || _storage.isEndReached) return;
+    if (_fetchingPage || page <= this.page || _storage.value.isEndReached) return;
     _fetchingPage = true;
     final loader = LoaderCoordinator.instance.touch();
 
@@ -323,9 +324,9 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     if (_participants == null) {
       _participantsSubscription?.cancel();
       _participantsSubscription = participantListCollection.onValue.listen(
-          (event) => _storage.participants = Set<String>.from(event.snapshot.value as List ?? const <String>[]));
+          (event) => _storage.value.participants = Set<String>.from(event.snapshot.value as List ?? const <String>[]));
     } else {
-      assert(_storage.participants == _participants);
+      assert(_storage.value.participants == _participants);
     }
   }
 
@@ -405,7 +406,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     );
 
     // Participant list provided manually.
-    if (_participants != null) _storage.participants = _participants;
+    if (_participants != null) _storage.value.participants = _participants;
 
     if (pendingItems.isNotEmpty || subscribedItems.isNotEmpty) {
       paginatedItems.insertAll(0, pendingItems.reversed.followedBy(subscribedItems.reversed));
@@ -482,6 +483,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     _disposeSubscription();
     _participantsSubscription?.cancel();
     _mirrorStorage?.dispose();
+    _storage?.dispose();
 
     // Send last presence, indicating the user is offline.
     reportPresence(writing: false, online: false);
@@ -490,10 +492,10 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   void handleAppLifecycleStatus(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
+      case AppLifecycleState.inactive:
         _startSubscription(timestamp: _subscriptionTimestamp);
         _startParticipating();
         break;
-      case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
         _disposeSubscription();
