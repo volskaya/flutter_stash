@@ -41,8 +41,8 @@ abstract class FirebaseRealtimeChatMessageImpl {
   /// Whether the message was confirmed online.
   bool online;
 
-  /// User IDs that have read this message.
-  List<String> readBy;
+  /// User IDs that have read this message with their read timestamp.
+  Map<String, num> reads;
 
   /// Json serializer of this participant.
   Map toJson();

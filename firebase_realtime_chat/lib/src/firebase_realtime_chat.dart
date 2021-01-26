@@ -38,6 +38,15 @@ abstract class __FirebaseRealtimeChatPageStorage<T extends FirebaseRealtimeChatM
 
   @observable
   Set<String> participants = const <String>{};
+
+  FirebaseRealtimeChatMirrorStorage mirrorStorage;
+
+  @override
+  void dispose([dynamic _]) {
+    super.dispose(_);
+    mirrorStorage?.dispose();
+    mirrorStorage = null;
+  }
 }
 
 /// Firebase realtime chat list & ui builder, similar to FirestoreCollectionBuilder.
@@ -134,7 +143,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
       index > (subscribedItems.length - 1) ? paginatedItems[index - subscribedItems.length] : subscribedItems[index];
 
   Future fetchPage(int page, [int timestamp]) async {
-    assert(_mirrorStorage != null);
+    assert(_storage?.value?.mirrorStorage != null);
 
     // This method is called by lists, that use this chat class.
     // The pagination, without `timestamp`, can only be called, when
@@ -148,8 +157,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
     try {
       await _paginate(timestamp);
-    } catch (e, s) {
-      _log.e('Failed to paginate ${chatReference.path} page ${page + 1}', e, s);
+    } catch (e, t) {
+      _log.e('Failed to paginate ${chatReference.path} page ${page + 1}', e, t);
     } finally {
       _fetchingPage = false;
       loader.dispose();
@@ -160,7 +169,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
   /// NOTE: `_paginationTimestamp` will have priority over `timestamp`.
   Future _paginate([int timestamp]) async {
-    assert(_mirrorStorage != null);
+    assert(_storage?.value?.mirrorStorage != null);
 
     final oldestTimestamp = _paginationTimestamp ?? timestamp;
     _log.v('Paginating page ${page + 1}, startingAt: ${oldestTimestamp ?? "First item"}');
@@ -174,7 +183,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     //
     // A mirror storage is initialized per each chat room, before the pagination starts,
     // so this should be ready.
-    final offlineSnapshots = await _mirrorStorage?.find(
+    final offlineSnapshots = await _storage?.value?.mirrorStorage?.find(
       messageCollection.path,
       oldestTimestamp != null
           ? Finder(
@@ -210,8 +219,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         if (onlineSnapshots.value != null) {
           items = HashMap<String, dynamic>.from(onlineSnapshots.value as Map);
         }
-      } catch (e, s) {
-        _log.e('Failed to query online snapshots of ${chatReference.path} page ${page + 1}', e, s);
+      } catch (e, t) {
+        _log.e('Failed to query online snapshots of ${chatReference.path} page ${page + 1}', e, t);
       }
     }
 
@@ -235,8 +244,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
         return message;
       }).toList(growable: false)
         ..sort((a, b) => b.createTime.compareTo(a.createTime)); // NOTE: Firebase DB returns the documents unordered.
-    } catch (e, s) {
-      _log.e('Failed to build models of paginated messages for ${chatReference.path} page ${page + 1}', e, s);
+    } catch (e, t) {
+      _log.e('Failed to build models of paginated messages for ${chatReference.path} page ${page + 1}', e, t);
     }
 
     // Assert order is correct, by making sure document timestamps
@@ -361,8 +370,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
               'writing': false,
               'updateTime': ServerValue.timestamp,
             });
-          } on PlatformException catch (e, s) {
-            _log.e('Failed to notify ${sendersParticipantRef.path} of being online', e, s);
+          } on PlatformException catch (e, t) {
+            _log.e('Failed to notify ${sendersParticipantRef.path} of being online', e, t);
           }
 
           try {
@@ -372,8 +381,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
               'writing': false,
               'updateTime': ServerValue.timestamp,
             });
-          } on PlatformException catch (e, s) {
-            _log.e('Failed to add a disconnect callback for ${sendersParticipantRef.path} ', e, s);
+          } on PlatformException catch (e, t) {
+            _log.e('Failed to add a disconnect callback for ${sendersParticipantRef.path} ', e, t);
           }
         },
       );
@@ -390,8 +399,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
           ...HashMap<String, dynamic>.from(presence.toJson()),
           'updateTime': ServerValue.timestamp,
         });
-      } on PlatformException catch (e, s) {
-        _log.e('Failed to to report presence for ${sendersParticipantRef.path} ', e, s);
+      } on PlatformException catch (e, t) {
+        _log.e('Failed to to report presence for ${sendersParticipantRef.path} ', e, t);
       }
     }
   }
@@ -449,11 +458,14 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     _startListening();
   }
 
-  FirebaseRealtimeChatMirrorStorage _mirrorStorage;
   Future _initializeMirror() async {
     // First prepare the mirror storage for offline documents.
-    _mirrorStorage = await FirebaseRealtimeChatMirrorStorage.initialize(chatReference);
-    if (_disposed) await _mirrorStorage.dispose();
+    final mirrorStorage = await FirebaseRealtimeChatMirrorStorage.initialize(chatReference);
+    if (!_disposed) {
+      _storage?.value?.mirrorStorage = mirrorStorage;
+    } else {
+      await mirrorStorage.dispose();
+    }
   }
 
   Future _startListening() async {
@@ -482,7 +494,6 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     _onDisconnectReaction?.cancel();
     _disposeSubscription();
     _participantsSubscription?.cancel();
-    _mirrorStorage?.dispose();
     _storage?.dispose();
 
     // Send last presence, indicating the user is offline.
