@@ -36,6 +36,16 @@ class LoaderCoordinator {
   LoaderDisposer touch({bool instant = false}) {
     final disposer = LoaderDisposer();
     _loaders.add(disposer);
+
+    // In debug mode create a timer which notifies of old disposers.
+    assert((() {
+      Timer(const Duration(seconds: 60), () {
+        if (_loaders.contains(disposer))
+          print('LoaderCoordinator disposer ${disposer.hashCode} is still alive after 60 seconds');
+      });
+      return true;
+    })());
+
     if (instant) {
       _maybeToggleNotifier(instant: instant);
     } else {
