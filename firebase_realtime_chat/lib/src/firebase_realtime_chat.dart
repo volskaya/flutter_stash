@@ -500,15 +500,20 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     reportPresence(writing: false, online: false);
   }
 
+  bool _lifecycleToggled;
   void handleAppLifecycleStatus(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
       case AppLifecycleState.inactive:
-        _startSubscription(timestamp: _subscriptionTimestamp);
+        if (_lifecycleToggled == true) break;
+        _lifecycleToggled = true;
+        if (!_isSubscribed) _startSubscription(timestamp: _subscriptionTimestamp);
         _startParticipating();
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
+        if (_lifecycleToggled == false) break;
+        _lifecycleToggled = false;
         _disposeSubscription();
         reportPresence(writing: false, online: false);
         _onDisconnectReaction?.cancel();
