@@ -56,11 +56,12 @@ class RefreshContainer extends StatelessWidget {
   /// else for more complicated layouts.
   final OverscrollIndicatorNotificationPredicate overscrollPredicate;
 
-  Widget _buildSwitcher(BuildContext context, int refresh) => FancySwitcher.vertical(
+  Widget _buildSwitcher(BuildContext context, String bucket, int refresh) => FancySwitcher.vertical(
         fillColor: fillColor,
         duration: duration,
         child: FancySwitcherTag(
-          tag: -refresh, // Have the switcher animate in reverse.
+          tag: '${bucket}_$refresh',
+          index: -refresh, // Have the switcher animate in reverse.
           child: child,
         ),
       );

@@ -4,6 +4,9 @@ import 'package:refresh_storage/src/refresh_indicator.dart' as my;
 import 'package:refresh_storage/src/refresh_storage.dart';
 import 'package:refresh_storage/src/refresh_storage_entry.dart';
 
+/// Child builder of [RefreshBuilder].
+typedef RefreshChildBuilder = Widget Function(BuildContext context, String bucket, int refresh);
+
 /// Page storage of [RefreshController].
 class RefreshControllerStorage extends RefreshStorageItem {
   /// Which refresh is the [RefreshController] set at.
@@ -40,7 +43,7 @@ class RefreshBuilder extends StatefulWidget {
 
   /// Child should contain a scrollable, which will controll the scroll
   /// indicator in [RefreshBuilder].
-  final IndexedWidgetBuilder builder;
+  final RefreshChildBuilder builder;
 
   /// Page storage identifier, where this widget will preserve its refresh
   /// counter state.
@@ -104,6 +107,21 @@ class RefreshController extends State<RefreshBuilder> {
   }
 
   @override
+  void didUpdateWidget(covariant RefreshBuilder oldWidget) {
+    if (oldWidget.bucket != widget.bucket) {
+      _storage?.dispose();
+      _storage = RefreshStorage.write(
+        context: context,
+        identifier: widget.bucket + RefreshController.storageIdentifierPostfix,
+        refreshes: 0, // Never refresh this storage.
+        builder: () => RefreshControllerStorage(),
+      );
+    }
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void dispose() {
     _storage?.dispose();
     super.dispose();
@@ -117,7 +135,7 @@ class RefreshController extends State<RefreshBuilder> {
         overscrollPredicate: widget.overscrollPredicate,
         child: Provider.value(
           value: this,
-          child: widget.builder(context, refreshes),
+          child: widget.builder(context, widget.bucket, refreshes),
         ),
       );
 }
