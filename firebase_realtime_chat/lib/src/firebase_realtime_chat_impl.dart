@@ -42,7 +42,10 @@ abstract class FirebaseRealtimeChatMessageImpl {
   bool online;
 
   /// User IDs that have read this message with their read timestamp.
-  Map<String, num> reads;
+  ///
+  /// The package uses this to look up the participant's uid key to check
+  /// if the it has read the message.
+  Map reads;
 
   /// Json serializer of this participant.
   Map toJson();

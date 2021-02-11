@@ -84,7 +84,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
 
   DatabaseReference get chatReference => collection.child(chatId);
   DatabaseReference get participantsCollection => chatReference.child('participants');
-  DatabaseReference get participantListCollection => chatReference.child('participantIds');
+  DatabaseReference get participantListCollection => chatReference.child('whitelist');
   DatabaseReference get messageCollection => chatReference.child('messages');
 
   // Assigned in `initialize`.
@@ -332,8 +332,8 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     // Don't subscribe to the participant ID list, if the IDs were passed manually.
     if (_participants == null) {
       _participantsSubscription?.cancel();
-      _participantsSubscription = participantListCollection.onValue.listen(
-          (event) => _storage.value.participants = Set<String>.from(event.snapshot.value as List ?? const <String>[]));
+      _participantsSubscription = participantListCollection.onValue.listen((event) =>
+          _storage.value.participants = Set<String>.from((event.snapshot.value as Map)?.keys ?? const <String>[]));
     } else {
       assert(_storage.value.participants == _participants);
     }
