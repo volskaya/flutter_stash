@@ -83,9 +83,10 @@ class RefreshController extends State<RefreshBuilder> {
   }
 
   RefreshStorageEntry<RefreshControllerStorage> _storage;
+  int _bucketChanges = 0; // Incremented every time the widget's bucket changes.
 
   /// Number of times this container has been refreshed.
-  int get refreshes => _storage?.value?.refreshes ?? 0;
+  int get refreshes => (_storage?.value?.refreshes ?? 0) + _bucketChanges;
 
   /// Refresh the controller.
   void refresh() {
@@ -110,11 +111,23 @@ class RefreshController extends State<RefreshBuilder> {
   void didUpdateWidget(covariant RefreshBuilder oldWidget) {
     if (oldWidget.bucket != widget.bucket) {
       _storage?.dispose();
+      _bucketChanges += 1;
       _storage = RefreshStorage.write(
         context: context,
         identifier: widget.bucket + RefreshController.storageIdentifierPostfix,
         refreshes: 0, // Never refresh this storage.
         builder: () => RefreshControllerStorage(),
+      );
+
+      // Get the storage early, in case the state is unmounted, and
+      // destroy the old refresh storage item.
+      final storage = RefreshStorage.of(context);
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => RefreshStorage.destroy(
+          context: context,
+          identifier: oldWidget.bucket + RefreshController.storageIdentifierPostfix,
+          storage: storage,
+        ),
       );
     }
 

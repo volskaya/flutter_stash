@@ -72,6 +72,14 @@ class RefreshStorage extends StatefulWidget {
     return RefreshStorageEntry<T>(identifier, item.value);
   }
 
+  /// Manually destroy a [RefreshStorageItem] cached in [RefreshStorageState].
+  static void destroy({
+    @required BuildContext context,
+    @required String identifier,
+    RefreshStorageState storage,
+  }) =>
+      (storage ?? RefreshStorage.of(context))._cache.remove(identifier.hashCode)?.value?.dispose();
+
   @override
   RefreshStorageState createState() => RefreshStorageState();
 }
