@@ -132,11 +132,7 @@ class MobileAds {
   static void _debugCheckIsTestId(String id, List<String> testIds) {
     assert(id != null);
     assert(testIds != null);
-    if (!testIds.contains(id) && !kReleaseMode)
-      print(
-        'It is highly recommended to use test ads in for testing instead of production ads'
-        'Failure to do so can lead in to the suspension of your account',
-      );
+    assert(kReleaseMode || testIds.isNotEmpty);
   }
 
   /// Sets a list of test device IDs corresponding to test devices which will

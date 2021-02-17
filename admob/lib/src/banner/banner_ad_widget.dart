@@ -81,7 +81,6 @@ class BannerAd extends StatefulWidget {
   ///     case BannerAdEvent.loading:
   ///       break;
   ///     case BannerAdEvent.loadFailed:
-  ///       print(info);
   ///       break;
   ///     case BannerAdEvent.loaded:
   ///       break;
