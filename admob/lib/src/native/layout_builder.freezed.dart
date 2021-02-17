@@ -495,7 +495,7 @@ abstract class _AdDecoration implements AdDecoration {
 }
 
 AdView _$AdViewFromJson(Map<String, dynamic> json) {
-  switch (json['runtimeType'] as String) {
+  switch (json['type'] as String) {
     case 'linearLayout':
       return AdLinearLayout.fromJson(json);
     case 'text':
@@ -1189,7 +1189,7 @@ class _$AdLinearLayout implements AdLinearLayout {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$AdLinearLayoutToJson(this)..['runtimeType'] = 'linearLayout';
+    return _$_$AdLinearLayoutToJson(this)..['type'] = 'linearLayout';
   }
 }
 
@@ -1554,7 +1554,7 @@ class _$AdTextView implements AdTextView {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$AdTextViewToJson(this)..['runtimeType'] = 'text';
+    return _$_$AdTextViewToJson(this)..['type'] = 'text';
   }
 }
 
@@ -1931,7 +1931,7 @@ class _$AdButtonView implements AdButtonView {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$AdButtonViewToJson(this)..['runtimeType'] = 'button';
+    return _$_$AdButtonViewToJson(this)..['type'] = 'button';
   }
 }
 
@@ -2278,7 +2278,7 @@ class _$AdRatingBarView implements AdRatingBarView {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$AdRatingBarViewToJson(this)..['runtimeType'] = 'ratingBar';
+    return _$_$AdRatingBarViewToJson(this)..['type'] = 'ratingBar';
   }
 }
 
@@ -2609,7 +2609,7 @@ class _$AdMediaView implements AdMediaView {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$AdMediaViewToJson(this)..['runtimeType'] = 'media';
+    return _$_$AdMediaViewToJson(this)..['type'] = 'media';
   }
 }
 
@@ -2938,7 +2938,7 @@ class _$AdImageView implements AdImageView {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$AdImageViewToJson(this)..['runtimeType'] = 'image';
+    return _$_$AdImageViewToJson(this)..['type'] = 'image';
   }
 }
 

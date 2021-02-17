@@ -116,7 +116,7 @@ abstract class AdDecoration with _$AdDecoration {
   factory AdDecoration.fromJson(Map<String, dynamic> json) => _$AdDecorationFromJson(json);
 }
 
-@freezed
+@Freezed(unionKey: 'type')
 abstract class AdView with _$AdView {
   const factory AdView.linearLayout({
     @EdgeInsetsConverter() EdgeInsets padding,

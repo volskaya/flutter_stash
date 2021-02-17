@@ -27,9 +27,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
 class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     private lateinit var channel: MethodChannel
-
     private lateinit var activity: Activity
-
     private lateinit var messenger: BinaryMessenger
 
     override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {

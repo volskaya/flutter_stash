@@ -10,13 +10,12 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import kotlin.collections.ArrayList
 
 class NativeAdmobBuilderTask(
         val controller: NativeAdmobController,
         val result: MethodChannel.Result,
-        val context: Context,
-        val unitId: String,
+        private val context: Context,
+        private val unitId: String,
         private val options: Map<*, *>,
         private val callback: ((AdLoader) -> Unit)?
 ) : AsyncTask<Any?, Any?, AdLoader>() {
@@ -135,9 +134,9 @@ class NativeAdmobController(
         }
     }
 
-    fun undefined() {
-        channel.invokeMethod("undefined", null)
-    }
+//    fun undefined() {
+//        channel.invokeMethod("undefined", null)
+//    null}
 
     fun dispose() {
         disposed = true
@@ -146,102 +145,21 @@ class NativeAdmobController(
 
     private fun loadAd(unitId: String, options: Map<String, Any>, result: MethodChannel.Result) {
         channel.invokeMethod("loading", null)
-
-        val task = NativeAdmobBuilderTask(this, result, context, unitId, options) {
-//            val timestamp = System.currentTimeMillis()
-//            it.loadAd(AdRequest.Builder().build())
-//            Log.d("NativeAdController", "Loaded NativeAd with a builder in ${System.currentTimeMillis() - timestamp} ms")
-        }
-
-        task.execute()
-
-        // Build the options.
-//        val timestamp = System.currentTimeMillis()
-//        val videoOptions = options["videoOptions"] as? Map<*, *>
-//        val adVideoOptions = VideoOptions.Builder().setStartMuted((videoOptions?.get("startMuted") as? Boolean) ?: true)
-//        val adOptions = NativeAdOptions.Builder()
-//                .setReturnUrlsForImageAssets(options["returnUrlsForImageAssets"] as Boolean)
-//                .setRequestMultipleImages(options["requestMultipleImages"] as Boolean)
-//                .setAdChoicesPlacement(options["adChoicesPlacement"] as Int)
-//                .setMediaAspectRatio(options["mediaAspectRatio"] as Int)
-//                .setRequestCustomMuteThisAd(options["requestCustomMuteThisAd"] as Boolean)
-//                .setVideoOptions(adVideoOptions.build())
-//
-//        // Build the ad.
-//        val loader = AdLoader.Builder(context, unitId)
-//                .forNativeAd {
-//                    nativeAd = it
-//                    val now = System.currentTimeMillis()
-//
-//                    it.setMuteThisAdListener { channel.invokeMethod("onAdMuted", null) }
-//                    if (it.mediaContent.hasVideoContent()) {
-//                        it.mediaContent.videoController.videoLifecycleCallbacks = object : VideoController.VideoLifecycleCallbacks() {
-//                            override fun onVideoStart() { channel.invokeMethod("onVideoStart", null) }
-//                            override fun onVideoPlay() { channel.invokeMethod("onVideoPlay", null) }
-//                            override fun onVideoPause() { channel.invokeMethod("onVideoPause", null) }
-//                            override fun onVideoEnd() { channel.invokeMethod("onVideoEnd", null) }
-//                            override fun onVideoMute(isMuted: Boolean) { channel.invokeMethod("onVideoMute", isMuted) }
-//                        }
-//                    }
-//
-//                    Log.d("NativeAdController", "Attached listeners for NativeAd ${nativeAd.hashCode()} in ${ System.currentTimeMillis() - now} ms")
-//                }
-//                .withAdListener(object : AdListener() {
-//                    override fun onAdFailedToLoad(error: LoadAdError) {
-//                        super.onAdFailedToLoad(error)
-//                        channel.invokeMethod("onAdFailedToLoad", encodeError(error))
-//                        result.success(false)
-//                    }
-//
-//                    override fun onAdLoaded() {
-//                        super.onAdLoaded()
-//                        if (!disposed) {
-//                            nativeAdChanged?.let { it(nativeAd) }
-//                            val mediaContent = nativeAd!!.mediaContent
-//                            channel.invokeMethod("onAdLoaded", hashMapOf(
-//                                    "muteThisAdInfo" to hashMapOf(
-//                                            "muteThisAdReasons" to nativeAd!!.muteThisAdReasons?.map { it.description } as List<String>,
-//                                            "isCustomMuteThisAdEnabled" to nativeAd!!.isCustomMuteThisAdEnabled
-//                                    ),
-//                                    "mediaContent" to hashMapOf(
-//                                            "duration" to mediaContent.duration.toDouble(),
-//                                            "aspectRatio" to mediaContent.aspectRatio.toDouble(),
-//                                            "hasVideoContent" to mediaContent.hasVideoContent()
-//                                    )
-//                            ))
-//                        } else {
-//                            nativeAd?.destroy()
-//                        }
-//                        result.success(true)
-//                    }
-//                })
-//                .withNativeAdOptions(adOptions.build())
-//                .build()
-//        Log.d("NativeAdController", "Constructed NativeAd builders in ${System.currentTimeMillis() - timestamp} ms")
-//
-//        loader.loadAd(AdRequest.Builder().build())
-//        Log.d("NativeAdController", "Loaded NativeAd with a builder in ${System.currentTimeMillis() - timestamp} ms")
+        NativeAdmobBuilderTask(this, result, context, unitId, options, null).execute()
     }
 }
 
 object NativeAdmobControllerManager {
-    private val controllers: ArrayList<NativeAdmobController> = arrayListOf()
+    private val controllers: HashMap<String, NativeAdmobController> = hashMapOf()
 
     fun createController(id: String, binaryMessenger: BinaryMessenger, context: Context) {
-        if (getController(id) == null) {
+        if (!controllers.containsKey(id)) {
             val methodChannel = MethodChannel(binaryMessenger, id)
             val controller = NativeAdmobController(id, methodChannel, context)
-            controllers.add(controller)
+            controllers[id] = controller
         }
     }
 
-    fun getController(id: String): NativeAdmobController? {
-        return controllers.firstOrNull { it.id == id }
-    }
-
-    fun removeController(id: String) {
-        val index = controllers.indexOfFirst { it.id == id }
-        val controller = if (index >= 0) controllers.removeAt(index) else null
-        controller?.dispose()
-    }
+    fun getController(id: String): NativeAdmobController? { return controllers[id] }
+    fun removeController(id: String) { controllers.remove(id)?.dispose() }
 }

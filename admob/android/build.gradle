@@ -2,7 +2,8 @@ group 'dev.volskaya.admob'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.4.10'
+    ext.kotlin_version = "1.4.21"
+
     repositories {
         google()
         jcenter()

@@ -25,12 +25,6 @@ import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
 
-class NativeViewFactory : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
-    override fun create(context: Context, id: Int, args: Any?): PlatformView {
-        return NativeAdPlatformView(context, args as Map<*, *>)
-    }
-}
-
 class NativeViewHolder {
     var mediaView: MediaView? = null
     var iconView: ImageView? = null
@@ -54,8 +48,7 @@ private class InflateViewTask(
     override fun doInBackground(vararg params: NativeAd?): View? {
         if (params.size == 1 && params[0] != null) {
             val nativeAd = params[0]!!
-            val inflater = LayoutInflater.from(context)
-            val adView = inflater.inflate(R.layout.ad_unified_native_ad, null) as NativeAdView
+            val adView = LayoutInflater.from(context).inflate(R.layout.ad_unified_native_ad, null) as NativeAdView
             val viewHolder = NativeViewHolder()
             viewHolder.view = buildView(data, context, viewHolder, nativeAd)
 
@@ -117,8 +110,7 @@ private class InflateViewTask(
     }
 
     private fun buildView(data: Map<*, *>, context: Context, viewHolder: NativeViewHolder, nativeAd: NativeAd): View {
-        val viewType = data["runtimeType"] as? String
-        val view = when (viewType) {
+        val view = when (data["type"] as? String) {
             "image" -> ImageView(context).also { it.adjustViewBounds = true }
             "media" -> MediaView(context).also { it.setImageScaleType(ImageView.ScaleType.CENTER_INSIDE) }
             "ratingBar" -> RatingBar(context, null, android.R.attr.ratingBarStyleSmall)
@@ -169,8 +161,7 @@ private class InflateViewTask(
         }
 
         // Bounds.
-        val weight: Float = ((data["layout_weight"] as? Double)?.toFloat()) ?: 0f
-        val layoutParams = view.layoutParams ?: LinearLayout.LayoutParams(-1, -1, weight)
+        val layoutParams = view.layoutParams ?: LinearLayout.LayoutParams(-1, -1, 0f)
         val marginParams = (layoutParams as? ViewGroup.MarginLayoutParams)
                 ?: ViewGroup.MarginLayoutParams(context, null)
 
@@ -193,18 +184,8 @@ private class InflateViewTask(
 
         view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
 
-        when (viewType) {
-//            "media" -> {
-//                (data["width"] as? Double)?.let {
-//                    marginParams.width = it.toInt().dp()
-//                    marginParams.height = (view.measuredWidth.toFloat() * nativeAd.mediaContent.aspectRatio).toInt()
-//                }
-//            }
-            else -> {
-                (data["height"] as? Double)?.let { marginParams.height = it.toInt().dp() }
-                (data["width"] as? Double)?.let { marginParams.width = it.toInt().dp() }
-            }
-        }
+        (data["height"] as? Double)?.let { marginParams.height = it.toInt().dp() }
+        (data["width"] as? Double)?.let { marginParams.width = it.toInt().dp() }
 
         (data["id"] as? String)?.let { id ->
             view.id = "native_ad_$id".hashCode()
@@ -227,27 +208,31 @@ private class InflateViewTask(
     }
 }
 
+class NativeViewFactory : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
+    override fun create(context: Context, id: Int, args: Any?): PlatformView {
+        return NativeAdPlatformView(context, args as? Map<*, *>)
+    }
+}
+
 class NativeAdPlatformView(context: Context, data: Map<*, *>?) : PlatformView {
-    private val viewGroup: ViewGroup
-    private var controller: NativeAdmobController? = null
+    private val viewGroup: ViewGroup = LinearLayout(context).also { it.gravity = Gravity.CENTER_VERTICAL }
+    private var controller: NativeAdmobController? = (data?.get("controllerId") as? String)?.let { NativeAdmobControllerManager.getController(it) }
+
+    // The view can change, if the flutter widget called "updateUI".
+    private var view: Map<*, *>? = (data?.get("view") as? Map<*, *>)
 
     init {
-        val time = System.currentTimeMillis()
-        viewGroup = LinearLayout(context).also { it.gravity = Gravity.CENTER_VERTICAL }
-
-        Log.d("NativeAdPlatformView", "Created ViewGroup in ${System.currentTimeMillis() - time}ms")
-
-        (data!!["controllerId"] as? String)?.let { id ->
-            val controller = NativeAdmobControllerManager.getController(id)
-            controller?.nativeAdChanged = { it?.let { buildAsyncView(data, context, it, viewGroup) } }
-            controller?.nativeAdUpdateRequested = { layout: Map<String, Any?>, ad: NativeAd? ->
-                Log.d("NativeAdPlatformView", "Native ad changed ------------")
-                ad?.let { buildAsyncView(layout, context, it, viewGroup) }
+        // Attach to the controller.
+        controller?.let { controller ->
+            controller.nativeAdChanged = { it?.let { view?.let { view -> buildAsyncView(view, context, it, viewGroup)} } }
+            controller.nativeAdUpdateRequested = { newView: Map<String, Any?>, ad: NativeAd? ->
+                view = newView
+                ad?.let { buildAsyncView(newView, context, it, viewGroup) }
             }
-            this.controller = controller
-        } ?: Log.e("NativeAdPlatformView", "No controller id passed to NativeAd")
 
-        controller?.nativeAd?.let { buildAsyncView(data, context, it, viewGroup) }
+            // Build the first view.
+            view?.let { view -> controller.nativeAd?.let { buildAsyncView(view, context, it, viewGroup) } }
+        } ?: Log.e("NativeAdPlatformView", "No controller id passed to NativeAd")
     }
 
     override fun getView(): View { return viewGroup }
@@ -255,13 +240,7 @@ class NativeAdPlatformView(context: Context, data: Map<*, *>?) : PlatformView {
 
     private fun buildAsyncView(data: Map<*, *>, context: Context, nativeAd: NativeAd, parent: ViewGroup?) {
         parent?.removeAllViews()
-        val task = InflateViewTask(context, data) { adView ->
-            val time = System.currentTimeMillis()
-            parent?.addView(adView)
-            Log.d("NativeAdPlatformView", "Added ad view to the ViewGroup in ${System.currentTimeMillis() - time}ms")
-        }
-
-        task.execute(nativeAd)
+        (InflateViewTask(context, data) { parent?.addView(it) }).execute(nativeAd)
     }
 }
 

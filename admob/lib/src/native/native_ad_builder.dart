@@ -14,14 +14,26 @@ import 'controller/controller.dart';
 import 'layout_builder.dart';
 
 part 'native_ad_builder.freezed.dart';
-
-const _kViewType = 'native_admob';
+part 'native_ad_builder.g.dart';
 
 /// Layout builder of [NativeAd]. It must return [AdLinearLayout].
 typedef NativeAdLayoutBuilder = AdLinearLayout Function(NativeAdViewHolder viewHolder);
 
 /// Child widget builder of [NativeAd].
 typedef NativeAdChildBuilder = Widget Function(BuildContext context, NativeAdEvent status, Widget platformView);
+
+@freezed
+abstract class NativeAdPlatformViewProps with _$NativeAdPlatformViewProps {
+  factory NativeAdPlatformViewProps({
+    @required String controllerId,
+    @required AdView view,
+  }) = _NativeAdPlatformViewProps;
+
+  factory NativeAdPlatformViewProps.fromJson(Map<String, dynamic> json) => _$NativeAdPlatformViewPropsFromJson(json);
+
+  @late
+  Map<String, dynamic> get json => toJson();
+}
 
 @freezed
 abstract class NativeAdViewHolder with _$NativeAdViewHolder {
@@ -56,6 +68,9 @@ class NativeAdBuilder extends StatefulWidget {
     this.height,
     this.width,
   }) : super(key: key);
+
+  /// The platform view factory [NativeAdBuilder] works with.
+  static const viewFactory = 'native_admob';
 
   /// Constraints where the ad will be built in.
   final BoxConstraints constraints;
@@ -92,6 +107,7 @@ class NativeAdBuilder extends StatefulWidget {
   /// Usage inside of a ListView requires a defined width.
   final double width;
 
+  /// Default layout builder of [NativeAdBuilder].
   static AdLinearLayout bannerLayoutBuilder(NativeAdViewHolder viewHolder) => AdLinearLayout(
         decoration: const AdDecoration(backgroundColor: Colors.white),
         width: MATCH_PARENT,
@@ -132,8 +148,8 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
   NativeAdController _controller;
   StreamSubscription _controllerSubscription;
   NativeAdEvent state = NativeAdEvent.loading;
-  Map<String, dynamic> _layout;
-  bool _attached = false;
+  Map<String, dynamic> _props;
+  bool get _attached => _props != null;
 
   Future _requestAdUIUpdate(Map<String, dynamic> layout) =>
       _controller.channel.invokeMethod('updateUI', {'layout': layout ?? {}});
@@ -152,7 +168,7 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
       // while the ad was loading.
       if (mounted && !Scrollable.recommendIdleLoadingForContext(context)) {
         _controller.attach(this);
-        _attached = true;
+        _reconstructProps();
         _controllerSubscription = _controller.onEvent.listen((e) {
           final event = e.keys.first;
           switch (event) {
@@ -178,9 +194,13 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
     }
   }
 
+  void _reconstructProps() => _props = NativeAdPlatformViewProps(
+        controllerId: _controller.id,
+        view: _constructView(widget),
+      ).toJson();
+
   @override
   void initState() {
-    _layout = _constructLayout(widget);
     _deferredLoad();
     super.initState();
   }
@@ -188,12 +208,7 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
   @override
   void didUpdateWidget(covariant NativeAdBuilder oldWidget) {
     assert((oldWidget.controller != null) == (widget.controller != null));
-
-    if (oldWidget.viewHolder != widget.viewHolder) {
-      _layout = _constructLayout(widget);
-      _requestAdUIUpdate(_layout);
-    }
-
+    if (oldWidget.viewHolder != widget.viewHolder) _reconstructProps();
     super.didUpdateWidget(oldWidget);
   }
 
@@ -205,7 +220,7 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
     super.dispose();
   }
 
-  static Map<String, dynamic> _constructLayout(NativeAdBuilder widget) {
+  static AdView _constructView(NativeAdBuilder widget) {
     final viewHolder = NativeAdViewHolder(
       headline: widget.viewHolder?.headline ?? const AdTextView(id: NativeAdSlot.headline),
       advertiser: widget.viewHolder?.advertiser ?? const AdTextView(id: NativeAdSlot.advertiser),
@@ -238,9 +253,7 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
           ),
     );
 
-    final layout = (widget.buildLayout ?? NativeAdBuilder.bannerLayoutBuilder)(viewHolder)?.toJson();
-    assert(layout != null, 'The layout must not return null');
-    return layout;
+    return (widget.buildLayout ?? NativeAdBuilder.bannerLayoutBuilder)(viewHolder);
   }
 
   @override
@@ -257,7 +270,6 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
         break; // No platform view for these cases.
       case NativeAdEvent.loaded:
       case NativeAdEvent.muted:
-        final params = {..._layout, 'controllerId': _controller.id};
         final height = widget.height ?? widget.constraints.biggest.height;
         final width = widget.width ?? widget.constraints.biggest.width;
 
@@ -265,15 +277,15 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
 
         if (Platform.isAndroid) {
           platformView = buildAndroidPlatformView(
-            params,
-            _kViewType,
+            _props,
+            NativeAdBuilder.viewFactory,
             MobileAds.useHybridComposition,
           );
         } else if (Platform.isIOS) {
           platformView = UiKitView(
-            viewType: _kViewType,
+            viewType: NativeAdBuilder.viewFactory,
             creationParamsCodec: const StandardMessageCodec(),
-            creationParams: params,
+            creationParams: _props,
           );
         }
 

@@ -17,7 +17,8 @@ class _$AdErrorTearOff {
   const _$AdErrorTearOff();
 
 // ignore: unused_element
-  _AdError call({@required int code, @required String message, @required String domain}) {
+  _AdError call(
+      {@required int code, @required String message, @required String domain}) {
     return _AdError(
       code: code,
       message: message,
@@ -69,7 +70,8 @@ mixin _$AdError {
 
 /// @nodoc
 abstract class $AdErrorCopyWith<$Res> {
-  factory $AdErrorCopyWith(AdError value, $Res Function(AdError) then) = _$AdErrorCopyWithImpl<$Res>;
+  factory $AdErrorCopyWith(AdError value, $Res Function(AdError) then) =
+      _$AdErrorCopyWithImpl<$Res>;
   $Res call({int code, String message, String domain});
 }
 
@@ -97,14 +99,17 @@ class _$AdErrorCopyWithImpl<$Res> implements $AdErrorCopyWith<$Res> {
 
 /// @nodoc
 abstract class _$AdErrorCopyWith<$Res> implements $AdErrorCopyWith<$Res> {
-  factory _$AdErrorCopyWith(_AdError value, $Res Function(_AdError) then) = __$AdErrorCopyWithImpl<$Res>;
+  factory _$AdErrorCopyWith(_AdError value, $Res Function(_AdError) then) =
+      __$AdErrorCopyWithImpl<$Res>;
   @override
   $Res call({int code, String message, String domain});
 }
 
 /// @nodoc
-class __$AdErrorCopyWithImpl<$Res> extends _$AdErrorCopyWithImpl<$Res> implements _$AdErrorCopyWith<$Res> {
-  __$AdErrorCopyWithImpl(_AdError _value, $Res Function(_AdError) _then) : super(_value, (v) => _then(v as _AdError));
+class __$AdErrorCopyWithImpl<$Res> extends _$AdErrorCopyWithImpl<$Res>
+    implements _$AdErrorCopyWith<$Res> {
+  __$AdErrorCopyWithImpl(_AdError _value, $Res Function(_AdError) _then)
+      : super(_value, (v) => _then(v as _AdError));
 
   @override
   _AdError get _value => super._value as _AdError;
@@ -127,12 +132,14 @@ class __$AdErrorCopyWithImpl<$Res> extends _$AdErrorCopyWithImpl<$Res> implement
 
 /// @nodoc
 class _$_AdError with DiagnosticableTreeMixin implements _AdError {
-  const _$_AdError({@required this.code, @required this.message, @required this.domain})
+  const _$_AdError(
+      {@required this.code, @required this.message, @required this.domain})
       : assert(code != null),
         assert(message != null),
         assert(domain != null);
 
-  factory _$_AdError.fromJson(Map<String, dynamic> json) => _$_$_AdErrorFromJson(json);
+  factory _$_AdError.fromJson(Map<String, dynamic> json) =>
+      _$_$_AdErrorFromJson(json);
 
   @override
 
@@ -183,9 +190,13 @@ class _$_AdError with DiagnosticableTreeMixin implements _AdError {
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other is _AdError &&
-            (identical(other.code, code) || const DeepCollectionEquality().equals(other.code, code)) &&
-            (identical(other.message, message) || const DeepCollectionEquality().equals(other.message, message)) &&
-            (identical(other.domain, domain) || const DeepCollectionEquality().equals(other.domain, domain)));
+            (identical(other.code, code) ||
+                const DeepCollectionEquality().equals(other.code, code)) &&
+            (identical(other.message, message) ||
+                const DeepCollectionEquality()
+                    .equals(other.message, message)) &&
+            (identical(other.domain, domain) ||
+                const DeepCollectionEquality().equals(other.domain, domain)));
   }
 
   @override
@@ -196,7 +207,8 @@ class _$_AdError with DiagnosticableTreeMixin implements _AdError {
       const DeepCollectionEquality().hash(domain);
 
   @override
-  _$AdErrorCopyWith<_AdError> get copyWith => __$AdErrorCopyWithImpl<_AdError>(this, _$identity);
+  _$AdErrorCopyWith<_AdError> get copyWith =>
+      __$AdErrorCopyWithImpl<_AdError>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
@@ -205,7 +217,10 @@ class _$_AdError with DiagnosticableTreeMixin implements _AdError {
 }
 
 abstract class _AdError implements AdError {
-  const factory _AdError({@required int code, @required String message, @required String domain}) = _$_AdError;
+  const factory _AdError(
+      {@required int code,
+      @required String message,
+      @required String domain}) = _$_AdError;
 
   factory _AdError.fromJson(Map<String, dynamic> json) = _$_AdError.fromJson;
 
