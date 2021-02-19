@@ -222,17 +222,21 @@ fun Drawable.toBitmapByteArray(): ByteArray {
     return byteArray
 }
 
-fun NativeAd.Image.toFlutterMap(): Map<*, *>? {
+fun NativeAd.Image.toFlutterMap(): Map<*, *> {
     // Flutter units don't have density applied, but native android does.
     val density = Resources.getSystem().displayMetrics.density
 
-    return this.drawable?.let { hashMapOf(
-            "width" to this.drawable?.intrinsicWidth?.let { width -> width / density },
-            "height" to this.drawable?.intrinsicWidth?.let { height -> height / density },
+    return hashMapOf(
             "uri" to this.uri.toString(),
-            "scale" to this.scale
-//            "bitmap" to it.toBitmapByteArray()
-    ) }
+            "scale" to this.scale,
+            "drawable" to (this.drawable?.let {
+                hashMapOf<String, Any?>(
+                        "width" to it.intrinsicWidth / density,
+                        "height" to it.intrinsicWidth / density,
+                        "bitmap" to it.toBitmapByteArray()
+                )
+            })
+    )
 }
 
 fun NativeAd.toFlutterMap(): Map<*, *> {

@@ -6,23 +6,39 @@ part of 'native_ad.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_NativeAdImage _$_$_NativeAdImageFromJson(Map json) {
-  return _$_NativeAdImage(
+_$_NativeAdImageDrawable _$_$_NativeAdImageDrawableFromJson(Map json) {
+  return _$_NativeAdImageDrawable(
     width: (json['width'] as num)?.toDouble(),
     height: (json['height'] as num)?.toDouble(),
+    bitmap: const Uint8ListConverter().fromJson(json['bitmap']),
+  );
+}
+
+Map<String, dynamic> _$_$_NativeAdImageDrawableToJson(
+        _$_NativeAdImageDrawable instance) =>
+    <String, dynamic>{
+      'width': instance.width,
+      'height': instance.height,
+      'bitmap': const Uint8ListConverter().toJson(instance.bitmap),
+    };
+
+_$_NativeAdImage _$_$_NativeAdImageFromJson(Map json) {
+  return _$_NativeAdImage(
     uri: json['uri'] as String,
     scale: (json['scale'] as num)?.toDouble(),
-    bitmap: const Uint8ListConverter().fromJson(json['bitmap']),
+    drawable: json['drawable'] == null
+        ? null
+        : NativeAdImageDrawable.fromJson((json['drawable'] as Map)?.map(
+            (k, e) => MapEntry(k as String, e),
+          )),
   );
 }
 
 Map<String, dynamic> _$_$_NativeAdImageToJson(_$_NativeAdImage instance) =>
     <String, dynamic>{
-      'width': instance.width,
-      'height': instance.height,
       'uri': instance.uri,
       'scale': instance.scale,
-      'bitmap': const Uint8ListConverter().toJson(instance.bitmap),
+      'drawable': instance.drawable?.toJson(),
     };
 
 _$_NativeAdMediaContent _$_$_NativeAdMediaContentFromJson(Map json) {

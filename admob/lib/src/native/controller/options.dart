@@ -48,8 +48,8 @@ abstract class VideoOptions with _$VideoOptions {
 abstract class NativeAdOptions with _$NativeAdOptions {
   const factory NativeAdOptions({
     @Default(false) bool requestCustomMuteThisAd,
-    @Default(false) bool returnUrlsForImageAssets,
     @Default(false) bool requestMultipleImages,
+    @Default(true) bool returnUrlsForImageAssets, // No point of preparing the native drawables.
     @Default(AdChoicesPlacement.topRight) AdChoicesPlacement adChoicesPlacement,
     @Default(AdMediaAspectRatio.landscape) AdMediaAspectRatio mediaAspectRatio,
     VideoOptions videoOptions,

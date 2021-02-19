@@ -20,8 +20,8 @@ Map<String, dynamic> _$_$_VideoOptionsToJson(_$_VideoOptions instance) =>
 _$_NativeAdOptions _$_$_NativeAdOptionsFromJson(Map json) {
   return _$_NativeAdOptions(
     requestCustomMuteThisAd: json['requestCustomMuteThisAd'] as bool ?? false,
-    returnUrlsForImageAssets: json['returnUrlsForImageAssets'] as bool ?? false,
     requestMultipleImages: json['requestMultipleImages'] as bool ?? false,
+    returnUrlsForImageAssets: json['returnUrlsForImageAssets'] as bool ?? true,
     adChoicesPlacement: _$enumDecodeNullable(
             _$AdChoicesPlacementEnumMap, json['adChoicesPlacement']) ??
         AdChoicesPlacement.topRight,
@@ -39,8 +39,8 @@ _$_NativeAdOptions _$_$_NativeAdOptionsFromJson(Map json) {
 Map<String, dynamic> _$_$_NativeAdOptionsToJson(_$_NativeAdOptions instance) =>
     <String, dynamic>{
       'requestCustomMuteThisAd': instance.requestCustomMuteThisAd,
-      'returnUrlsForImageAssets': instance.returnUrlsForImageAssets,
       'requestMultipleImages': instance.requestMultipleImages,
+      'returnUrlsForImageAssets': instance.returnUrlsForImageAssets,
       'adChoicesPlacement':
           _$AdChoicesPlacementEnumMap[instance.adChoicesPlacement],
       'mediaAspectRatio':

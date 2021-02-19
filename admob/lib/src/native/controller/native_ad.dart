@@ -8,19 +8,28 @@ part 'native_ad.freezed.dart';
 part 'native_ad.g.dart';
 
 @freezed
-abstract class NativeAdImage with _$NativeAdImage {
-  factory NativeAdImage({
+abstract class NativeAdImageDrawable with _$NativeAdImageDrawable {
+  factory NativeAdImageDrawable({
     @required double width,
     @required double height,
-    @required String uri,
-    @required double scale,
-    @Uint8ListConverter() Uint8List bitmap,
-  }) = _NativeAdImage;
+    @required @Uint8ListConverter() Uint8List bitmap,
+  }) = _NativeAdImageDrawable;
 
-  factory NativeAdImage.fromJson(Map<String, dynamic> json) => _$NativeAdImageFromJson(json);
+  factory NativeAdImageDrawable.fromJson(Map<String, dynamic> json) => _$NativeAdImageDrawableFromJson(json);
 
   @late
   Size get size => Size(width, height);
+}
+
+@freezed
+abstract class NativeAdImage with _$NativeAdImage {
+  factory NativeAdImage({
+    @required String uri,
+    @required double scale,
+    NativeAdImageDrawable drawable, // The drawable is null, if native ad options requested URLs only.
+  }) = _NativeAdImage;
+
+  factory NativeAdImage.fromJson(Map<String, dynamic> json) => _$NativeAdImageFromJson(json);
 }
 
 @freezed

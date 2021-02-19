@@ -8,132 +8,111 @@ part of 'native_ad.dart';
 // **************************************************************************
 
 T _$identity<T>(T value) => value;
-NativeAdImage _$NativeAdImageFromJson(Map<String, dynamic> json) {
-  return _NativeAdImage.fromJson(json);
+NativeAdImageDrawable _$NativeAdImageDrawableFromJson(
+    Map<String, dynamic> json) {
+  return _NativeAdImageDrawable.fromJson(json);
 }
 
 /// @nodoc
-class _$NativeAdImageTearOff {
-  const _$NativeAdImageTearOff();
+class _$NativeAdImageDrawableTearOff {
+  const _$NativeAdImageDrawableTearOff();
 
 // ignore: unused_element
-  _NativeAdImage call(
+  _NativeAdImageDrawable call(
       {@required double width,
       @required double height,
-      @required String uri,
-      @required double scale,
-      @Uint8ListConverter() Uint8List bitmap}) {
-    return _NativeAdImage(
+      @required @Uint8ListConverter() Uint8List bitmap}) {
+    return _NativeAdImageDrawable(
       width: width,
       height: height,
-      uri: uri,
-      scale: scale,
       bitmap: bitmap,
     );
   }
 
 // ignore: unused_element
-  NativeAdImage fromJson(Map<String, Object> json) {
-    return NativeAdImage.fromJson(json);
+  NativeAdImageDrawable fromJson(Map<String, Object> json) {
+    return NativeAdImageDrawable.fromJson(json);
   }
 }
 
 /// @nodoc
 // ignore: unused_element
-const $NativeAdImage = _$NativeAdImageTearOff();
+const $NativeAdImageDrawable = _$NativeAdImageDrawableTearOff();
 
 /// @nodoc
-mixin _$NativeAdImage {
+mixin _$NativeAdImageDrawable {
   double get width;
   double get height;
-  String get uri;
-  double get scale;
   @Uint8ListConverter()
   Uint8List get bitmap;
 
   Map<String, dynamic> toJson();
-  $NativeAdImageCopyWith<NativeAdImage> get copyWith;
+  $NativeAdImageDrawableCopyWith<NativeAdImageDrawable> get copyWith;
 }
 
 /// @nodoc
-abstract class $NativeAdImageCopyWith<$Res> {
-  factory $NativeAdImageCopyWith(
-          NativeAdImage value, $Res Function(NativeAdImage) then) =
-      _$NativeAdImageCopyWithImpl<$Res>;
+abstract class $NativeAdImageDrawableCopyWith<$Res> {
+  factory $NativeAdImageDrawableCopyWith(NativeAdImageDrawable value,
+          $Res Function(NativeAdImageDrawable) then) =
+      _$NativeAdImageDrawableCopyWithImpl<$Res>;
   $Res call(
-      {double width,
-      double height,
-      String uri,
-      double scale,
-      @Uint8ListConverter() Uint8List bitmap});
+      {double width, double height, @Uint8ListConverter() Uint8List bitmap});
 }
 
 /// @nodoc
-class _$NativeAdImageCopyWithImpl<$Res>
-    implements $NativeAdImageCopyWith<$Res> {
-  _$NativeAdImageCopyWithImpl(this._value, this._then);
+class _$NativeAdImageDrawableCopyWithImpl<$Res>
+    implements $NativeAdImageDrawableCopyWith<$Res> {
+  _$NativeAdImageDrawableCopyWithImpl(this._value, this._then);
 
-  final NativeAdImage _value;
+  final NativeAdImageDrawable _value;
   // ignore: unused_field
-  final $Res Function(NativeAdImage) _then;
+  final $Res Function(NativeAdImageDrawable) _then;
 
   @override
   $Res call({
     Object width = freezed,
     Object height = freezed,
-    Object uri = freezed,
-    Object scale = freezed,
     Object bitmap = freezed,
   }) {
     return _then(_value.copyWith(
       width: width == freezed ? _value.width : width as double,
       height: height == freezed ? _value.height : height as double,
-      uri: uri == freezed ? _value.uri : uri as String,
-      scale: scale == freezed ? _value.scale : scale as double,
       bitmap: bitmap == freezed ? _value.bitmap : bitmap as Uint8List,
     ));
   }
 }
 
 /// @nodoc
-abstract class _$NativeAdImageCopyWith<$Res>
-    implements $NativeAdImageCopyWith<$Res> {
-  factory _$NativeAdImageCopyWith(
-          _NativeAdImage value, $Res Function(_NativeAdImage) then) =
-      __$NativeAdImageCopyWithImpl<$Res>;
+abstract class _$NativeAdImageDrawableCopyWith<$Res>
+    implements $NativeAdImageDrawableCopyWith<$Res> {
+  factory _$NativeAdImageDrawableCopyWith(_NativeAdImageDrawable value,
+          $Res Function(_NativeAdImageDrawable) then) =
+      __$NativeAdImageDrawableCopyWithImpl<$Res>;
   @override
   $Res call(
-      {double width,
-      double height,
-      String uri,
-      double scale,
-      @Uint8ListConverter() Uint8List bitmap});
+      {double width, double height, @Uint8ListConverter() Uint8List bitmap});
 }
 
 /// @nodoc
-class __$NativeAdImageCopyWithImpl<$Res>
-    extends _$NativeAdImageCopyWithImpl<$Res>
-    implements _$NativeAdImageCopyWith<$Res> {
-  __$NativeAdImageCopyWithImpl(
-      _NativeAdImage _value, $Res Function(_NativeAdImage) _then)
-      : super(_value, (v) => _then(v as _NativeAdImage));
+class __$NativeAdImageDrawableCopyWithImpl<$Res>
+    extends _$NativeAdImageDrawableCopyWithImpl<$Res>
+    implements _$NativeAdImageDrawableCopyWith<$Res> {
+  __$NativeAdImageDrawableCopyWithImpl(_NativeAdImageDrawable _value,
+      $Res Function(_NativeAdImageDrawable) _then)
+      : super(_value, (v) => _then(v as _NativeAdImageDrawable));
 
   @override
-  _NativeAdImage get _value => super._value as _NativeAdImage;
+  _NativeAdImageDrawable get _value => super._value as _NativeAdImageDrawable;
 
   @override
   $Res call({
     Object width = freezed,
     Object height = freezed,
-    Object uri = freezed,
-    Object scale = freezed,
     Object bitmap = freezed,
   }) {
-    return _then(_NativeAdImage(
+    return _then(_NativeAdImageDrawable(
       width: width == freezed ? _value.width : width as double,
       height: height == freezed ? _value.height : height as double,
-      uri: uri == freezed ? _value.uri : uri as String,
-      scale: scale == freezed ? _value.scale : scale as double,
       bitmap: bitmap == freezed ? _value.bitmap : bitmap as Uint8List,
     ));
   }
@@ -142,29 +121,22 @@ class __$NativeAdImageCopyWithImpl<$Res>
 @JsonSerializable()
 
 /// @nodoc
-class _$_NativeAdImage implements _NativeAdImage {
-  _$_NativeAdImage(
+class _$_NativeAdImageDrawable implements _NativeAdImageDrawable {
+  _$_NativeAdImageDrawable(
       {@required this.width,
       @required this.height,
-      @required this.uri,
-      @required this.scale,
-      @Uint8ListConverter() this.bitmap})
+      @required @Uint8ListConverter() this.bitmap})
       : assert(width != null),
         assert(height != null),
-        assert(uri != null),
-        assert(scale != null);
+        assert(bitmap != null);
 
-  factory _$_NativeAdImage.fromJson(Map<String, dynamic> json) =>
-      _$_$_NativeAdImageFromJson(json);
+  factory _$_NativeAdImageDrawable.fromJson(Map<String, dynamic> json) =>
+      _$_$_NativeAdImageDrawableFromJson(json);
 
   @override
   final double width;
   @override
   final double height;
-  @override
-  final String uri;
-  @override
-  final double scale;
   @override
   @Uint8ListConverter()
   final Uint8List bitmap;
@@ -183,21 +155,17 @@ class _$_NativeAdImage implements _NativeAdImage {
 
   @override
   String toString() {
-    return 'NativeAdImage(width: $width, height: $height, uri: $uri, scale: $scale, bitmap: $bitmap, size: $size)';
+    return 'NativeAdImageDrawable(width: $width, height: $height, bitmap: $bitmap, size: $size)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _NativeAdImage &&
+        (other is _NativeAdImageDrawable &&
             (identical(other.width, width) ||
                 const DeepCollectionEquality().equals(other.width, width)) &&
             (identical(other.height, height) ||
                 const DeepCollectionEquality().equals(other.height, height)) &&
-            (identical(other.uri, uri) ||
-                const DeepCollectionEquality().equals(other.uri, uri)) &&
-            (identical(other.scale, scale) ||
-                const DeepCollectionEquality().equals(other.scale, scale)) &&
             (identical(other.bitmap, bitmap) ||
                 const DeepCollectionEquality().equals(other.bitmap, bitmap)));
   }
@@ -207,9 +175,207 @@ class _$_NativeAdImage implements _NativeAdImage {
       runtimeType.hashCode ^
       const DeepCollectionEquality().hash(width) ^
       const DeepCollectionEquality().hash(height) ^
+      const DeepCollectionEquality().hash(bitmap);
+
+  @override
+  _$NativeAdImageDrawableCopyWith<_NativeAdImageDrawable> get copyWith =>
+      __$NativeAdImageDrawableCopyWithImpl<_NativeAdImageDrawable>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$_$_NativeAdImageDrawableToJson(this);
+  }
+}
+
+abstract class _NativeAdImageDrawable implements NativeAdImageDrawable {
+  factory _NativeAdImageDrawable(
+          {@required double width,
+          @required double height,
+          @required @Uint8ListConverter() Uint8List bitmap}) =
+      _$_NativeAdImageDrawable;
+
+  factory _NativeAdImageDrawable.fromJson(Map<String, dynamic> json) =
+      _$_NativeAdImageDrawable.fromJson;
+
+  @override
+  double get width;
+  @override
+  double get height;
+  @override
+  @Uint8ListConverter()
+  Uint8List get bitmap;
+  @override
+  _$NativeAdImageDrawableCopyWith<_NativeAdImageDrawable> get copyWith;
+}
+
+NativeAdImage _$NativeAdImageFromJson(Map<String, dynamic> json) {
+  return _NativeAdImage.fromJson(json);
+}
+
+/// @nodoc
+class _$NativeAdImageTearOff {
+  const _$NativeAdImageTearOff();
+
+// ignore: unused_element
+  _NativeAdImage call(
+      {@required String uri,
+      @required double scale,
+      NativeAdImageDrawable drawable}) {
+    return _NativeAdImage(
+      uri: uri,
+      scale: scale,
+      drawable: drawable,
+    );
+  }
+
+// ignore: unused_element
+  NativeAdImage fromJson(Map<String, Object> json) {
+    return NativeAdImage.fromJson(json);
+  }
+}
+
+/// @nodoc
+// ignore: unused_element
+const $NativeAdImage = _$NativeAdImageTearOff();
+
+/// @nodoc
+mixin _$NativeAdImage {
+  String get uri;
+  double get scale;
+  NativeAdImageDrawable get drawable;
+
+  Map<String, dynamic> toJson();
+  $NativeAdImageCopyWith<NativeAdImage> get copyWith;
+}
+
+/// @nodoc
+abstract class $NativeAdImageCopyWith<$Res> {
+  factory $NativeAdImageCopyWith(
+          NativeAdImage value, $Res Function(NativeAdImage) then) =
+      _$NativeAdImageCopyWithImpl<$Res>;
+  $Res call({String uri, double scale, NativeAdImageDrawable drawable});
+
+  $NativeAdImageDrawableCopyWith<$Res> get drawable;
+}
+
+/// @nodoc
+class _$NativeAdImageCopyWithImpl<$Res>
+    implements $NativeAdImageCopyWith<$Res> {
+  _$NativeAdImageCopyWithImpl(this._value, this._then);
+
+  final NativeAdImage _value;
+  // ignore: unused_field
+  final $Res Function(NativeAdImage) _then;
+
+  @override
+  $Res call({
+    Object uri = freezed,
+    Object scale = freezed,
+    Object drawable = freezed,
+  }) {
+    return _then(_value.copyWith(
+      uri: uri == freezed ? _value.uri : uri as String,
+      scale: scale == freezed ? _value.scale : scale as double,
+      drawable: drawable == freezed
+          ? _value.drawable
+          : drawable as NativeAdImageDrawable,
+    ));
+  }
+
+  @override
+  $NativeAdImageDrawableCopyWith<$Res> get drawable {
+    if (_value.drawable == null) {
+      return null;
+    }
+    return $NativeAdImageDrawableCopyWith<$Res>(_value.drawable, (value) {
+      return _then(_value.copyWith(drawable: value));
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$NativeAdImageCopyWith<$Res>
+    implements $NativeAdImageCopyWith<$Res> {
+  factory _$NativeAdImageCopyWith(
+          _NativeAdImage value, $Res Function(_NativeAdImage) then) =
+      __$NativeAdImageCopyWithImpl<$Res>;
+  @override
+  $Res call({String uri, double scale, NativeAdImageDrawable drawable});
+
+  @override
+  $NativeAdImageDrawableCopyWith<$Res> get drawable;
+}
+
+/// @nodoc
+class __$NativeAdImageCopyWithImpl<$Res>
+    extends _$NativeAdImageCopyWithImpl<$Res>
+    implements _$NativeAdImageCopyWith<$Res> {
+  __$NativeAdImageCopyWithImpl(
+      _NativeAdImage _value, $Res Function(_NativeAdImage) _then)
+      : super(_value, (v) => _then(v as _NativeAdImage));
+
+  @override
+  _NativeAdImage get _value => super._value as _NativeAdImage;
+
+  @override
+  $Res call({
+    Object uri = freezed,
+    Object scale = freezed,
+    Object drawable = freezed,
+  }) {
+    return _then(_NativeAdImage(
+      uri: uri == freezed ? _value.uri : uri as String,
+      scale: scale == freezed ? _value.scale : scale as double,
+      drawable: drawable == freezed
+          ? _value.drawable
+          : drawable as NativeAdImageDrawable,
+    ));
+  }
+}
+
+@JsonSerializable()
+
+/// @nodoc
+class _$_NativeAdImage implements _NativeAdImage {
+  _$_NativeAdImage({@required this.uri, @required this.scale, this.drawable})
+      : assert(uri != null),
+        assert(scale != null);
+
+  factory _$_NativeAdImage.fromJson(Map<String, dynamic> json) =>
+      _$_$_NativeAdImageFromJson(json);
+
+  @override
+  final String uri;
+  @override
+  final double scale;
+  @override
+  final NativeAdImageDrawable drawable;
+
+  @override
+  String toString() {
+    return 'NativeAdImage(uri: $uri, scale: $scale, drawable: $drawable)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other is _NativeAdImage &&
+            (identical(other.uri, uri) ||
+                const DeepCollectionEquality().equals(other.uri, uri)) &&
+            (identical(other.scale, scale) ||
+                const DeepCollectionEquality().equals(other.scale, scale)) &&
+            (identical(other.drawable, drawable) ||
+                const DeepCollectionEquality()
+                    .equals(other.drawable, drawable)));
+  }
+
+  @override
+  int get hashCode =>
+      runtimeType.hashCode ^
       const DeepCollectionEquality().hash(uri) ^
       const DeepCollectionEquality().hash(scale) ^
-      const DeepCollectionEquality().hash(bitmap);
+      const DeepCollectionEquality().hash(drawable);
 
   @override
   _$NativeAdImageCopyWith<_NativeAdImage> get copyWith =>
@@ -223,26 +389,19 @@ class _$_NativeAdImage implements _NativeAdImage {
 
 abstract class _NativeAdImage implements NativeAdImage {
   factory _NativeAdImage(
-      {@required double width,
-      @required double height,
-      @required String uri,
+      {@required String uri,
       @required double scale,
-      @Uint8ListConverter() Uint8List bitmap}) = _$_NativeAdImage;
+      NativeAdImageDrawable drawable}) = _$_NativeAdImage;
 
   factory _NativeAdImage.fromJson(Map<String, dynamic> json) =
       _$_NativeAdImage.fromJson;
 
   @override
-  double get width;
-  @override
-  double get height;
-  @override
   String get uri;
   @override
   double get scale;
   @override
-  @Uint8ListConverter()
-  Uint8List get bitmap;
+  NativeAdImageDrawable get drawable;
   @override
   _$NativeAdImageCopyWith<_NativeAdImage> get copyWith;
 }

@@ -163,15 +163,15 @@ class _$NativeAdOptionsTearOff {
 // ignore: unused_element
   _NativeAdOptions call(
       {bool requestCustomMuteThisAd = false,
-      bool returnUrlsForImageAssets = false,
       bool requestMultipleImages = false,
+      bool returnUrlsForImageAssets = true,
       AdChoicesPlacement adChoicesPlacement = AdChoicesPlacement.topRight,
       AdMediaAspectRatio mediaAspectRatio = AdMediaAspectRatio.landscape,
       VideoOptions videoOptions}) {
     return _NativeAdOptions(
       requestCustomMuteThisAd: requestCustomMuteThisAd,
-      returnUrlsForImageAssets: returnUrlsForImageAssets,
       requestMultipleImages: requestMultipleImages,
+      returnUrlsForImageAssets: returnUrlsForImageAssets,
       adChoicesPlacement: adChoicesPlacement,
       mediaAspectRatio: mediaAspectRatio,
       videoOptions: videoOptions,
@@ -191,8 +191,8 @@ const $NativeAdOptions = _$NativeAdOptionsTearOff();
 /// @nodoc
 mixin _$NativeAdOptions {
   bool get requestCustomMuteThisAd;
-  bool get returnUrlsForImageAssets;
   bool get requestMultipleImages;
+  bool get returnUrlsForImageAssets;
   AdChoicesPlacement get adChoicesPlacement;
   AdMediaAspectRatio get mediaAspectRatio;
   VideoOptions get videoOptions;
@@ -208,8 +208,8 @@ abstract class $NativeAdOptionsCopyWith<$Res> {
       _$NativeAdOptionsCopyWithImpl<$Res>;
   $Res call(
       {bool requestCustomMuteThisAd,
-      bool returnUrlsForImageAssets,
       bool requestMultipleImages,
+      bool returnUrlsForImageAssets,
       AdChoicesPlacement adChoicesPlacement,
       AdMediaAspectRatio mediaAspectRatio,
       VideoOptions videoOptions});
@@ -229,8 +229,8 @@ class _$NativeAdOptionsCopyWithImpl<$Res>
   @override
   $Res call({
     Object requestCustomMuteThisAd = freezed,
-    Object returnUrlsForImageAssets = freezed,
     Object requestMultipleImages = freezed,
+    Object returnUrlsForImageAssets = freezed,
     Object adChoicesPlacement = freezed,
     Object mediaAspectRatio = freezed,
     Object videoOptions = freezed,
@@ -239,12 +239,12 @@ class _$NativeAdOptionsCopyWithImpl<$Res>
       requestCustomMuteThisAd: requestCustomMuteThisAd == freezed
           ? _value.requestCustomMuteThisAd
           : requestCustomMuteThisAd as bool,
-      returnUrlsForImageAssets: returnUrlsForImageAssets == freezed
-          ? _value.returnUrlsForImageAssets
-          : returnUrlsForImageAssets as bool,
       requestMultipleImages: requestMultipleImages == freezed
           ? _value.requestMultipleImages
           : requestMultipleImages as bool,
+      returnUrlsForImageAssets: returnUrlsForImageAssets == freezed
+          ? _value.returnUrlsForImageAssets
+          : returnUrlsForImageAssets as bool,
       adChoicesPlacement: adChoicesPlacement == freezed
           ? _value.adChoicesPlacement
           : adChoicesPlacement as AdChoicesPlacement,
@@ -277,8 +277,8 @@ abstract class _$NativeAdOptionsCopyWith<$Res>
   @override
   $Res call(
       {bool requestCustomMuteThisAd,
-      bool returnUrlsForImageAssets,
       bool requestMultipleImages,
+      bool returnUrlsForImageAssets,
       AdChoicesPlacement adChoicesPlacement,
       AdMediaAspectRatio mediaAspectRatio,
       VideoOptions videoOptions});
@@ -301,8 +301,8 @@ class __$NativeAdOptionsCopyWithImpl<$Res>
   @override
   $Res call({
     Object requestCustomMuteThisAd = freezed,
-    Object returnUrlsForImageAssets = freezed,
     Object requestMultipleImages = freezed,
+    Object returnUrlsForImageAssets = freezed,
     Object adChoicesPlacement = freezed,
     Object mediaAspectRatio = freezed,
     Object videoOptions = freezed,
@@ -311,12 +311,12 @@ class __$NativeAdOptionsCopyWithImpl<$Res>
       requestCustomMuteThisAd: requestCustomMuteThisAd == freezed
           ? _value.requestCustomMuteThisAd
           : requestCustomMuteThisAd as bool,
-      returnUrlsForImageAssets: returnUrlsForImageAssets == freezed
-          ? _value.returnUrlsForImageAssets
-          : returnUrlsForImageAssets as bool,
       requestMultipleImages: requestMultipleImages == freezed
           ? _value.requestMultipleImages
           : requestMultipleImages as bool,
+      returnUrlsForImageAssets: returnUrlsForImageAssets == freezed
+          ? _value.returnUrlsForImageAssets
+          : returnUrlsForImageAssets as bool,
       adChoicesPlacement: adChoicesPlacement == freezed
           ? _value.adChoicesPlacement
           : adChoicesPlacement as AdChoicesPlacement,
@@ -336,14 +336,14 @@ class __$NativeAdOptionsCopyWithImpl<$Res>
 class _$_NativeAdOptions implements _NativeAdOptions {
   const _$_NativeAdOptions(
       {this.requestCustomMuteThisAd = false,
-      this.returnUrlsForImageAssets = false,
       this.requestMultipleImages = false,
+      this.returnUrlsForImageAssets = true,
       this.adChoicesPlacement = AdChoicesPlacement.topRight,
       this.mediaAspectRatio = AdMediaAspectRatio.landscape,
       this.videoOptions})
       : assert(requestCustomMuteThisAd != null),
-        assert(returnUrlsForImageAssets != null),
         assert(requestMultipleImages != null),
+        assert(returnUrlsForImageAssets != null),
         assert(adChoicesPlacement != null),
         assert(mediaAspectRatio != null);
 
@@ -355,10 +355,10 @@ class _$_NativeAdOptions implements _NativeAdOptions {
   final bool requestCustomMuteThisAd;
   @JsonKey(defaultValue: false)
   @override
-  final bool returnUrlsForImageAssets;
-  @JsonKey(defaultValue: false)
-  @override
   final bool requestMultipleImages;
+  @JsonKey(defaultValue: true)
+  @override
+  final bool returnUrlsForImageAssets;
   @JsonKey(defaultValue: AdChoicesPlacement.topRight)
   @override
   final AdChoicesPlacement adChoicesPlacement;
@@ -370,7 +370,7 @@ class _$_NativeAdOptions implements _NativeAdOptions {
 
   @override
   String toString() {
-    return 'NativeAdOptions(requestCustomMuteThisAd: $requestCustomMuteThisAd, returnUrlsForImageAssets: $returnUrlsForImageAssets, requestMultipleImages: $requestMultipleImages, adChoicesPlacement: $adChoicesPlacement, mediaAspectRatio: $mediaAspectRatio, videoOptions: $videoOptions)';
+    return 'NativeAdOptions(requestCustomMuteThisAd: $requestCustomMuteThisAd, requestMultipleImages: $requestMultipleImages, returnUrlsForImageAssets: $returnUrlsForImageAssets, adChoicesPlacement: $adChoicesPlacement, mediaAspectRatio: $mediaAspectRatio, videoOptions: $videoOptions)';
   }
 
   @override
@@ -381,14 +381,14 @@ class _$_NativeAdOptions implements _NativeAdOptions {
                     other.requestCustomMuteThisAd, requestCustomMuteThisAd) ||
                 const DeepCollectionEquality().equals(
                     other.requestCustomMuteThisAd, requestCustomMuteThisAd)) &&
+            (identical(other.requestMultipleImages, requestMultipleImages) ||
+                const DeepCollectionEquality().equals(
+                    other.requestMultipleImages, requestMultipleImages)) &&
             (identical(
                     other.returnUrlsForImageAssets, returnUrlsForImageAssets) ||
                 const DeepCollectionEquality().equals(
                     other.returnUrlsForImageAssets,
                     returnUrlsForImageAssets)) &&
-            (identical(other.requestMultipleImages, requestMultipleImages) ||
-                const DeepCollectionEquality().equals(
-                    other.requestMultipleImages, requestMultipleImages)) &&
             (identical(other.adChoicesPlacement, adChoicesPlacement) ||
                 const DeepCollectionEquality()
                     .equals(other.adChoicesPlacement, adChoicesPlacement)) &&
@@ -404,8 +404,8 @@ class _$_NativeAdOptions implements _NativeAdOptions {
   int get hashCode =>
       runtimeType.hashCode ^
       const DeepCollectionEquality().hash(requestCustomMuteThisAd) ^
-      const DeepCollectionEquality().hash(returnUrlsForImageAssets) ^
       const DeepCollectionEquality().hash(requestMultipleImages) ^
+      const DeepCollectionEquality().hash(returnUrlsForImageAssets) ^
       const DeepCollectionEquality().hash(adChoicesPlacement) ^
       const DeepCollectionEquality().hash(mediaAspectRatio) ^
       const DeepCollectionEquality().hash(videoOptions);
@@ -423,8 +423,8 @@ class _$_NativeAdOptions implements _NativeAdOptions {
 abstract class _NativeAdOptions implements NativeAdOptions {
   const factory _NativeAdOptions(
       {bool requestCustomMuteThisAd,
-      bool returnUrlsForImageAssets,
       bool requestMultipleImages,
+      bool returnUrlsForImageAssets,
       AdChoicesPlacement adChoicesPlacement,
       AdMediaAspectRatio mediaAspectRatio,
       VideoOptions videoOptions}) = _$_NativeAdOptions;
@@ -435,9 +435,9 @@ abstract class _NativeAdOptions implements NativeAdOptions {
   @override
   bool get requestCustomMuteThisAd;
   @override
-  bool get returnUrlsForImageAssets;
-  @override
   bool get requestMultipleImages;
+  @override
+  bool get returnUrlsForImageAssets;
   @override
   AdChoicesPlacement get adChoicesPlacement;
   @override
