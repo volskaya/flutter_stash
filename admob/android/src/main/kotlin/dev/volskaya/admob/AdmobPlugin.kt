@@ -78,7 +78,7 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                 BannerAdControllerManager.removeController(call.argument<String>("id")!!)
                 result.success(null)
             }
-            // Interstitial
+            // Interstitial.
             "initInterstitialAd" -> {
                 InterstitialAdControllerManager.createController(
                         call.argument<String>("id")!!,
@@ -90,7 +90,7 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                 InterstitialAdControllerManager.removeController(call.argument<String>("id")!!)
                 result.success(null)
             }
-            // Rewarded
+            // Rewarded.
             "initRewardedAd" -> {
                 RewardedAdControllerManager.createController(
                         call.argument<String>("id")!!,
@@ -102,7 +102,7 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                 RewardedAdControllerManager.removeController(call.argument<String>("id")!!)
                 result.success(null)
             }
-            // App Open
+            // App Open.
             "initAppOpenAd" -> {
                 AppOpenAdControllerManager.createController(
                         call.argument<String>("id")!!,
@@ -113,17 +113,8 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
             "disposeAppOpenAd" -> {
                 AppOpenAdControllerManager.removeController(call.argument<String>("id")!!)
             }
-            // General Controller
+            // General Controller.
             "isTestDevice" -> result.success(AdRequest.Builder().build().isTestDevice(activity))
-            "setTestDeviceIds" -> {
-                val configuration = MobileAds
-                        .getRequestConfiguration()
-                        .toBuilder()
-                        .setTestDeviceIds(call.argument<List<String>>("ids"))
-                        .build()
-                MobileAds.setRequestConfiguration(configuration)
-                result.success(null)
-            }
             "setChildDirected" -> {
                 val child: Int = when (call.argument<Boolean>("directed")) {
                     true -> RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE

@@ -39,13 +39,13 @@ class InterstitialAd extends AdMethodChannel<InterstitialAdEvent> {
   @override
   void init() {
     channel.setMethodCallHandler(_handleMessages);
-    MobileAds.pluginChannel.invokeMethod('initInterstitialAd', {'id': id});
+    MobileAds.instance.pluginChannel.invokeMethod('initInterstitialAd', {'id': id});
   }
 
   @override
   void dispose() {
     super.dispose();
-    MobileAds.pluginChannel.invokeMethod('disposeInterstitialAd', {'id': id});
+    MobileAds.instance.pluginChannel.invokeMethod('disposeInterstitialAd', {'id': id});
   }
 
   /// Handle the messages the channel sends
@@ -80,11 +80,11 @@ class InterstitialAd extends AdMethodChannel<InterstitialAdEvent> {
   }
 
   Future<bool> _callLoadAd() => channel.invokeMethod<bool>('loadAd', {
-        'unitId': unitId ?? MobileAds.interstitialAdUnitId ?? MobileAds.interstitialAdTestUnitId,
+        'unitId': unitId ?? MobileAds.instance.interstitialAdUnitId ?? MobileAds.interstitialAdTestUnitId,
       });
 
   Future<bool> load() async {
-    assert(MobileAds.isInitialized);
+    assert(MobileAds.instance.isInitialized);
     assert(!disposed);
     return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
   }

@@ -111,7 +111,7 @@ class BannerAd extends StatefulWidget {
 
   /// The unitId used by this `BannerAd`.
   /// If changed after loaded it'll be reloaded with the new ad unit id.\
-  /// If null, defaults to `MobileAds.bannerAdUnitId`.
+  /// If null, defaults to `MobileAds.instance.bannerAdUnitId`.
   final String unitId;
 
   final BannerAdOptions options;
@@ -194,7 +194,7 @@ class _BannerAdState extends State<BannerAd> with AutomaticKeepAliveClientMixin<
 
         final params = <String, dynamic>{
           'controllerId': controller.id,
-          'unitId': widget.unitId ?? MobileAds.bannerAdUnitId,
+          'unitId': widget.unitId ?? MobileAds.instance.bannerAdUnitId,
           'size_height': height ?? -1,
           'size_width': width,
         };
@@ -204,7 +204,7 @@ class _BannerAdState extends State<BannerAd> with AutomaticKeepAliveClientMixin<
           w = buildAndroidPlatformView(
             params,
             _viewType,
-            MobileAds.useHybridComposition,
+            MobileAds.instance.useHybridComposition,
           );
         } else if (Platform.isIOS) {
           w = UiKitView(

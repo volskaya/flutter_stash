@@ -25,6 +25,8 @@ enum AdChoicesPlacement {
 }
 
 enum AdMediaAspectRatio {
+  @JsonValue(0)
+  unknown,
   @JsonValue(1)
   any,
   @JsonValue(2)

@@ -54,7 +54,7 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
   @override
   void init() {
     channel.setMethodCallHandler(_handleMessages);
-    MobileAds.pluginChannel.invokeMethod('initAppOpenAd', {'id': id});
+    MobileAds.instance.pluginChannel.invokeMethod('initAppOpenAd', {'id': id});
   }
 
   Future<void> _handleMessages(MethodCall call) async {
@@ -108,19 +108,19 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
     }
 
     return channel.invokeMethod<bool>('loadAd', {
-      'unitId': unitId ?? MobileAds.appOpenAdUnitId ?? MobileAds.appOpenAdTestUnitId,
+      'unitId': unitId ?? MobileAds.instance.appOpenAdUnitId ?? MobileAds.appOpenAdTestUnitId,
       'orientation': orientationInt,
     });
   }
 
   Future<bool> load() {
-    assert(MobileAds.isInitialized);
+    assert(MobileAds.instance.isInitialized);
     assert(!disposed);
     return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
   }
 
   Future<bool> show() async {
-    assert(MobileAds.isInitialized);
+    assert(MobileAds.instance.isInitialized);
     assert(!disposed);
     if (await load()) return channel.invokeMethod<bool>('showAd');
     return false;
@@ -129,6 +129,6 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
   @override
   void dispose() {
     super.dispose();
-    MobileAds.pluginChannel.invokeMethod('disposeAppOpenAd', {'id': id});
+    MobileAds.instance.pluginChannel.invokeMethod('disposeAppOpenAd', {'id': id});
   }
 }

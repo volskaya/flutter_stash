@@ -65,14 +65,14 @@ class BannerAdController extends AdMethodChannel<BannerAdEvent> with AttachableM
   @override
   void init() {
     channel.setMethodCallHandler(_handleMessages);
-    MobileAds.pluginChannel.invokeMethod('initBannerAdController', {'id': id});
+    MobileAds.instance.pluginChannel.invokeMethod('initBannerAdController', {'id': id});
   }
 
   @override
   void dispose() {
     assert(!isAttached, 'Controller disposed before its client was detached');
     super.dispose();
-    MobileAds.pluginChannel.invokeMethod('disposeBannerAdController', {'id': id});
+    MobileAds.instance.pluginChannel.invokeMethod('disposeBannerAdController', {'id': id});
   }
 
   Future _handleMessages(MethodCall call) async {
@@ -100,7 +100,7 @@ class BannerAdController extends AdMethodChannel<BannerAdEvent> with AttachableM
   Future<bool> _callLoadAd() => channel.invokeMethod<bool>('loadAd');
 
   Future<bool> load() async {
-    assert(MobileAds.isInitialized);
+    assert(MobileAds.instance.isInitialized);
     assert(!disposed);
     return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
   }

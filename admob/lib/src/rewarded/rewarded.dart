@@ -53,13 +53,13 @@ class RewardedAd extends AdMethodChannel<RewardedAdEvent> {
   @override
   Future init() async {
     channel.setMethodCallHandler(_handleMessages);
-    await MobileAds.pluginChannel.invokeMethod('initRewardedAd', {'id': id});
+    await MobileAds.instance.pluginChannel.invokeMethod('initRewardedAd', {'id': id});
   }
 
   @override
   void dispose() {
     super.dispose();
-    MobileAds.pluginChannel.invokeMethod('disposeRewardedAd', {'id': id});
+    MobileAds.instance.pluginChannel.invokeMethod('disposeRewardedAd', {'id': id});
   }
 
   /// Handle the messages the channel sends
@@ -96,17 +96,17 @@ class RewardedAd extends AdMethodChannel<RewardedAdEvent> {
   }
 
   Future<bool> _callLoadAd() => channel.invokeMethod<bool>('loadAd', {
-        'unitId': unitId ?? MobileAds.rewardedAdUnitId ?? MobileAds.rewardedAdTestUnitId,
+        'unitId': unitId ?? MobileAds.instance.rewardedAdUnitId ?? MobileAds.rewardedAdTestUnitId,
       });
 
   Future<bool> load() async {
-    assert(MobileAds.isInitialized);
+    assert(MobileAds.instance.isInitialized);
     assert(!disposed);
     return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
   }
 
   Future<bool> show() async {
-    assert(MobileAds.isInitialized);
+    assert(MobileAds.instance.isInitialized);
     assert(!disposed);
     if (await load()) return channel.invokeMethod<bool>('show');
     return false;

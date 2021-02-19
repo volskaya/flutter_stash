@@ -32,7 +32,7 @@ void assertPlatformIsSupported() {
 /// It must be initialized before any ads can be loaded and must be initialized once.
 void assertMobileAdsIsInitialized() {
   assert(
-    MobileAds.isInitialized,
+    MobileAds.instance.isInitialized,
     'The Mobile Ads SDK must be initialized before any ads can be loaded',
   );
 }
@@ -45,7 +45,7 @@ void assertVersionIsSupported([bool usePlatformView = true]) {
   if (Platform.isAndroid) {
     /// The min required version for Android is 16
     assert(
-      MobileAds.osVersion >= 16,
+      MobileAds.instance.osVersion >= 16,
       'The required version to use the AdMOB SDK is 16 or higher',
     );
 
@@ -54,14 +54,14 @@ void assertVersionIsSupported([bool usePlatformView = true]) {
     ///   - Virtual display: 20
     if (usePlatformView)
       assert(
-        MobileAds.osVersion >= 19,
+        MobileAds.instance.osVersion >= 19,
         'Native and Banner Ads are not supported in versions before 19 because'
         ' flutter only support platform views on Android 19 or greater.',
       );
   } else {
     /// The min required version for iOS is 9
     assert(
-      MobileAds.osVersion >= 9,
+      MobileAds.instance.osVersion >= 9,
       'The required version to use the AdMOB SDK is 9 or higher',
     );
   }

@@ -88,6 +88,7 @@ const _$AdChoicesPlacementEnumMap = {
 };
 
 const _$AdMediaAspectRatioEnumMap = {
+  AdMediaAspectRatio.unknown: 0,
   AdMediaAspectRatio.any: 1,
   AdMediaAspectRatio.landscape: 2,
   AdMediaAspectRatio.portrait: 3,

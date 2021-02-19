@@ -192,7 +192,8 @@ const $NativeAdOptions = _$NativeAdOptionsTearOff();
 mixin _$NativeAdOptions {
   bool get requestCustomMuteThisAd;
   bool get requestMultipleImages;
-  bool get returnUrlsForImageAssets;
+  bool
+      get returnUrlsForImageAssets; // No point of preparing the native drawables.
   AdChoicesPlacement get adChoicesPlacement;
   AdMediaAspectRatio get mediaAspectRatio;
   VideoOptions get videoOptions;
@@ -360,7 +361,7 @@ class _$_NativeAdOptions implements _NativeAdOptions {
   @override
   final bool returnUrlsForImageAssets;
   @JsonKey(defaultValue: AdChoicesPlacement.topRight)
-  @override
+  @override // No point of preparing the native drawables.
   final AdChoicesPlacement adChoicesPlacement;
   @JsonKey(defaultValue: AdMediaAspectRatio.landscape)
   @override
@@ -438,7 +439,7 @@ abstract class _NativeAdOptions implements NativeAdOptions {
   bool get requestMultipleImages;
   @override
   bool get returnUrlsForImageAssets;
-  @override
+  @override // No point of preparing the native drawables.
   AdChoicesPlacement get adChoicesPlacement;
   @override
   AdMediaAspectRatio get mediaAspectRatio;

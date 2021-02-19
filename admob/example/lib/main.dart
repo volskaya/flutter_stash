@@ -11,9 +11,7 @@ void main() async {
 
   /// Make sure to initialize the MobileAds sdk. It returns a future
   /// that will be completed as soon as it initializes
-  await MobileAds.initialize();
-  // This is my device id. Ad yours here
-  MobileAds.setTestDeviceIds(['9345804C1E5B8F0871DFE29CA0758842']);
+  await MobileAds.instance.initialize();
 
   /// Run the app
   runApp(MyApp());

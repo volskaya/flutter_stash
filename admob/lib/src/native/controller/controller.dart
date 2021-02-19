@@ -115,7 +115,7 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
 
   Future<NativeAd> _callLoadAd() async {
     final map = await channel.invokeMapMethod<String, dynamic>('load', {
-      'unitId': unitId ?? MobileAds.nativeAdUnitId ?? MobileAds.nativeAdTestUnitId,
+      'unitId': unitId ?? MobileAds.instance.nativeAdUnitId ?? MobileAds.nativeAdTestUnitId,
       'options': (options ?? const NativeAdOptions()).toJson(),
     });
 
@@ -130,7 +130,7 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
   Future unmountView() => channel.invokeMethod('unmountView');
 
   Future<NativeAd> load() {
-    assert(MobileAds.isInitialized);
+    assert(MobileAds.instance.isInitialized);
     assert(!disposed);
     loadTime ??= DateTime.now();
     return (_loadAdOperation ??= Memoizer(future: _callLoadAd)).future;
@@ -139,13 +139,13 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
   @override
   void init() {
     channel.setMethodCallHandler(_handleMessages);
-    MobileAds.pluginChannel.invokeMethod('initNativeAdController', {'id': id});
+    MobileAds.instance.pluginChannel.invokeMethod('initNativeAdController', {'id': id});
   }
 
   @override
   void dispose() {
     assert(!isAttached, 'Controller disposed before its client was detached');
     super.dispose();
-    MobileAds.pluginChannel.invokeMethod('disposeNativeAdController', {'id': id});
+    MobileAds.instance.pluginChannel.invokeMethod('disposeNativeAdController', {'id': id});
   }
 }
