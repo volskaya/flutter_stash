@@ -153,13 +153,6 @@ abstract class AdError with _$AdError {
   factory AdError.fromJson(Map<String, dynamic> json) => _$AdErrorFromJson(json);
 }
 
-mixin UniqueKeyMixin {
-  final _key = UniqueKey();
-
-  /// The unique key of [this] class
-  String get id => _key.toString();
-}
-
 mixin AttachableMixin {
   int _client;
   bool get isAttached => _client != null;
@@ -185,18 +178,16 @@ mixin AttachableMixin {
   }
 }
 
-abstract class AdMethodChannel<T> with UniqueKeyMixin {
+abstract class AdMethodChannel<T> {
   AdMethodChannel() {
     channel = MethodChannel(id);
     init();
   }
 
-  @protected
-  final onEventController = StreamController<Map<T, dynamic>>.broadcast();
+  String get id => hashCode.toString();
 
   MethodChannel channel;
   bool disposed = false;
-  Stream get onEvent => onEventController.stream;
 
   @protected
   void init();
@@ -204,12 +195,6 @@ abstract class AdMethodChannel<T> with UniqueKeyMixin {
   @mustCallSuper
   void dispose() {
     assert(!disposed, 'Redundant dispose');
-    onEventController.close();
     disposed = true;
-  }
-
-  Future<bool> load();
-  Future<bool> show() {
-    throw UnimplementedError('This was not implemented for this ad');
   }
 }

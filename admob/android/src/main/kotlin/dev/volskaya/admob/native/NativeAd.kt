@@ -15,15 +15,17 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.OnHierarchyChangeListener
 import android.widget.*
 import android.widget.LinearLayout.HORIZONTAL
-import dev.volskaya.admob.*
 import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
+import dev.volskaya.admob.*
 import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
+
 
 class NativeViewHolder {
     var mediaView: MediaView? = null
@@ -216,27 +218,49 @@ class NativeViewFactory : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
 
 class NativeAdPlatformView(context: Context, data: Map<*, *>?) : PlatformView {
     private val viewGroup: ViewGroup = LinearLayout(context).also { it.gravity = Gravity.CENTER_VERTICAL }
-    private var controller: NativeAdmobController? = (data?.get("controllerId") as? String)?.let { NativeAdmobControllerManager.getController(it) }
+    private val controller: NativeAdmobController? = (data?.get("controllerId") as? String)?.let { NativeAdmobControllerManager.getController(it) }
+    private val layoutId: String = data?.get("layoutId") as String
 
     // The view can change, if the flutter widget called "updateUI".
-    private var view: Map<*, *>? = (data?.get("view") as? Map<*, *>)
+//    private var view: Map<*, *>? = (data?.get("view") as? Map<*, *>)
+    private var recyclable: RecyclableAdView? = null
+
+    private fun cycleAd(nativeAd: NativeAd) {
+//        if (recyclable != null) {
+//            recyclable.view.setNativeAd(nativeAd)
+//        } else {
+//            recyclable = NativeAdViewRecycler.mount(layoutId, viewGroup, nativeAd)
+//        }
+
+        recyclable?.view?.setNativeAd(nativeAd)
+                ?: let {
+                    Log.d("NativeAdPlatformView", "Mounting a new recyclable ad view for $layoutId")
+                    recyclable = NativeAdViewRecycler.mount(layoutId, viewGroup, nativeAd)
+                }
+    }
 
     init {
         // Attach to the controller.
         controller?.let { controller ->
-            controller.nativeAdChanged = { it?.let { view?.let { view -> buildAsyncView(view, context, it, viewGroup)} } }
-            controller.nativeAdUpdateRequested = { newView: Map<String, Any?>, ad: NativeAd? ->
-                view = newView
-                ad?.let { buildAsyncView(newView, context, it, viewGroup) }
-            }
-
-            // Build the first view.
-            view?.let { view -> controller.nativeAd?.let { buildAsyncView(view, context, it, viewGroup) } }
+            controller.nativeAdChanged = { it?.let { cycleAd(it) } }
+            controller.nativeAd?.let { cycleAd(it) } // Build the first view.
         } ?: Log.e("NativeAdPlatformView", "No controller id passed to NativeAd")
+
+//        // Attach to the controller.
+//        controller?.let { controller ->
+//            controller.nativeAdChanged = { it?.let { view?.let { view -> buildAsyncView(view, context, it, viewGroup)} } }
+//            controller.nativeAdUpdateRequested = { newView: Map<String, Any?>, ad: NativeAd? ->
+//                view = newView
+//                ad?.let { buildAsyncView(newView, context, it, viewGroup) }
+//            }
+//
+//            // Build the first view.
+//            view?.let { view -> controller.nativeAd?.let { buildAsyncView(view, context, it, viewGroup) } }
+//        } ?: Log.e("NativeAdPlatformView", "No controller id passed to NativeAd")
     }
 
     override fun getView(): View { return viewGroup }
-    override fun dispose() {}
+    override fun dispose() { recyclable?.unmount() }
 
     private fun buildAsyncView(data: Map<*, *>, context: Context, nativeAd: NativeAd, parent: ViewGroup?) {
         parent?.removeAllViews()

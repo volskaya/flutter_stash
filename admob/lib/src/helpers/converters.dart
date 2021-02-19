@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -13,6 +15,16 @@ class ColorHexConverter implements JsonConverter<Color, String> {
 
   @override
   String toJson(Color object) => object?._toHex();
+}
+
+class Uint8ListConverter implements JsonConverter<Uint8List, dynamic> {
+  const Uint8ListConverter();
+
+  @override
+  Uint8List fromJson(dynamic json) => json != null && json is List<int> ? Uint8List.fromList(json) : null;
+
+  @override
+  dynamic toJson(Uint8List object) => object;
 }
 
 class EdgeInsetsConverter implements JsonConverter<EdgeInsets, Map> {

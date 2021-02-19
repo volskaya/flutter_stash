@@ -39,6 +39,7 @@ abstract class RewardItem with _$RewardItem {
 /// For more info, see:
 ///   - https://developers.google.com/admob/android/rewarded-fullscreen
 ///   - https://developers.google.com/admob/ios/rewarded-ads
+@Deprecated('This has not been refactored and contains buggy code')
 class RewardedAd extends AdMethodChannel<RewardedAdEvent> {
   RewardedAd({this.unitId});
 
@@ -46,8 +47,6 @@ class RewardedAd extends AdMethodChannel<RewardedAdEvent> {
 
   final String unitId;
 
-  @override
-  Stream<Map<RewardedAdEvent, dynamic>> get onEvent => super.onEvent as Stream<Map<RewardedAdEvent, dynamic>>;
   Memoizer<bool> _loaded;
   bool get isLoaded => _loaded?.value == true;
 
@@ -68,32 +67,30 @@ class RewardedAd extends AdMethodChannel<RewardedAdEvent> {
     if (disposed) return;
     switch (call.method) {
       case 'loading':
-        onEventController.add({RewardedAdEvent.loading: null});
+        // onEventController.add({RewardedAdEvent.loading: null});
         break;
       case 'onAdFailedToLoad':
-        onEventController.add({
-          RewardedAdEvent.loadFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
-        });
+        // onEventController.add({
+        //   RewardedAdEvent.loadFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
+        // });
         break;
       case 'onAdLoaded':
-        onEventController.add({RewardedAdEvent.loaded: null});
+        // onEventController.add({RewardedAdEvent.loaded: null});
         break;
       case 'onUserEarnedReward':
-        onEventController
-            .add({RewardedAdEvent.earnedReward: RewardItem.fromJson(call.arguments as Map<String, dynamic>)});
+        // onEventController
+        //     .add({RewardedAdEvent.earnedReward: RewardItem.fromJson(call.arguments as Map<String, dynamic>)});
         break;
       case 'onAdShowedFullScreenContent':
-        onEventController.add({RewardedAdEvent.showed: null});
+        // onEventController.add({RewardedAdEvent.showed: null});
         break;
       case 'onAdFailedToShowFullScreenContent':
-        onEventController.add({
-          RewardedAdEvent.showFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
-        });
+        // onEventController.add({
+        //   RewardedAdEvent.showFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
+        // });
         break;
       case 'onAdDismissedFullScreenContent':
-        onEventController.add({RewardedAdEvent.closed: null});
-        break;
-      default:
+        // onEventController.add({RewardedAdEvent.closed: null});
         break;
     }
   }
@@ -102,14 +99,12 @@ class RewardedAd extends AdMethodChannel<RewardedAdEvent> {
         'unitId': unitId ?? MobileAds.rewardedAdUnitId ?? MobileAds.rewardedAdTestUnitId,
       });
 
-  @override
   Future<bool> load() async {
     assert(MobileAds.isInitialized);
     assert(!disposed);
     return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
   }
 
-  @override
   Future<bool> show() async {
     assert(MobileAds.isInitialized);
     assert(!disposed);

@@ -1,18 +1,34 @@
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:admob/src/helpers/memoizer.dart';
+import 'package:admob/src/native/controller/native_ad.dart';
+import 'package:flutter/services.dart';
+import 'package:mobx/mobx.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../admob.dart';
 import '../../utils.dart';
-import 'media_content.dart';
 import 'options.dart';
 
-export 'media_content.dart';
+export 'native_ad.dart';
 export 'options.dart';
+
+part 'controller.freezed.dart';
+part 'controller.g.dart';
 
 enum NativeAdEvent { loadFailed, loaded, loading, muted, undefined }
 enum AdVideoEvent { start, play, pause, end, muted, unmuted }
+enum NativeAdVideoPlaybackState { playing, paused }
+enum NativeAdVideoLifecycle { idle, started, ended }
+
+@freezed
+abstract class NativeAdVideoState with _$NativeAdVideoState {
+  const factory NativeAdVideoState({
+    @Default(NativeAdVideoPlaybackState.paused) NativeAdVideoPlaybackState playback,
+    @Default(NativeAdVideoLifecycle.idle) NativeAdVideoLifecycle lifecycle,
+    @Default(true) bool muted,
+  }) = _NativeAdVideoState;
+}
 
 /// An Native Ad Controller model to communicate with the model on the platform side.
 /// It gives you methods to help in the implementation and event tracking.
@@ -22,112 +38,102 @@ enum AdVideoEvent { start, play, pause, end, muted, unmuted }
 /// For more info, see:
 ///   - https://developers.google.com/admob/android/native/start
 ///   - https://developers.google.com/admob/ios/native/start
-class NativeAdController extends AdMethodChannel<NativeAdEvent> with AttachableMixin {
-  NativeAdController({this.unitId, this.options});
+class NativeAdController extends _NativeAdController with _$NativeAdController {
+  NativeAdController({String unitId, NativeAdOptions options}) : super(unitId, options);
 
   static String get testUnitId => MobileAds.nativeAdTestUnitId;
   static String get videoTestUnitId => MobileAds.nativeAdVideoTestUnitId;
+}
+
+abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with AttachableMixin, Store {
+  _NativeAdController(this.unitId, this.options);
 
   final NativeAdOptions options;
   final String unitId;
-  final _onVideoEvent = StreamController<Map<AdVideoEvent, dynamic>>.broadcast();
 
-  MediaContent _mediaContent;
-  List<String> _muteThisAdReasons = [];
-  bool _customMuteThisAdEnabled = false;
-  Memoizer<bool> _loaded;
+  DateTime loadTime;
+  Memoizer<NativeAd> _loadAdOperation;
+  bool get isLoaded => _loadAdOperation?.value != null;
 
-  MediaContent get mediaContent => _mediaContent;
-  List<String> get muteThisAdReasons => _muteThisAdReasons;
-  bool get isCustomMuteThisAdEnabled => _customMuteThisAdEnabled;
-  bool get isLoaded => _loaded?.value == true;
+  @observable
+  NativeAd nativeAd = NativeAd.loading();
 
-  @override
-  Stream<Map<NativeAdEvent, dynamic>> get onEvent => super.onEvent as Stream<Map<NativeAdEvent, dynamic>>;
-  Stream<Map<AdVideoEvent, dynamic>> get onVideoEvent => _onVideoEvent.stream;
+  @observable
+  NativeAdVideoState videoState = const NativeAdVideoState();
+
+  @observable
+  List<String> muteThisAdReasons = const <String>[];
+
+  bool considerThisOld() => loadTime != null
+      ? loadTime.difference(DateTime.now()) > const Duration(minutes: 30)
+      : null; // Hasn't even been built yet.
 
   /// Handle the messages the channel sends
   Future<void> _handleMessages(MethodCall call) async {
-    if (disposed) return;
-    if (call.method.startsWith('onVideo')) {
-      switch (call.method) {
-        case 'onVideoStart':
-          _onVideoEvent.add({AdVideoEvent.start: null});
-          break;
-        case 'onVideoPlay':
-          _onVideoEvent.add({AdVideoEvent.play: null});
-          break;
-        case 'onVideoPause':
-          _onVideoEvent.add({AdVideoEvent.pause: null});
-          break;
-        case 'onVideoMute':
-          if (call.arguments as bool) // Is muted.
-            _onVideoEvent.add({AdVideoEvent.muted: null});
-          else
-            _onVideoEvent.add({AdVideoEvent.unmuted: null});
-          break;
-        case 'onVideoEnd':
-          _onVideoEvent.add({AdVideoEvent.end: null});
-          break;
-      }
-    } else {
-      switch (call.method) {
-        case 'loading':
-          onEventController.add({NativeAdEvent.loading: null});
-          break;
-        case 'onAdFailedToLoad':
-          onEventController.add({
-            NativeAdEvent.loadFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
-          });
-          break;
-        case 'onAdLoaded':
-          onEventController.add({NativeAdEvent.loaded: null});
-          break;
-        case 'onAdMuted':
-          onEventController.add({NativeAdEvent.muted: null});
-          break;
-        case 'undefined':
-        default:
-          onEventController.add({NativeAdEvent.undefined: null});
-          break;
-      }
+    switch (call.method) {
+      // Ad cases.
+      case 'onAdLoading':
+        nativeAd = NativeAd.loading();
+        break;
+      case 'onAdChanged':
+        nativeAd = NativeAd.fromJson(Map<String, dynamic>.from(call.arguments as Map));
+        break;
+      case 'onAdMuted':
+        muteThisAdReasons = List<String>.from(call.arguments as List);
+        break;
 
-      if (call.arguments != null && call.arguments is Map) {
-        (call.arguments as Map).forEach((key, _value) {
-          final value = Map<String, dynamic>.from(_value as Map ?? const {});
-          switch (key as String) {
-            case 'muteThisAdInfo':
-              _muteThisAdReasons = List<String>.from(value['muteThisAdReasons'] as List ?? []);
-              _customMuteThisAdEnabled = (value['isCustomMuteThisAdEnabled'] as bool) ?? false;
-              break;
-            case 'mediaContent':
-              _mediaContent = MediaContent.fromJson(value);
-              break;
-            default:
-              break;
-          }
-        });
-      }
+      // Video cases.
+      case 'onVideoStart':
+        videoState = videoState.copyWith.call(lifecycle: NativeAdVideoLifecycle.started);
+        break;
+      case 'onVideoPlay':
+        videoState = videoState.copyWith.call(playback: NativeAdVideoPlaybackState.playing);
+        break;
+      case 'onVideoPause':
+        videoState = videoState.copyWith.call(playback: NativeAdVideoPlaybackState.paused);
+        break;
+      case 'onVideoMute':
+        videoState = videoState.copyWith.call(muted: call.arguments as bool);
+        break;
+      case 'onVideoEnd':
+        videoState = videoState.copyWith.call(lifecycle: NativeAdVideoLifecycle.ended);
+        break;
     }
+  }
+
+  Future<bool> click() {
+    assert(nativeAd != null);
+    return channel.invokeMethod<bool>('click');
   }
 
   /// Mutes this ad programmatically. Use `null` to mute this ad with the default reason.
   Future<void> muteThisAd([int reason]) {
     assert(!disposed);
     if (reason != null) assert(!reason.isNegative, 'You must specify a valid reason');
-    return channel.invokeMethod('muteAd', {'reason': reason});
+    return channel.invokeMethod('mute', {'reason': reason});
   }
 
-  Future<bool> _callLoadAd() => channel.invokeMethod<bool>('loadAd', {
-        'unitId': unitId ?? MobileAds.nativeAdUnitId ?? MobileAds.nativeAdTestUnitId,
-        'options': (options ?? const NativeAdOptions()).toJson(),
-      });
+  Future<NativeAd> _callLoadAd() async {
+    final map = await channel.invokeMapMethod<String, dynamic>('load', {
+      'unitId': unitId ?? MobileAds.nativeAdUnitId ?? MobileAds.nativeAdTestUnitId,
+      'options': (options ?? const NativeAdOptions()).toJson(),
+    });
 
-  @override
-  Future<bool> load() {
+    return map != null ? NativeAd.fromJson(map) : null;
+  }
+
+  Future mountView() async {
+    await load();
+    await channel.invokeMethod('mountView');
+  }
+
+  Future unmountView() => channel.invokeMethod('unmountView');
+
+  Future<NativeAd> load() {
     assert(MobileAds.isInitialized);
     assert(!disposed);
-    return (_loaded ??= Memoizer(future: _callLoadAd)).future;
+    loadTime ??= DateTime.now();
+    return (_loadAdOperation ??= Memoizer(future: _callLoadAd)).future;
   }
 
   @override
@@ -139,7 +145,6 @@ class NativeAdController extends AdMethodChannel<NativeAdEvent> with AttachableM
   @override
   void dispose() {
     assert(!isAttached, 'Controller disposed before its client was detached');
-    _onVideoEvent.close();
     super.dispose();
     MobileAds.pluginChannel.invokeMethod('disposeNativeAdController', {'id': id});
   }

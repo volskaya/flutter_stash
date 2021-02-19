@@ -24,6 +24,7 @@ enum InterstitialAdEvent { loadFailed, loaded, loading, showed, failedToShow, cl
 /// For more info, see:
 ///   - https://developers.google.com/admob/android/interstitial-fullscreen
 ///   - https://developers.google.com/admob/ios/interstitial
+@Deprecated('This has not been refactored and contains buggy code')
 class InterstitialAd extends AdMethodChannel<InterstitialAdEvent> {
   InterstitialAd({this.unitId});
 
@@ -32,8 +33,6 @@ class InterstitialAd extends AdMethodChannel<InterstitialAdEvent> {
 
   final String unitId;
 
-  @override
-  Stream<Map<InterstitialAdEvent, dynamic>> get onEvent => super.onEvent as Stream<Map<InterstitialAdEvent, dynamic>>;
   Memoizer<bool> _loaded;
   bool get isLoaded => _loaded?.value == true;
 
@@ -54,26 +53,26 @@ class InterstitialAd extends AdMethodChannel<InterstitialAdEvent> {
     if (disposed) return;
     switch (call.method) {
       case 'loading':
-        onEventController.add({InterstitialAdEvent.loading: null});
+        // onEventController.add({InterstitialAdEvent.loading: null});
         break;
       case 'onAdFailedToLoad':
-        onEventController.add({
-          InterstitialAdEvent.loadFailed: AdError.fromJson(call.arguments),
-        });
+        // onEventController.add({
+        //   InterstitialAdEvent.loadFailed: AdError.fromJson(Map<String, dynamic>.from(call.arguments as Map)),
+        // });
         break;
       case 'onAdLoaded':
-        onEventController.add({InterstitialAdEvent.loaded: null});
+        // onEventController.add({InterstitialAdEvent.loaded: null});
         break;
       case 'onAdShowedFullScreenContent':
-        onEventController.add({InterstitialAdEvent.showed: null});
+        // onEventController.add({InterstitialAdEvent.showed: null});
         break;
       case 'onAdFailedToShowFullScreenContent':
-        onEventController.add({
-          InterstitialAdEvent.failedToShow: AdError.fromJson(call.arguments as Map<String, dynamic>),
-        });
+        // onEventController.add({
+        //   InterstitialAdEvent.failedToShow: AdError.fromJson(Map<String, dynamic>.from(call.arguments as Map)),
+        // });
         break;
       case 'onAdDismissedFullScreenContent':
-        onEventController.add({InterstitialAdEvent.closed: null});
+        // onEventController.add({InterstitialAdEvent.closed: null});
         break;
       default:
         break;
@@ -84,14 +83,12 @@ class InterstitialAd extends AdMethodChannel<InterstitialAdEvent> {
         'unitId': unitId ?? MobileAds.interstitialAdUnitId ?? MobileAds.interstitialAdTestUnitId,
       });
 
-  @override
   Future<bool> load() async {
     assert(MobileAds.isInitialized);
     assert(!disposed);
     return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
   }
 
-  @override
   Future<bool> show() async {
     assert(!disposed);
     if (await load()) return channel.invokeMethod<bool>('show');

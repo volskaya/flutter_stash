@@ -1,10 +1,14 @@
 import 'dart:io';
 
+import 'package:admob/src/native/layout_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'utils.dart';
+
+// part 'mobile_ads.freezed.dart';
+// part 'mobile_ads.g.dart';
 
 const int RATING_G = 0;
 const int RATING_PG = 1;
@@ -94,6 +98,7 @@ class MobileAds {
     String rewardedAdUnitId,
     String appOpenAdUnitId,
     bool useHybridComposition,
+    List<String> debugDeviceIds,
   }) async {
     assertPlatformIsSupported();
     assert(!isInitialized);
@@ -115,20 +120,23 @@ class MobileAds {
     _debugCheckIsTestId(MobileAds.appOpenAdUnitId, [appOpenAdTestUnitId]);
 
     // Make sure the version is supported.
-    _version = await _pluginChannel.invokeMethod<int>('initialize');
-    assertVersionIsSupported(false);
+    _version = await _pluginChannel.invokeMethod<int>(
+      'initialize',
+      <String, dynamic>{'debugDeviceIds': debugDeviceIds},
+    );
 
     if (Platform.isAndroid) {
-      // hybrid composition is enabled in android 19 and can't be disabled
+      // hybrid composition is enabled in android 19 and can't be disabled.
       MobileAds.useHybridComposition = osVersion == 19 ? true : useHybridComposition ?? false;
     }
 
+    assertVersionIsSupported(false);
     _initialized = true;
   }
 
   /// Check if the test id that is being used is for testing or not.
   ///
-  /// [kReleaseMode] and [kDebugMode] are considered as test mode
+  /// [kReleaseMode] and [kDebugMode] are considered as test mode.
   static void _debugCheckIsTestId(String id, List<String> testIds) {
     assert(id != null);
     assert(testIds != null);

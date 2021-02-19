@@ -21,6 +21,7 @@ enum AppOpenEvent { loading, loaded, loadFailed, dismissed, showFailed, showed }
 /// For more info, see:
 ///   - https://developers.google.com/admob/android/app-open-ads
 ///   - https://developers.google.com/admob/ios/app-open-ads
+@Deprecated('This has not been refactored and contains buggy code')
 class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
   AppOpenAd({
     this.timeout = const Duration(hours: 1),
@@ -34,8 +35,6 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
 
   static String get testUnitId => MobileAds.appOpenAdTestUnitId;
 
-  @override
-  Stream<Map<AppOpenEvent, dynamic>> get onEvent => super.onEvent as Stream<Map<AppOpenEvent, dynamic>>;
   bool _isAvaiable = false;
   bool isShowing = false;
   DateTime _lastLoadedTime;
@@ -62,30 +61,30 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
     if (disposed) return;
     switch (call.method) {
       case 'loading':
-        onEventController.add({AppOpenEvent.loading: null});
+        // onEventController.add({AppOpenEvent.loading: null});
         break;
       case 'onAppOpenAdFailedToLoad':
-        onEventController.add({
-          AppOpenEvent.loadFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
-        });
+        // onEventController.add({
+        //   AppOpenEvent.loadFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
+        // });
         break;
       case 'onAppOpenAdLoaded':
         _isAvaiable = true;
-        onEventController.add({AppOpenEvent.loaded: null});
+        // onEventController.add({AppOpenEvent.loaded: null});
         break;
       case 'onAdDismissedFullScreenContent':
         _isAvaiable = false;
         isShowing = false;
-        onEventController.add({AppOpenEvent.dismissed: null});
+        // onEventController.add({AppOpenEvent.dismissed: null});
         break;
       case 'onAdFailedToShowFullScreenContent':
-        onEventController.add({
-          AppOpenEvent.showFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
-        });
+        // onEventController.add({
+        //   AppOpenEvent.showFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
+        // });
         break;
       case 'onAdShowedFullScreenContent':
         isShowing = true;
-        onEventController.add({AppOpenEvent.showed: null});
+        // onEventController.add({AppOpenEvent.showed: null});
         break;
     }
   }
@@ -114,14 +113,12 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
     });
   }
 
-  @override
   Future<bool> load() {
     assert(MobileAds.isInitialized);
     assert(!disposed);
     return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
   }
 
-  @override
   Future<bool> show() async {
     assert(MobileAds.isInitialized);
     assert(!disposed);

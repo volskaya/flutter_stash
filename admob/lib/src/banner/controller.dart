@@ -55,11 +55,10 @@ abstract class BannerSize {
 /// For more info, see:
 ///   - https://developers.google.com/admob/android/banner
 ///   - https://developers.google.com/admob/ios/banner
+@Deprecated('This has not been refactored and contains buggy code')
 class BannerAdController extends AdMethodChannel<BannerAdEvent> with AttachableMixin {
   static String get testUnitId => MobileAds.bannerAdTestUnitId;
 
-  @override
-  Stream<Map<BannerAdEvent, dynamic>> get onEvent => super.onEvent as Stream<Map<BannerAdEvent, dynamic>>;
   Memoizer<bool> _loaded;
   bool get isLoaded => _loaded?.value == true;
 
@@ -80,18 +79,18 @@ class BannerAdController extends AdMethodChannel<BannerAdEvent> with AttachableM
     if (disposed) return;
     switch (call.method) {
       case 'loading':
-        onEventController.add({BannerAdEvent.loading: null});
+        // onEventController.add({BannerAdEvent.loading: null});
         break;
       case 'onAdFailedToLoad':
-        onEventController.add({
-          BannerAdEvent.loadFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
-        });
+        // onEventController.add({
+        //   BannerAdEvent.loadFailed: AdError.fromJson(call.arguments as Map<String, dynamic>),
+        // });
         break;
       case 'onAdLoaded':
-        onEventController.add({BannerAdEvent.loaded: call.arguments});
+        // onEventController.add({BannerAdEvent.loaded: call.arguments});
         break;
       case 'onAdImpression':
-        onEventController.add({BannerAdEvent.impression: null});
+        // onEventController.add({BannerAdEvent.impression: null});
         break;
       default:
         break;
@@ -100,7 +99,6 @@ class BannerAdController extends AdMethodChannel<BannerAdEvent> with AttachableM
 
   Future<bool> _callLoadAd() => channel.invokeMethod<bool>('loadAd');
 
-  @override
   Future<bool> load() async {
     assert(MobileAds.isInitialized);
     assert(!disposed);

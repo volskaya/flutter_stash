@@ -13,6 +13,9 @@ dependencies:
     sdk: flutter
   freezed: ^0.12.6
   json_annotation:
+  flutter_mobx: ^1.1.0+2
+  mobx: ^1.2.1+2
+  mobx_codegen: ^1.1.0+1
 
 dev_dependencies:
   flutter_test:
@@ -26,6 +29,8 @@ dependency_overrides:
     path: /home/projects/forks/freezed/packages/freezed_annotation
   freezed:
     path: /home/projects/forks/freezed/packages/freezed
+  mobx_codegen:
+    path: /home/projects/forks/mobx.dart/mobx_codegen
 
 flutter:
   plugin:

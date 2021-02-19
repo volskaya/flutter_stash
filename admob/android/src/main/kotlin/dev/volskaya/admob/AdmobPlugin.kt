@@ -1,9 +1,8 @@
 package dev.volskaya.admob
 
 import android.app.Activity
-import android.content.Context
-import android.content.res.Resources
 import android.os.Build
+import android.util.Log
 import androidx.annotation.NonNull
 import dev.volskaya.admob.app_open.AppOpenAdControllerManager
 import dev.volskaya.admob.banner.*
@@ -43,9 +42,22 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "initialize" -> {
-                MobileAds.initialize(activity) { result.success(Build.VERSION.SDK_INT) }
+                MobileAds.initialize(activity) {
+                    call.argument<List<String>>("debugDeviceIds")?.let {
+                        if (it.isNotEmpty()) {
+                            val configuration = MobileAds
+                                    .getRequestConfiguration()
+                                    .toBuilder()
+                                    .setTestDeviceIds(it)
+                                    .build()
+                            MobileAds.setRequestConfiguration(configuration)
+                        }
+                    }
+
+                    result.success(Build.VERSION.SDK_INT)
+                }
             }
-            // Native Ads Controller
+            // Native Ads Controller.
             "initNativeAdController" -> {
                 NativeAdmobControllerManager.createController(call.argument<String>("id")!!, messenger, activity)
                 result.success(null)
@@ -54,7 +66,7 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                 NativeAdmobControllerManager.removeController(call.argument<String>("id")!!)
                 result.success(null)
             }
-            // Banner Ads Controller
+            // Banner Ads Controller.
             "initBannerAdController" -> {
                 BannerAdControllerManager.createController(
                         call.argument<String>("id")!!,
@@ -188,7 +200,7 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
 }
 
 fun encodeError(error: AdError?): Map<String, Any?> {
-    return mapOf<String, Any?>(
+    return mapOf(
             "errorCode" to error?.code,
             "domain" to error?.domain,
             "message" to error?.message,

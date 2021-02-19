@@ -153,20 +153,20 @@ class _BannerAdState extends State<BannerAd> with AutomaticKeepAliveClientMixin<
   void attachNewController() {
     controller = widget.controller ?? BannerAdController();
     controller.attach(this);
-    controller.onEvent.listen((e) {
-      final event = e.keys.first;
-      final info = e.values.first;
-      switch (event) {
-        case BannerAdEvent.loading:
-        case BannerAdEvent.loadFailed:
-        case BannerAdEvent.loaded:
-          height = (info as int)?.toDouble();
-          setState(() => state = event);
-          break;
-        default:
-          break;
-      }
-    });
+    // controller.onEvent.listen((e) {
+    //   final event = e.keys.first;
+    //   final info = e.values.first;
+    //   switch (event) {
+    //     case BannerAdEvent.loading:
+    //     case BannerAdEvent.loadFailed:
+    //     case BannerAdEvent.loaded:
+    //       height = (info as int)?.toDouble();
+    //       setState(() => state = event);
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // });
   }
 
   @override
