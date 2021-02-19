@@ -8,7 +8,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
-import android.os.Build
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
@@ -24,12 +23,12 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.ByteArrayOutputStream
-import java.lang.annotation.Native
 
+@SuppressLint("StaticFieldLeak")
 class NativeAdmobBuilderTask(
         val controller: NativeAdmobController,
         val result: MethodChannel.Result,
-        @SuppressLint("StaticFieldLeak") private val context: Context, // Expects the application context.
+        private val context: Context, // Expects the application context.
         private val unitId: String,
         private val options: Map<*, *>
 ) : AsyncTask<Any?, Any?, Any?>() {
@@ -69,7 +68,7 @@ class NativeAdmobBuilderTask(
                         super.onAdFailedToLoad(error)
                         val response = hashMapOf(
                                 "runtimeType" to "error",
-                                "message" to encodeError(error)
+                                "message" to error.message
                         )
 
                         controller.channel.invokeMethod("onAdChanged", response)
@@ -108,18 +107,11 @@ class NativeAdmobController(
     val channel: MethodChannel,
     private val activity: Activity
 ) : MethodChannel.MethodCallHandler {
-    companion object {
-        const val tag = "NativeAdmobController"
-    }
-
-    private val contentView = activity.window.decorView.findViewById<ViewGroup>(android.R.id.content)
-    private val contentViewParent = contentView.parent as ViewGroup
+    private val viewParent = activity.window.decorView as ViewGroup
+    private var mountView: Boolean = false
+    private var view: NativeAdView? = null
 
     var disposed: Boolean = false
-    var mountView: Boolean = false
-
-    var backgroundView: NativeAdView? = null
-    var nativeAdChanged: ((NativeAd?) -> Unit)? = null
     var nativeAd: NativeAd? = null
 
     init {
@@ -129,24 +121,23 @@ class NativeAdmobController(
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "mountView" -> {
-                Log.d(tag, "Mount view called")
-                mountView = true
                 nativeAd?.let { nativeAd ->
-                    AsyncLayoutInflater(activity).inflate(R.layout.background_native_ad, contentViewParent) { inflatedView, resid, parent ->
+                    if (nativeAd.mediaContent.hasVideoContent()) return@let // Video ads are built with a PlatformView.
+                    mountView = true
+
+                    AsyncLayoutInflater(activity).inflate(R.layout.background_native_ad, viewParent) { inflatedView, _, viewParent ->
                         val view = (inflatedView as NativeAdView)
 
                         if (mountView) {
-                            parent?.let { parent ->
+                            viewParent?.let { parent ->
                                 view.headlineView = view.findViewById<TextView>(R.id.background_native_ad_view_headline).also { it.text = nativeAd.headline }
                                 view.bodyView = view.findViewById<TextView>(R.id.background_native_ad_view_body).also { it.text = nativeAd.body }
                                 view.callToActionView = view.findViewById<Button>(R.id.background_native_ad_view_button).also { it.text = nativeAd.callToAction }
                                 view.setNativeAd(nativeAd)
 
                                 parent.addView(view, 0)
-                                backgroundView = view
+                                this.view = view
                             } ?: view.destroy()
-
-                            if (parent == null) { Log.d(tag, "Parent is null") }
                         } else {
                             view.destroy()
                         }
@@ -155,15 +146,12 @@ class NativeAdmobController(
                 result.success(null)
             }
             "unmountView" -> {
-                Log.d(tag, "Unmount view called")
-
                 mountView = false
-                // NOTE: Also calling .destroy() on the NativeAdView prevented its exposure from being logged.
-                backgroundView?.let { contentViewParent.removeView(it) }
+                view?.let { viewParent.removeView(it) }
                 result.success(null)
             }
             "click" -> {
-                val click = (backgroundView?.callToActionView as? Button)?.performClick() ?: false
+                val click = (view?.callToActionView as? Button)?.performClick() ?: false
                 result.success(click)
             }
             "load" -> {
@@ -182,10 +170,11 @@ class NativeAdmobController(
     }
 
     fun dispose() {
-        backgroundView?.destroy()
+        view?.destroy()
         mountView = false
         disposed = true
         nativeAd?.destroy()
+        nativeAd = null
     }
 
     private fun loadAd(unitId: String, options: Map<String, Any>, result: MethodChannel.Result) {

@@ -30,13 +30,11 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     private lateinit var messenger: BinaryMessenger
 
     override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-        channel = MethodChannel(binding.binaryMessenger, "admob")
-        channel.setMethodCallHandler(this)
-
+        channel = MethodChannel(binding.binaryMessenger, "admob").also { it.setMethodCallHandler(this) }
         messenger = binding.binaryMessenger
 
-        binding.platformViewRegistry.registerViewFactory("native_admob", NativeViewFactory())
         binding.platformViewRegistry.registerViewFactory("banner_admob", BannerAdViewFactory())
+        binding.platformViewRegistry.registerViewFactory("nativeAdVideoMedia", NativeAdMediaViewFactory())
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
