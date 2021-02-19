@@ -823,9 +823,9 @@ NativeAd _$NativeAdFromJson(Map<String, dynamic> json) {
     case 'default':
       return NativeAdData.fromJson(json);
     case 'loading':
-      return _NativeAdLoading.fromJson(json);
+      return NativeAdLoadingData.fromJson(json);
     case 'error':
-      return _NativeAdError.fromJson(json);
+      return NativeAdErrorData.fromJson(json);
 
     default:
       throw FallThroughError();
@@ -875,13 +875,13 @@ class _$NativeAdTearOff {
   }
 
 // ignore: unused_element
-  _NativeAdLoading loading() {
-    return _NativeAdLoading();
+  NativeAdLoadingData loading() {
+    return NativeAdLoadingData();
   }
 
 // ignore: unused_element
-  _NativeAdError error({@required String message}) {
-    return _NativeAdError(
+  NativeAdErrorData error({@required String message}) {
+    return NativeAdErrorData(
       message: message,
     );
   }
@@ -946,14 +946,14 @@ mixin _$NativeAd {
   @optionalTypeArgs
   TResult map<TResult extends Object>(
     TResult $default(NativeAdData value), {
-    @required TResult loading(_NativeAdLoading value),
-    @required TResult error(_NativeAdError value),
+    @required TResult loading(NativeAdLoadingData value),
+    @required TResult error(NativeAdErrorData value),
   });
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object>(
     TResult $default(NativeAdData value), {
-    TResult loading(_NativeAdLoading value),
-    TResult error(_NativeAdError value),
+    TResult loading(NativeAdLoadingData value),
+    TResult error(NativeAdErrorData value),
     @required TResult orElse(),
   });
   Map<String, dynamic> toJson();
@@ -1335,8 +1335,8 @@ class _$NativeAdData implements NativeAdData {
   @optionalTypeArgs
   TResult map<TResult extends Object>(
     TResult $default(NativeAdData value), {
-    @required TResult loading(_NativeAdLoading value),
-    @required TResult error(_NativeAdError value),
+    @required TResult loading(NativeAdLoadingData value),
+    @required TResult error(NativeAdErrorData value),
   }) {
     assert($default != null);
     assert(loading != null);
@@ -1348,8 +1348,8 @@ class _$NativeAdData implements NativeAdData {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object>(
     TResult $default(NativeAdData value), {
-    TResult loading(_NativeAdLoading value),
-    TResult error(_NativeAdError value),
+    TResult loading(NativeAdLoadingData value),
+    TResult error(NativeAdErrorData value),
     @required TResult orElse(),
   }) {
     assert(orElse != null);
@@ -1409,31 +1409,32 @@ abstract class NativeAdData implements NativeAd {
 }
 
 /// @nodoc
-abstract class _$NativeAdLoadingCopyWith<$Res> {
-  factory _$NativeAdLoadingCopyWith(
-          _NativeAdLoading value, $Res Function(_NativeAdLoading) then) =
-      __$NativeAdLoadingCopyWithImpl<$Res>;
+abstract class $NativeAdLoadingDataCopyWith<$Res> {
+  factory $NativeAdLoadingDataCopyWith(
+          NativeAdLoadingData value, $Res Function(NativeAdLoadingData) then) =
+      _$NativeAdLoadingDataCopyWithImpl<$Res>;
 }
 
 /// @nodoc
-class __$NativeAdLoadingCopyWithImpl<$Res> extends _$NativeAdCopyWithImpl<$Res>
-    implements _$NativeAdLoadingCopyWith<$Res> {
-  __$NativeAdLoadingCopyWithImpl(
-      _NativeAdLoading _value, $Res Function(_NativeAdLoading) _then)
-      : super(_value, (v) => _then(v as _NativeAdLoading));
+class _$NativeAdLoadingDataCopyWithImpl<$Res>
+    extends _$NativeAdCopyWithImpl<$Res>
+    implements $NativeAdLoadingDataCopyWith<$Res> {
+  _$NativeAdLoadingDataCopyWithImpl(
+      NativeAdLoadingData _value, $Res Function(NativeAdLoadingData) _then)
+      : super(_value, (v) => _then(v as NativeAdLoadingData));
 
   @override
-  _NativeAdLoading get _value => super._value as _NativeAdLoading;
+  NativeAdLoadingData get _value => super._value as NativeAdLoadingData;
 }
 
 @JsonSerializable()
 
 /// @nodoc
-class _$_NativeAdLoading implements _NativeAdLoading {
-  _$_NativeAdLoading();
+class _$NativeAdLoadingData implements NativeAdLoadingData {
+  _$NativeAdLoadingData();
 
-  factory _$_NativeAdLoading.fromJson(Map<String, dynamic> json) =>
-      _$_$_NativeAdLoadingFromJson(json);
+  factory _$NativeAdLoadingData.fromJson(Map<String, dynamic> json) =>
+      _$_$NativeAdLoadingDataFromJson(json);
 
   bool _didimage = false;
   NativeAdImage _image;
@@ -1457,7 +1458,7 @@ class _$_NativeAdLoading implements _NativeAdLoading {
 
   @override
   bool operator ==(dynamic other) {
-    return identical(this, other) || (other is _NativeAdLoading);
+    return identical(this, other) || (other is NativeAdLoadingData);
   }
 
   @override
@@ -1527,8 +1528,8 @@ class _$_NativeAdLoading implements _NativeAdLoading {
   @optionalTypeArgs
   TResult map<TResult extends Object>(
     TResult $default(NativeAdData value), {
-    @required TResult loading(_NativeAdLoading value),
-    @required TResult error(_NativeAdError value),
+    @required TResult loading(NativeAdLoadingData value),
+    @required TResult error(NativeAdErrorData value),
   }) {
     assert($default != null);
     assert(loading != null);
@@ -1540,8 +1541,8 @@ class _$_NativeAdLoading implements _NativeAdLoading {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object>(
     TResult $default(NativeAdData value), {
-    TResult loading(_NativeAdLoading value),
-    TResult error(_NativeAdError value),
+    TResult loading(NativeAdLoadingData value),
+    TResult error(NativeAdErrorData value),
     @required TResult orElse(),
   }) {
     assert(orElse != null);
@@ -1553,40 +1554,40 @@ class _$_NativeAdLoading implements _NativeAdLoading {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$_NativeAdLoadingToJson(this)..['runtimeType'] = 'loading';
+    return _$_$NativeAdLoadingDataToJson(this)..['runtimeType'] = 'loading';
   }
 }
 
-abstract class _NativeAdLoading implements NativeAd {
-  factory _NativeAdLoading() = _$_NativeAdLoading;
+abstract class NativeAdLoadingData implements NativeAd {
+  factory NativeAdLoadingData() = _$NativeAdLoadingData;
 
-  factory _NativeAdLoading.fromJson(Map<String, dynamic> json) =
-      _$_NativeAdLoading.fromJson;
+  factory NativeAdLoadingData.fromJson(Map<String, dynamic> json) =
+      _$NativeAdLoadingData.fromJson;
 }
 
 /// @nodoc
-abstract class _$NativeAdErrorCopyWith<$Res> {
-  factory _$NativeAdErrorCopyWith(
-          _NativeAdError value, $Res Function(_NativeAdError) then) =
-      __$NativeAdErrorCopyWithImpl<$Res>;
+abstract class $NativeAdErrorDataCopyWith<$Res> {
+  factory $NativeAdErrorDataCopyWith(
+          NativeAdErrorData value, $Res Function(NativeAdErrorData) then) =
+      _$NativeAdErrorDataCopyWithImpl<$Res>;
   $Res call({String message});
 }
 
 /// @nodoc
-class __$NativeAdErrorCopyWithImpl<$Res> extends _$NativeAdCopyWithImpl<$Res>
-    implements _$NativeAdErrorCopyWith<$Res> {
-  __$NativeAdErrorCopyWithImpl(
-      _NativeAdError _value, $Res Function(_NativeAdError) _then)
-      : super(_value, (v) => _then(v as _NativeAdError));
+class _$NativeAdErrorDataCopyWithImpl<$Res> extends _$NativeAdCopyWithImpl<$Res>
+    implements $NativeAdErrorDataCopyWith<$Res> {
+  _$NativeAdErrorDataCopyWithImpl(
+      NativeAdErrorData _value, $Res Function(NativeAdErrorData) _then)
+      : super(_value, (v) => _then(v as NativeAdErrorData));
 
   @override
-  _NativeAdError get _value => super._value as _NativeAdError;
+  NativeAdErrorData get _value => super._value as NativeAdErrorData;
 
   @override
   $Res call({
     Object message = freezed,
   }) {
-    return _then(_NativeAdError(
+    return _then(NativeAdErrorData(
       message: message == freezed ? _value.message : message as String,
     ));
   }
@@ -1595,11 +1596,11 @@ class __$NativeAdErrorCopyWithImpl<$Res> extends _$NativeAdCopyWithImpl<$Res>
 @JsonSerializable()
 
 /// @nodoc
-class _$_NativeAdError implements _NativeAdError {
-  _$_NativeAdError({@required this.message}) : assert(message != null);
+class _$NativeAdErrorData implements NativeAdErrorData {
+  _$NativeAdErrorData({@required this.message}) : assert(message != null);
 
-  factory _$_NativeAdError.fromJson(Map<String, dynamic> json) =>
-      _$_$_NativeAdErrorFromJson(json);
+  factory _$NativeAdErrorData.fromJson(Map<String, dynamic> json) =>
+      _$_$NativeAdErrorDataFromJson(json);
 
   @override
   final String message;
@@ -1627,7 +1628,7 @@ class _$_NativeAdError implements _NativeAdError {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _NativeAdError &&
+        (other is NativeAdErrorData &&
             (identical(other.message, message) ||
                 const DeepCollectionEquality().equals(other.message, message)));
   }
@@ -1637,8 +1638,8 @@ class _$_NativeAdError implements _NativeAdError {
       runtimeType.hashCode ^ const DeepCollectionEquality().hash(message);
 
   @override
-  _$NativeAdErrorCopyWith<_NativeAdError> get copyWith =>
-      __$NativeAdErrorCopyWithImpl<_NativeAdError>(this, _$identity);
+  $NativeAdErrorDataCopyWith<NativeAdErrorData> get copyWith =>
+      _$NativeAdErrorDataCopyWithImpl<NativeAdErrorData>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -1704,8 +1705,8 @@ class _$_NativeAdError implements _NativeAdError {
   @optionalTypeArgs
   TResult map<TResult extends Object>(
     TResult $default(NativeAdData value), {
-    @required TResult loading(_NativeAdLoading value),
-    @required TResult error(_NativeAdError value),
+    @required TResult loading(NativeAdLoadingData value),
+    @required TResult error(NativeAdErrorData value),
   }) {
     assert($default != null);
     assert(loading != null);
@@ -1717,8 +1718,8 @@ class _$_NativeAdError implements _NativeAdError {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object>(
     TResult $default(NativeAdData value), {
-    TResult loading(_NativeAdLoading value),
-    TResult error(_NativeAdError value),
+    TResult loading(NativeAdLoadingData value),
+    TResult error(NativeAdErrorData value),
     @required TResult orElse(),
   }) {
     assert(orElse != null);
@@ -1730,16 +1731,16 @@ class _$_NativeAdError implements _NativeAdError {
 
   @override
   Map<String, dynamic> toJson() {
-    return _$_$_NativeAdErrorToJson(this)..['runtimeType'] = 'error';
+    return _$_$NativeAdErrorDataToJson(this)..['runtimeType'] = 'error';
   }
 }
 
-abstract class _NativeAdError implements NativeAd {
-  factory _NativeAdError({@required String message}) = _$_NativeAdError;
+abstract class NativeAdErrorData implements NativeAd {
+  factory NativeAdErrorData({@required String message}) = _$NativeAdErrorData;
 
-  factory _NativeAdError.fromJson(Map<String, dynamic> json) =
-      _$_NativeAdError.fromJson;
+  factory NativeAdErrorData.fromJson(Map<String, dynamic> json) =
+      _$NativeAdErrorData.fromJson;
 
   String get message;
-  _$NativeAdErrorCopyWith<_NativeAdError> get copyWith;
+  $NativeAdErrorDataCopyWith<NativeAdErrorData> get copyWith;
 }

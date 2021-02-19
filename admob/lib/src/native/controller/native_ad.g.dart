@@ -138,20 +138,22 @@ Map<String, dynamic> _$_$NativeAdDataToJson(_$NativeAdData instance) =>
       'muteThisAdReasons': instance.muteThisAdReasons,
     };
 
-_$_NativeAdLoading _$_$_NativeAdLoadingFromJson(Map json) {
-  return _$_NativeAdLoading();
+_$NativeAdLoadingData _$_$NativeAdLoadingDataFromJson(Map json) {
+  return _$NativeAdLoadingData();
 }
 
-Map<String, dynamic> _$_$_NativeAdLoadingToJson(_$_NativeAdLoading instance) =>
+Map<String, dynamic> _$_$NativeAdLoadingDataToJson(
+        _$NativeAdLoadingData instance) =>
     <String, dynamic>{};
 
-_$_NativeAdError _$_$_NativeAdErrorFromJson(Map json) {
-  return _$_NativeAdError(
+_$NativeAdErrorData _$_$NativeAdErrorDataFromJson(Map json) {
+  return _$NativeAdErrorData(
     message: json['message'] as String,
   );
 }
 
-Map<String, dynamic> _$_$_NativeAdErrorToJson(_$_NativeAdError instance) =>
+Map<String, dynamic> _$_$NativeAdErrorDataToJson(
+        _$NativeAdErrorData instance) =>
     <String, dynamic>{
       'message': instance.message,
     };

@@ -97,7 +97,7 @@ Widget buildAndroidPlatformView(
       viewType: viewType,
       surfaceFactory: (context, controller) {
         return AndroidViewSurface(
-          controller: controller,
+          controller: controller as AndroidViewController,
           gestureRecognizers: gestures,
           hitTestBehavior: PlatformViewHitTestBehavior.opaque,
         );

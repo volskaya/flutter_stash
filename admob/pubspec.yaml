@@ -17,6 +17,13 @@ dependencies:
   mobx: ^1.2.1+2
   mobx_codegen: ^1.1.0+1
 
+  loader_coordinator:
+    path: /home/projects/packages/flutter_helpers/loader_coordinator
+  log:
+    path: /home/projects/packages/flutter_helpers/log
+  refresh_storage:
+    path: /home/projects/packages/flutter_helpers/refresh_storage
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

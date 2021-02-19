@@ -76,8 +76,8 @@ abstract class NativeAd with _$NativeAd {
     @JsonKey(defaultValue: <String>[]) @Default(<String>[]) List<String> muteThisAdReasons,
   }) = NativeAdData;
 
-  factory NativeAd.loading() = _NativeAdLoading;
-  factory NativeAd.error({@required String message}) = _NativeAdError;
+  factory NativeAd.loading() = NativeAdLoadingData;
+  factory NativeAd.error({@required String message}) = NativeAdErrorData;
 
   factory NativeAd.fromJson(Map<String, dynamic> json) => _$NativeAdFromJson(json);
 
