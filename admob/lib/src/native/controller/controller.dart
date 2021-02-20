@@ -39,17 +39,22 @@ abstract class NativeAdVideoState with _$NativeAdVideoState {
 ///   - https://developers.google.com/admob/android/native/start
 ///   - https://developers.google.com/admob/ios/native/start
 class NativeAdController extends _NativeAdController with _$NativeAdController {
-  NativeAdController({String unitId, NativeAdOptions options}) : super(unitId, options);
+  NativeAdController({
+    String unitId,
+    NativeAdOptions options = const NativeAdOptions(),
+    bool showVideoContent = true,
+  }) : super(unitId, options, showVideoContent);
 
   static String get testUnitId => MobileAds.nativeAdTestUnitId;
   static String get videoTestUnitId => MobileAds.nativeAdVideoTestUnitId;
 }
 
 abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with AttachableMixin, Store {
-  _NativeAdController(this.unitId, this.options);
+  _NativeAdController(this.unitId, this.options, [this.showVideoContent = true]);
 
-  final NativeAdOptions options;
   final String unitId;
+  final NativeAdOptions options;
+  final bool showVideoContent; // Instructs the platform to build ghost views, even if the ad has video content.
 
   DateTime loadTime;
   Memoizer<NativeAd> _loadAdOperation;
@@ -139,7 +144,8 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
   @override
   void init() {
     channel.setMethodCallHandler(_handleMessages);
-    MobileAds.instance.pluginChannel.invokeMethod('initNativeAdController', {'id': id});
+    MobileAds.instance.pluginChannel
+        .invokeMethod('initNativeAdController', {'id': id, 'showVideoContent': showVideoContent});
   }
 
   @override

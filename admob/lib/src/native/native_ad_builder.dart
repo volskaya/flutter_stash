@@ -31,6 +31,30 @@ class NativeAdBuilder extends StatefulObserverWidget {
   /// [NativeAdController] of [NativeAdBuilder]. If not specified, constructs its own controller.
   final NativeAdController controller;
 
+  /// Get the lists child count factoring in ads.
+  static int childCount(int length, [int n = 20]) => length + (length / n).floor();
+
+  /// Get the index of an original list item factoring in ads.
+  static int childIndex(int length, [int n = 20]) => length - (length / n).floor();
+
+  /// Child builder that shows ads every `n` items.
+  static Widget childBuilder(
+    int i,
+    int n, {
+    @required Widget Function(int index) adBuilder,
+    @required Widget Function(int index) childBuilder,
+  }) {
+    final length = i + 1;
+    final adIndex = (length / (n + 1)).floor();
+
+    if (length >= n && (length % (n + 1)) == 0) {
+      final index = adIndex;
+      return adBuilder(index);
+    }
+
+    return childBuilder(i - adIndex);
+  }
+
   @override
   _NativeAdBuilderState createState() => _NativeAdBuilderState();
 }

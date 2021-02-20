@@ -51,7 +51,7 @@ class NativeAdmobBuilderTask(
                     val now = System.currentTimeMillis()
 
                     it.setMuteThisAdListener { controller.channel.invokeMethod("onAdMuted", it.muteThisAdReasons.map { reasons -> reasons.description }) }
-                    if (it.mediaContent.hasVideoContent()) {
+                    if (controller.showVideoContent && it.mediaContent.hasVideoContent()) {
                         it.mediaContent.videoController.videoLifecycleCallbacks = object : VideoController.VideoLifecycleCallbacks() {
                             override fun onVideoStart() { controller.channel.invokeMethod("onVideoStart", null) }
                             override fun onVideoPlay() { controller.channel.invokeMethod("onVideoPlay", null) }
@@ -105,7 +105,8 @@ class NativeAdmobBuilderTask(
 class NativeAdmobController(
     val id: String,
     val channel: MethodChannel,
-    private val activity: Activity
+    private val activity: Activity,
+    val showVideoContent: Boolean
 ) : MethodChannel.MethodCallHandler {
     private val viewParent = activity.window.decorView as ViewGroup
     private var mountView: Boolean = false
@@ -122,7 +123,7 @@ class NativeAdmobController(
         when (call.method) {
             "mountView" -> {
                 nativeAd?.let { nativeAd ->
-                    if (nativeAd.mediaContent.hasVideoContent()) return@let // Video ads are built with a PlatformView.
+                    if (showVideoContent && nativeAd.mediaContent.hasVideoContent()) return@let // Video ads are built with a PlatformView.
                     mountView = true
 
                     AsyncLayoutInflater(activity).inflate(R.layout.background_native_ad, viewParent) { inflatedView, _, viewParent ->
@@ -186,10 +187,10 @@ class NativeAdmobController(
 object NativeAdmobControllerManager {
     private val controllers: HashMap<String, NativeAdmobController> = hashMapOf()
 
-    fun createController(id: String, binaryMessenger: BinaryMessenger, activity: Activity) {
+    fun createController(id: String, binaryMessenger: BinaryMessenger, activity: Activity, showVideoContent: Boolean) {
         if (!controllers.containsKey(id)) {
             val methodChannel = MethodChannel(binaryMessenger, id)
-            val controller = NativeAdmobController(id, methodChannel, activity)
+            val controller = NativeAdmobController(id, methodChannel, activity, showVideoContent)
             controllers[id] = controller
         }
     }

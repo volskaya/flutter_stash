@@ -33,6 +33,11 @@ class NativeAdMediaView(context: Context, data: Map<*, *>) : PlatformView {
         }
     } ?: FrameLayout(context)
 
+    init {
+        if (controller?.showVideoContent == false)
+            throw Error("This view should not have been inflated for a controller that doesn't intend to show video content")
+    }
+
     override fun getView(): View { return view }
     override fun dispose() {}
 }
