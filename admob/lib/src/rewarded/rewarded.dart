@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:admob/src/helpers/memoizer.dart';
+import 'package:utils/utils.dart';
 
 import '../../admob.dart';
 import '../utils.dart';
@@ -45,26 +45,15 @@ class RewardedAd extends AdMethodChannel<RewardedAdEvent> {
 
   static String get testUnitId => MobileAds.rewardedAdTestUnitId;
 
+  @override
+  final String channelName = 'rewardedAd';
   final String unitId;
 
   Memoizer<bool> _loaded;
   bool get isLoaded => _loaded?.value == true;
 
   @override
-  Future init() async {
-    channel.setMethodCallHandler(_handleMessages);
-    await MobileAds.instance.pluginChannel.invokeMethod('initRewardedAd', {'id': id});
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    MobileAds.instance.pluginChannel.invokeMethod('disposeRewardedAd', {'id': id});
-  }
-
-  /// Handle the messages the channel sends
-  Future<void> _handleMessages(MethodCall call) async {
-    if (disposed) return;
+  void handleMethodCall(MethodCall call) {
     switch (call.method) {
       case 'loading':
         // onEventController.add({RewardedAdEvent.loading: null});
@@ -102,7 +91,7 @@ class RewardedAd extends AdMethodChannel<RewardedAdEvent> {
   Future<bool> load() async {
     assert(MobileAds.instance.isInitialized);
     assert(!disposed);
-    return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
+    return (_loaded ??= Memoizer<bool>(_callLoadAd)).future;
   }
 
   Future<bool> show() async {

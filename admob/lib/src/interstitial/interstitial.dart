@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:admob/src/helpers/memoizer.dart';
+import 'package:utils/utils.dart';
 
 import '../../admob.dart';
 import '../utils.dart';
@@ -31,26 +31,15 @@ class InterstitialAd extends AdMethodChannel<InterstitialAdEvent> {
   static String get testUnitId => MobileAds.interstitialAdTestUnitId;
   static String get videoTestUnitId => MobileAds.interstitialAdVideoTestUnitId;
 
+  @override
+  final String channelName = 'intertistialAd';
   final String unitId;
 
   Memoizer<bool> _loaded;
   bool get isLoaded => _loaded?.value == true;
 
   @override
-  void init() {
-    channel.setMethodCallHandler(_handleMessages);
-    MobileAds.instance.pluginChannel.invokeMethod('initInterstitialAd', {'id': id});
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    MobileAds.instance.pluginChannel.invokeMethod('disposeInterstitialAd', {'id': id});
-  }
-
-  /// Handle the messages the channel sends
-  Future<void> _handleMessages(MethodCall call) async {
-    if (disposed) return;
+  void handleMethodCall(MethodCall call) {
     switch (call.method) {
       case 'loading':
         // onEventController.add({InterstitialAdEvent.loading: null});
@@ -86,7 +75,7 @@ class InterstitialAd extends AdMethodChannel<InterstitialAdEvent> {
   Future<bool> load() async {
     assert(MobileAds.instance.isInitialized);
     assert(!disposed);
-    return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
+    return (_loaded ??= Memoizer<bool>(_callLoadAd)).future;
   }
 
   Future<bool> show() async {

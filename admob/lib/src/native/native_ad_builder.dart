@@ -46,13 +46,7 @@ class NativeAdBuilder extends StatefulObserverWidget {
   }) {
     final length = i + 1;
     final adIndex = (length / (n + 1)).floor();
-
-    if (length >= n && (length % (n + 1)) == 0) {
-      final index = adIndex;
-      return adBuilder(index);
-    }
-
-    return childBuilder(i - adIndex);
+    return length >= n && (length % (n + 1)) == 0 ? adBuilder(adIndex) : childBuilder(i - adIndex);
   }
 
   @override

@@ -22,7 +22,7 @@ class NativeAdMediaViewFactory : PlatformViewFactory(StandardMessageCodec.INSTAN
 @SuppressLint("InflateParams")
 class NativeAdMediaView(context: Context, data: Map<*, *>) : PlatformView {
     private val controllerId: String = data["controllerId"] as String
-    private val controller: NativeAdmobController? = NativeAdmobControllerManager.getController(controllerId)
+    private val controller: NativeAdmobController? = NativeAdmobController.get(controllerId)
     private val view: ViewGroup = controller?.nativeAd?.let { nativeAd ->
         (LayoutInflater.from(context).inflate(R.layout.video_native_ad, null) as? FrameLayout)?.also { parent ->
             val it = parent.findViewById<NativeAdView>(R.id.video_native_ad_view)

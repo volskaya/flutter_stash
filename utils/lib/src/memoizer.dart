@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 /// An async memoizer that returns the value synchronously, if the future has finished.
 class Memoizer<T> {
   /// Instantiate the [Memoizer] asynchronously.
-  Memoizer({@required Future<T> Function() future}) {
+  Memoizer(Future<T> Function() future) {
     _resolveFuture(future);
   }
 

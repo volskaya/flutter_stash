@@ -179,24 +179,55 @@ mixin AttachableMixin {
   }
 }
 
-abstract class AdMethodChannel<T> {
+mixin _AdMethodChannelImpl {
+  String get channelName;
+}
+
+abstract class AdMethodChannel<T> implements _AdMethodChannelImpl {
   AdMethodChannel() {
-    channel = MethodChannel(id);
     init();
   }
 
-  final lock = Mutex();
-
+  Memoizer<bool> initMemoizer;
   MethodChannel channel;
-  bool disposed = false;
+  bool get disposed => channel != null;
   String get id => hashCode.toString();
+  Map<String, dynamic> get initParams => const <String, dynamic>{};
 
   @protected
-  void init();
+  void handleMethodCall(MethodCall call);
 
+  Future _handleMethodCall(MethodCall call) {
+    handleMethodCall(call);
+    return SynchronousFuture(null);
+  }
+
+  @protected
   @mustCallSuper
-  void dispose() {
+  Future init() {
+    channel ??= MethodChannel(id)..setMethodCallHandler(_handleMethodCall);
+    return (initMemoizer ??= Memoizer(
+      () => MobileAds.instance.pluginChannel.invokeMethod(
+        '${channelName}Create',
+        {'id': id, ...initParams},
+      ),
+    ))
+        .future;
+  }
+
+  @protected
+  @mustCallSuper
+  Future dispose() async {
     assert(!disposed, 'Redundant dispose');
-    disposed = true;
+    await init();
+    final channel = this.channel;
+    this.channel = null;
+
+    try {
+      await channel?.invokeMethod('dispose');
+    } catch (_) {
+      this.channel = channel;
+      rethrow;
+    }
   }
 }

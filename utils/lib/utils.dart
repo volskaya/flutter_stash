@@ -28,6 +28,7 @@ export 'src/enums.dart';
 export 'src/mixins.dart';
 export 'src/converters.dart';
 export 'src/format.dart';
+export 'src/memoizer.dart';
 
 abstract class Utils {
   static int androidSdkVersion;

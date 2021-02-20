@@ -55,15 +55,10 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                     result.success(Build.VERSION.SDK_INT)
                 }
             }
-            // Native Ads Controller.
-            "initNativeAdController" -> {
+            "nativeAdControllerCreate" -> {
                 val id = call.argument<String>("id")!!
                 val showVideoContent = call.argument<Boolean>("showVideoContent")!!
-                NativeAdmobControllerManager.createController(id, messenger, activity, showVideoContent)
-                result.success(null)
-            }
-            "disposeNativeAdController" -> {
-                NativeAdmobControllerManager.removeController(call.argument<String>("id")!!)
+                NativeAdmobController.create(id, messenger, activity, showVideoContent)
                 result.success(null)
             }
             // Banner Ads Controller.

@@ -1,11 +1,10 @@
 import 'dart:async';
 
-import 'package:admob/src/helpers/memoizer.dart';
 import 'package:admob/src/native/controller/native_ad.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:utils/utils.dart';
 
 import '../../../admob.dart';
 import '../../utils.dart';
@@ -53,6 +52,8 @@ class NativeAdController extends _NativeAdController with _$NativeAdController {
 abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with AttachableMixin, Store {
   _NativeAdController(this.unitId, this.options, [this.showVideoContent = true]);
 
+  @override
+  final String channelName = 'nativeAdController';
   final String unitId;
   final NativeAdOptions options;
   final bool showVideoContent; // Instructs the platform to build ghost views, even if the ad has video content.
@@ -60,6 +61,9 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
   DateTime loadTime;
   Memoizer<NativeAd> _loadAdOperation;
   bool get isLoaded => _loadAdOperation?.value != null;
+
+  @override
+  Map<String, dynamic> get initParams => <String, dynamic>{'showVideoContent': showVideoContent};
 
   @observable
   NativeAd nativeAd = NativeAd.loading();
@@ -70,12 +74,13 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
   @observable
   List<String> muteThisAdReasons = const <String>[];
 
-  bool considerThisOld() => loadTime != null
-      ? DateTime.now().difference(loadTime) > const Duration(minutes: 30)
+  bool considerThisOld() => loadTime != null && nativeAd.maybeMap((_) => true, orElse: () => false)
+      ? DateTime.now().difference(loadTime) > const Duration(hours: 1)
       : null; // Hasn't even been built yet.
 
   /// Handle the messages the channel sends
-  Future _handleMessages(MethodCall call) {
+  @override
+  void handleMethodCall(MethodCall call) {
     switch (call.method) {
       // Ad cases.
       case 'onAdLoading':
@@ -105,24 +110,20 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
         videoState = videoState.copyWith.call(lifecycle: NativeAdVideoLifecycle.ended);
         break;
     }
-
-    return SynchronousFuture(null);
   }
 
-  Future<bool> click() => lock.protect(() => channel.invokeMethod<bool>('click'));
+  Future<bool> click() => channel.invokeMethod<bool>('click');
 
   /// Mutes this ad programmatically. Use `null` to mute this ad with the default reason.
-  Future<void> muteThisAd([int reason]) => lock.protect(() => channel.invokeMethod('mute', {'reason': reason}));
+  Future<void> muteThisAd([int reason]) => channel.invokeMethod('mute', {'reason': reason});
 
-  Future unmountView() => lock.protect(() => channel.invokeMethod('unmountView'));
-  Future mountView() => lock.protect(() async {
-        await load();
-        await channel.invokeMethod('mountView');
-      });
+  Future unmountView() => channel.invokeMethod('unmountView');
+  Future mountView() async {
+    assert(nativeAd.maybeMap((_) => true, orElse: () => false));
+    await channel.invokeMethod('mountView');
+  }
 
   Future<NativeAd> _callLoadAd() async {
-    await lock.acquire();
-
     try {
       final map = await channel.invokeMapMethod<String, dynamic>('load', {
         'unitId': unitId ?? MobileAds.instance.nativeAdUnitId ?? MobileAds.nativeAdTestUnitId,
@@ -131,37 +132,13 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
 
       return map != null ? NativeAd.fromJson(map) : null;
     } finally {
-      lock.release();
       loadTime ??= DateTime.now();
     }
   }
 
-  Future<NativeAd> load() {
+  Future<NativeAd> load() async {
     assert(MobileAds.instance.isInitialized);
-    assert(!disposed);
-    return (_loadAdOperation ??= Memoizer(future: _callLoadAd)).future;
-  }
-
-  @override
-  void init() {
-    assert(MobileAds.instance.isInitialized);
-    assert(!lock.isLocked);
-
-    channel.setMethodCallHandler(_handleMessages);
-    lock.protect(() async {
-      await MobileAds.instance.pluginChannel.invokeMethod(
-        'initNativeAdController',
-        {'id': id, 'showVideoContent': showVideoContent},
-      );
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    lock.protect(() async {
-      assert(!isAttached, 'Controller disposed before its client was detached');
-      await MobileAds.instance.pluginChannel.invokeMethod('disposeNativeAdController', {'id': id});
-    });
+    await init();
+    return (_loadAdOperation ??= Memoizer(_callLoadAd)).future;
   }
 }

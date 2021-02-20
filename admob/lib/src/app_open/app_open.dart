@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:admob/src/helpers/memoizer.dart';
+import 'package:utils/utils.dart';
 
 import '../mobile_ads.dart';
 import '../utils.dart';
@@ -29,6 +29,8 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
     this.orientation,
   });
 
+  @override
+  final String channelName = 'appOpenAd';
   final Duration timeout; // The duration this ad can be kept loaded. Default to 1 hour.
   final String unitId;
   final Orientation orientation;
@@ -52,13 +54,7 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
   }
 
   @override
-  void init() {
-    channel.setMethodCallHandler(_handleMessages);
-    MobileAds.instance.pluginChannel.invokeMethod('initAppOpenAd', {'id': id});
-  }
-
-  Future<void> _handleMessages(MethodCall call) async {
-    if (disposed) return;
+  void handleMethodCall(MethodCall call) {
     switch (call.method) {
       case 'loading':
         // onEventController.add({AppOpenEvent.loading: null});
@@ -116,7 +112,7 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
   Future<bool> load() {
     assert(MobileAds.instance.isInitialized);
     assert(!disposed);
-    return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
+    return (_loaded ??= Memoizer<bool>(_callLoadAd)).future;
   }
 
   Future<bool> show() async {
@@ -124,11 +120,5 @@ class AppOpenAd extends AdMethodChannel<AppOpenEvent> {
     assert(!disposed);
     if (await load()) return channel.invokeMethod<bool>('showAd');
     return false;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    MobileAds.instance.pluginChannel.invokeMethod('disposeAppOpenAd', {'id': id});
   }
 }

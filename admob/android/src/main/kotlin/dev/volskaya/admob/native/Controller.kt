@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.util.Log
@@ -23,6 +24,7 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.io.ByteArrayOutputStream
+import java.util.*
 
 @SuppressLint("StaticFieldLeak")
 class NativeAdmobBuilderTask(
@@ -103,11 +105,24 @@ class NativeAdmobBuilderTask(
 }
 
 class NativeAdmobController(
-    val id: String,
-    val channel: MethodChannel,
-    private val activity: Activity,
-    val showVideoContent: Boolean
+        val id: String,
+        val channel: MethodChannel,
+        private val activity: Activity,
+        val showVideoContent: Boolean
 ) : MethodChannel.MethodCallHandler {
+    companion object {
+        private val controllers: HashMap<String, NativeAdmobController> = hashMapOf()
+
+        fun get(id: String): NativeAdmobController? { return controllers[id] }
+        fun create(id: String, binaryMessenger: BinaryMessenger, activity: Activity, showVideoContent: Boolean): NativeAdmobController {
+            val methodChannel = MethodChannel(binaryMessenger, id)
+            val controller = NativeAdmobController(id, methodChannel, activity, showVideoContent)
+            controllers[id] = controller
+            return controller
+        }
+    }
+
+
     private val viewParent = activity.window.decorView as ViewGroup
     private var mountView: Boolean = false
     private var view: NativeAdView? = null
@@ -144,6 +159,19 @@ class NativeAdmobController(
                         }
                     }
                 }
+
+                view?.let {
+                    val buttonOffset = IntArray(2)
+                    val viewOffset = IntArray(2)
+                    it.getLocationOnScreen(buttonOffset)
+                    it.callToActionView.getLocationOnScreen(buttonOffset)
+                    val viewRect = Rect(viewOffset[0], viewOffset[1], viewOffset[0] + it.width, viewOffset[1] + it.height)
+                    val buttonRect = Rect(buttonOffset[0], buttonOffset[1], buttonOffset[0] + it.callToActionView.width, buttonOffset[1] + it.callToActionView.height)
+                    Log.d("N", "Mounted ad view at $viewRect (button: $buttonRect)")
+                } ?: let {
+                    Log.d("N", "No view mounted yet ----------")
+                }
+
                 result.success(null)
             }
             "unmountView" -> {
@@ -152,6 +180,15 @@ class NativeAdmobController(
                 result.success(null)
             }
             "click" -> {
+                view?.let {
+                    val buttonOffset = IntArray(2)
+                    val viewOffset = IntArray(2)
+                    it.getLocationOnScreen(buttonOffset)
+                    it.callToActionView.getLocationOnScreen(buttonOffset)
+                    val viewRect = Rect(viewOffset[0], viewOffset[1], viewOffset[0] + it.width, viewOffset[1] + it.height)
+                    val buttonRect = Rect(buttonOffset[0], buttonOffset[1], buttonOffset[0] + it.callToActionView.width, buttonOffset[1] + it.callToActionView.height)
+                    Log.d("N", "Clicking ad at $viewRect (button: $buttonRect)")
+                }
                 val click = (view?.callToActionView as? Button)?.performClick() ?: false
                 result.success(click)
             }
@@ -166,11 +203,16 @@ class NativeAdmobController(
                 }
                 result.success(null)
             }
+            "dispose" -> {
+                controllers.remove(id)
+                dispose()
+                result.success(null)
+            }
             else -> result.notImplemented()
         }
     }
 
-    fun dispose() {
+    private fun dispose() {
         view?.destroy()
         mountView = false
         disposed = true
@@ -182,21 +224,6 @@ class NativeAdmobController(
         channel.invokeMethod("onAdLoading", null)
         NativeAdmobBuilderTask(this, result, activity, unitId, options).execute()
     }
-}
-
-object NativeAdmobControllerManager {
-    private val controllers: HashMap<String, NativeAdmobController> = hashMapOf()
-
-    fun createController(id: String, binaryMessenger: BinaryMessenger, activity: Activity, showVideoContent: Boolean) {
-        if (!controllers.containsKey(id)) {
-            val methodChannel = MethodChannel(binaryMessenger, id)
-            val controller = NativeAdmobController(id, methodChannel, activity, showVideoContent)
-            controllers[id] = controller
-        }
-    }
-
-    fun getController(id: String): NativeAdmobController? { return controllers[id] }
-    fun removeController(id: String) { controllers.remove(id)?.dispose() }
 }
 
 fun Drawable.toBitmapByteArray(): ByteArray {

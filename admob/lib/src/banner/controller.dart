@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
-import 'package:admob/src/helpers/memoizer.dart';
+import 'package:utils/utils.dart';
 
 import '../mobile_ads.dart';
 import '../utils.dart';
@@ -59,23 +59,13 @@ abstract class BannerSize {
 class BannerAdController extends AdMethodChannel<BannerAdEvent> with AttachableMixin {
   static String get testUnitId => MobileAds.bannerAdTestUnitId;
 
+  @override
+  final String channelName = 'bannerAdController';
   Memoizer<bool> _loaded;
   bool get isLoaded => _loaded?.value == true;
 
   @override
-  void init() {
-    channel.setMethodCallHandler(_handleMessages);
-    MobileAds.instance.pluginChannel.invokeMethod('initBannerAdController', {'id': id});
-  }
-
-  @override
-  void dispose() {
-    assert(!isAttached, 'Controller disposed before its client was detached');
-    super.dispose();
-    MobileAds.instance.pluginChannel.invokeMethod('disposeBannerAdController', {'id': id});
-  }
-
-  Future _handleMessages(MethodCall call) async {
+  void handleMethodCall(MethodCall call) {
     if (disposed) return;
     switch (call.method) {
       case 'loading':
@@ -102,6 +92,6 @@ class BannerAdController extends AdMethodChannel<BannerAdEvent> with AttachableM
   Future<bool> load() async {
     assert(MobileAds.instance.isInitialized);
     assert(!disposed);
-    return (_loaded ??= Memoizer<bool>(future: _callLoadAd)).future;
+    return (_loaded ??= Memoizer<bool>(_callLoadAd)).future;
   }
 }
