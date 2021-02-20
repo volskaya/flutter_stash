@@ -36,17 +36,16 @@ abstract class Utils {
   static double clampAspectRatio(double aspectRatio) => aspectRatio.clamp(9 / 16, 16 / 9).toDouble();
 
   static bool isPictureInPicture(MediaQueryData mediaQuery) {
-    if (androidSdkVersion == null || pictureInPictureObserver == null)
-      throw 'Utils were not set up to call this function';
+    assert(androidSdkVersion == null || pictureInPictureObserver == null, 'Necessary variables are not set');
 
-    if (androidSdkVersion < 24) {
+    if ((androidSdkVersion ?? 0) < 24) {
       return false; // Not supported;
     } else if (androidSdkVersion > 26) {
       // Above api 26 the PIP window is set to be a square. So using the window size,
       // since it will be updated faster than the method channel event.
       return nearEqual(mediaQuery.size.aspectRatio, 1.0, Tolerance.defaultTolerance.distance);
     } else {
-      return pictureInPictureObserver.isInPictureInPictureMode;
+      return pictureInPictureObserver?.isInPictureInPictureMode ?? false;
     }
   }
 

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:loader_coordinator/loader_coordinator.dart';
 import 'package:log/log.dart';
 
+import '../utils.dart';
+
 class Mutex {
   static final _log = Log.named('Mutex');
   static final _tags = <String>{};
@@ -13,12 +15,6 @@ class Mutex {
   bool get isLocked => _rwMutex.isLocked;
   Future acquire() => _rwMutex.acquireWrite();
   void release() => _rwMutex.release();
-
-  static Future<Duration> awaitPostframe() async {
-    final completer = Completer<Duration>();
-    WidgetsBinding.instance.addPostFrameCallback(completer.complete);
-    return completer.future;
-  }
 
   Future protectTillSuccess(
     Function criticalSection, {
@@ -38,7 +34,7 @@ class Mutex {
             success = true;
           } catch (e) {
             _log.e(e);
-            await Mutex.awaitPostframe();
+            await Utils.awaitPostframe();
           }
         }
 
