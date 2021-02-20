@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:utils/utils.dart';
 
 import 'mobile_ads.dart';
 
@@ -184,10 +185,11 @@ abstract class AdMethodChannel<T> {
     init();
   }
 
-  String get id => hashCode.toString();
+  final lock = Mutex();
 
   MethodChannel channel;
   bool disposed = false;
+  String get id => hashCode.toString();
 
   @protected
   void init();

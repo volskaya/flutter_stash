@@ -23,6 +23,8 @@ dependencies:
     path: /home/projects/packages/flutter_helpers/log
   refresh_storage:
     path: /home/projects/packages/flutter_helpers/refresh_storage
+  utils:
+    path: /home/projects/packages/flutter_helpers/utils
 
 dev_dependencies:
   flutter_test:

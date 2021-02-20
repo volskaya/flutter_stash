@@ -68,10 +68,7 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
             }
             // Banner Ads Controller.
             "initBannerAdController" -> {
-                BannerAdControllerManager.createController(
-                        call.argument<String>("id")!!,
-                        messenger,
-                        activity)
+                BannerAdControllerManager.createController( call.argument<String>("id")!!, messenger, activity)
                 result.success(null)
             }
             "disposeBannerAdController" -> {

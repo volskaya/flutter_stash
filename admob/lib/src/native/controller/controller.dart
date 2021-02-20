@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:admob/src/helpers/memoizer.dart';
 import 'package:admob/src/native/controller/native_ad.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -70,11 +71,11 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
   List<String> muteThisAdReasons = const <String>[];
 
   bool considerThisOld() => loadTime != null
-      ? loadTime.difference(DateTime.now()) > const Duration(minutes: 30)
+      ? DateTime.now().difference(loadTime) > const Duration(minutes: 30)
       : null; // Hasn't even been built yet.
 
   /// Handle the messages the channel sends
-  Future<void> _handleMessages(MethodCall call) async {
+  Future _handleMessages(MethodCall call) {
     switch (call.method) {
       // Ad cases.
       case 'onAdLoading':
@@ -104,54 +105,63 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
         videoState = videoState.copyWith.call(lifecycle: NativeAdVideoLifecycle.ended);
         break;
     }
+
+    return SynchronousFuture(null);
   }
 
-  Future<bool> click() {
-    assert(nativeAd != null);
-    return channel.invokeMethod<bool>('click');
-  }
+  Future<bool> click() => lock.protect(() => channel.invokeMethod<bool>('click'));
 
   /// Mutes this ad programmatically. Use `null` to mute this ad with the default reason.
-  Future<void> muteThisAd([int reason]) {
-    assert(!disposed);
-    if (reason != null) assert(!reason.isNegative, 'You must specify a valid reason');
-    return channel.invokeMethod('mute', {'reason': reason});
-  }
+  Future<void> muteThisAd([int reason]) => lock.protect(() => channel.invokeMethod('mute', {'reason': reason}));
+
+  Future unmountView() => lock.protect(() => channel.invokeMethod('unmountView'));
+  Future mountView() => lock.protect(() async {
+        await load();
+        await channel.invokeMethod('mountView');
+      });
 
   Future<NativeAd> _callLoadAd() async {
-    final map = await channel.invokeMapMethod<String, dynamic>('load', {
-      'unitId': unitId ?? MobileAds.instance.nativeAdUnitId ?? MobileAds.nativeAdTestUnitId,
-      'options': (options ?? const NativeAdOptions()).toJson(),
-    });
+    await lock.acquire();
 
-    return map != null ? NativeAd.fromJson(map) : null;
+    try {
+      final map = await channel.invokeMapMethod<String, dynamic>('load', {
+        'unitId': unitId ?? MobileAds.instance.nativeAdUnitId ?? MobileAds.nativeAdTestUnitId,
+        'options': (options ?? const NativeAdOptions()).toJson(),
+      });
+
+      return map != null ? NativeAd.fromJson(map) : null;
+    } finally {
+      lock.release();
+      loadTime ??= DateTime.now();
+    }
   }
-
-  Future mountView() async {
-    await load();
-    await channel.invokeMethod('mountView');
-  }
-
-  Future unmountView() => channel.invokeMethod('unmountView');
 
   Future<NativeAd> load() {
     assert(MobileAds.instance.isInitialized);
     assert(!disposed);
-    loadTime ??= DateTime.now();
     return (_loadAdOperation ??= Memoizer(future: _callLoadAd)).future;
   }
 
   @override
   void init() {
+    assert(MobileAds.instance.isInitialized);
+    assert(!lock.isLocked);
+
     channel.setMethodCallHandler(_handleMessages);
-    MobileAds.instance.pluginChannel
-        .invokeMethod('initNativeAdController', {'id': id, 'showVideoContent': showVideoContent});
+    lock.protect(() async {
+      await MobileAds.instance.pluginChannel.invokeMethod(
+        'initNativeAdController',
+        {'id': id, 'showVideoContent': showVideoContent},
+      );
+    });
   }
 
   @override
   void dispose() {
-    assert(!isAttached, 'Controller disposed before its client was detached');
     super.dispose();
-    MobileAds.instance.pluginChannel.invokeMethod('disposeNativeAdController', {'id': id});
+    lock.protect(() async {
+      assert(!isAttached, 'Controller disposed before its client was detached');
+      await MobileAds.instance.pluginChannel.invokeMethod('disposeNativeAdController', {'id': id});
+    });
   }
 }

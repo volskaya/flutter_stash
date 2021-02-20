@@ -42,27 +42,30 @@ class Mutex {
       }, tag: tag, showLoader: showLoader);
 
   /// If `tag` is used, make sure the callback is idempotent.
-  Future protect(
+  Future<T> protect<T>(
     Function criticalSection, {
     String tag,
     bool showLoader = false,
   }) async {
+    T value;
     if (tag != null && _tags.contains(tag)) {
       if (_tags.contains(tag)) {
         _log.wtf('Dropped a redundant call on $tag');
-        return; // Redundant.
+        return value; // Redundant. Might cause unwanted behavior, if the call expected to return a value.
       }
       _tags.add(tag);
     }
     final loader = showLoader ? LoaderCoordinator.instance.touch() : null;
     await acquire();
     try {
-      await criticalSection();
+      value = await criticalSection();
     } finally {
       if (tag != null) _tags.remove(tag);
       loader?.dispose();
       release();
     }
+
+    return value;
   }
 }
 

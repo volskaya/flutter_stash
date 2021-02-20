@@ -36,7 +36,7 @@ abstract class Utils {
   static double clampAspectRatio(double aspectRatio) => aspectRatio.clamp(9 / 16, 16 / 9).toDouble();
 
   static bool isPictureInPicture(MediaQueryData mediaQuery) {
-    assert(androidSdkVersion == null || pictureInPictureObserver == null, 'Necessary variables are not set');
+    assert(androidSdkVersion != null && pictureInPictureObserver != null);
 
     if ((androidSdkVersion ?? 0) < 24) {
       return false; // Not supported;
