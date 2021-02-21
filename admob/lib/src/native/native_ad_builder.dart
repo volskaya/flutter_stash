@@ -6,7 +6,6 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:refresh_storage/refresh_storage.dart';
 
-import '../utils.dart';
 import 'controller/controller.dart';
 import 'controller/native_ad.dart';
 import 'native_ad_widget_state.dart';
@@ -101,6 +100,7 @@ class NativeAdBuilder extends StatefulObserverWidget {
 
 class _NativeAdBuilderState extends State<NativeAdBuilder> {
   NativeAdController _controller;
+  bool _hadAttachedToTheController = false;
 
   Future _preloadControllers() =>
       NativeAdBuilder.preloadControllers(context, widget.preloadIdentifiers, widget.controller.options);
@@ -114,6 +114,8 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
       if (!isReady && Scrollable.recommendDeferredLoadingForContext(context)) {
         WidgetsBinding.instance.addPostFrameCallback(_deferredLoad);
       } else {
+        _controller.attach(this);
+        _hadAttachedToTheController = true;
         await Future.wait([
           _controller.load(),
           _preloadControllers(),
@@ -124,7 +126,7 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
 
   @override
   void initState() {
-    _controller = widget.controller ?? NativeAdController();
+    _controller = widget.controller ?? NativeAdController.firstReusable() ?? NativeAdController();
     _deferredLoad();
     super.initState();
   }
@@ -137,15 +139,11 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
 
   @override
   void dispose() {
+    if (_hadAttachedToTheController) _controller?.detach(this);
     if (widget.controller == null) _controller?.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    assertPlatformIsSupported();
-    assertVersionIsSupported();
-
-    return widget.builder(context, _controller.nativeAd);
-  }
+  Widget build(BuildContext context) => widget.builder(context, _controller.nativeAd);
 }

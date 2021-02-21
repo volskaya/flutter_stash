@@ -9,12 +9,14 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import dev.volskaya.admob.R
 
-class NativeAdGhostView() {
+class NativeAdGhostView {
     private var view: NativeAdView? = null
     private var mounted: Boolean = true
+    private var removeOnDispose: Boolean = true // When mounted with an existing view, don't remove on dispose.
 
     fun mountExistingView(existingView: NativeAdView) {
         if (!mounted) throw Error("This ghost view should not be mounted again")
+        removeOnDispose = false
         view = existingView
     }
 
@@ -44,8 +46,13 @@ class NativeAdGhostView() {
 
     fun dispose() {
         mounted = false
-        view?.let { (it.parent as ViewGroup).removeView(it) }
-        view = null
+        
+        if (removeOnDispose) {
+            view?.let {
+                (it.parent as ViewGroup).removeView(it)
+                view = null
+            }
+        }
     }
 
     fun click(): Boolean {

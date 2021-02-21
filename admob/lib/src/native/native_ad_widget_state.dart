@@ -5,9 +5,8 @@ import 'controller/controller.dart';
 
 class NativeAdWidgetStateStorage extends RefreshStorageItem {
   NativeAdWidgetStateStorage({NativeAdOptions options})
-      : controller = NativeAdController(
-          options: options ?? const NativeAdOptions(),
-        );
+      : controller = NativeAdController.firstReusable(options: options ?? const NativeAdOptions()) ??
+            NativeAdController(options: options ?? const NativeAdOptions());
 
   final NativeAdController controller;
 
@@ -24,6 +23,7 @@ class NativeAdWidgetStateStorage extends RefreshStorageItem {
 abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> with WidgetsBindingObserver {
   RefreshStorageEntry<NativeAdWidgetStateStorage> storage;
   String get identifier;
+  String _oldIdentifier;
   NativeAdController get controller => storage?.value?.controller;
   NativeAdOptions get options => const NativeAdOptions();
 
@@ -63,7 +63,11 @@ abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> wi
   @mustCallSuper
   @override
   void didUpdateWidget(covariant T oldWidget) {
-    assert(identifier == identifier);
+    assert((() {
+      final hasChanged = _oldIdentifier != null && _oldIdentifier != identifier;
+      _oldIdentifier = identifier;
+      return !hasChanged;
+    })(), 'NativeAdWidgetState.identifier must not change troughout the lifecycle of the state');
     super.didUpdateWidget(oldWidget);
   }
 

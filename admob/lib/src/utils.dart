@@ -159,10 +159,6 @@ mixin AttachableMixin {
   bool get isAttached => _client != null;
   bool hasBeenAttachedTo = false;
 
-  /// Attach the controller to an Ad
-  /// Throws an `AssertionException` if the controller is already attached.
-  ///
-  /// You should not call this function
   @mustCallSuper
   void attach(dynamic object) {
     assert(
