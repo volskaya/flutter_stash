@@ -22,28 +22,27 @@ class NativeAdWidgetStateStorage extends RefreshStorageItem {
 /// rebuilding it, when the controller is considered old on `initState` or app coming
 /// into the foreground.
 abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> with WidgetsBindingObserver {
-  RefreshStorageEntry<NativeAdWidgetStateStorage> nativeAdWidgetStateStorage;
+  RefreshStorageEntry<NativeAdWidgetStateStorage> storage;
   String get identifier;
-  NativeAdController get controller => nativeAdWidgetStateStorage?.value?.controller;
+  NativeAdController get controller => storage?.value?.controller;
   NativeAdOptions get options => const NativeAdOptions();
 
   NativeAdWidgetStateStorage _buildStorage() => NativeAdWidgetStateStorage(options: options);
 
-  void _createStorage(String identifier) =>
-      nativeAdWidgetStateStorage = RefreshStorage.write<NativeAdWidgetStateStorage>(
+  void _createStorage(String identifier) => storage = RefreshStorage.write<NativeAdWidgetStateStorage>(
         context: context,
         identifier: identifier,
         builder: _buildStorage,
       );
 
   void _checkOldController() {
-    if (nativeAdWidgetStateStorage?.value?.controller?.considerThisOld() == true) {
-      nativeAdWidgetStateStorage.value.controller.dispose();
+    if (storage?.value?.controller?.considerThisOld() == true) {
+      storage.dispose();
       RefreshStorage.destroy(context: context, identifier: identifier);
 
       // This will build a fresh controller and fetch a new ad.
       setState(
-        () => nativeAdWidgetStateStorage = RefreshStorage.write<NativeAdWidgetStateStorage>(
+        () => storage = RefreshStorage.write<NativeAdWidgetStateStorage>(
           context: context,
           identifier: identifier,
           builder: _buildStorage,
@@ -72,7 +71,7 @@ abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> wi
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    nativeAdWidgetStateStorage?.dispose();
+    storage?.dispose();
     super.dispose();
   }
 

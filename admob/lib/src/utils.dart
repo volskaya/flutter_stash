@@ -157,6 +157,7 @@ abstract class AdError with _$AdError {
 mixin AttachableMixin {
   int _client;
   bool get isAttached => _client != null;
+  bool hasBeenAttachedTo = false;
 
   /// Attach the controller to an Ad
   /// Throws an `AssertionException` if the controller is already attached.
@@ -170,6 +171,7 @@ mixin AttachableMixin {
     );
 
     _client = object.hashCode;
+    hasBeenAttachedTo = true;
   }
 
   void detach(Object object) {
@@ -190,7 +192,7 @@ abstract class AdMethodChannel<T> implements _AdMethodChannelImpl {
 
   Memoizer<bool> initMemoizer;
   MethodChannel channel;
-  bool get disposed => channel != null;
+  bool get disposed => channel == null;
   String get id => hashCode.toString();
   Map<String, dynamic> get initParams => const <String, dynamic>{};
 
@@ -218,15 +220,17 @@ abstract class AdMethodChannel<T> implements _AdMethodChannelImpl {
   @mustCallSuper
   Future dispose() async {
     assert(!disposed, 'Redundant dispose');
-    await init();
-    final channel = this.channel;
-    this.channel = null;
+    if (channel != null) {
+      await init();
+      final channel = this.channel;
+      this.channel = null;
 
-    try {
-      await channel?.invokeMethod('dispose');
-    } catch (_) {
-      this.channel = channel;
-      rethrow;
+      try {
+        await channel.invokeMethod('dispose');
+      } catch (_) {
+        this.channel = channel;
+        rethrow;
+      }
     }
   }
 }

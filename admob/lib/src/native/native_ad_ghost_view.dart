@@ -33,17 +33,17 @@ class _Element extends ProxyElement {
   bool _nativeViewMounted = false;
   bool _mounted = false;
 
+  // TODO: Unmount while the route is not active.
+
   /// Video ads build a native ad inside a platform view, so don't
   /// mount any background views. This is safe to call though, the
   /// platform will check for video as well.
   Future _mountView() async {
-    if (!widget.controller.showVideoContent || widget.nativeAd.mediaContent?.hasVideoContent != true) {
-      await widget.controller.mountView();
-      if (_mounted) {
-        _nativeViewMounted = true;
-      } else {
-        widget.controller.unmountView();
-      }
+    await widget.controller.mountView();
+    if (_mounted) {
+      _nativeViewMounted = true;
+    } else {
+      widget.controller.unmountView();
     }
   }
 
