@@ -24,10 +24,52 @@ class _Storage extends RefreshStorageItem {
 abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> with WidgetsBindingObserver {
   RefreshStorageEntry<_Storage> _storage;
   String get identifier;
+  List<String> get preloadIdentifiers => const <String>[];
   NativeAdController get controller => _storage?.value?.controller;
   NativeAdOptions get options => const NativeAdOptions();
 
+  static void preloadControllers(
+    BuildContext context,
+    List<String> preloadIdentifiers, [
+    NativeAdOptions options = const NativeAdOptions(),
+  ]) {
+    if (preloadIdentifiers.isEmpty) return;
+
+    final createStorage = (String identifier) => RefreshStorage.write<_Storage>(
+          context: context,
+          identifier: identifier,
+          builder: () => _Storage(options: options),
+        );
+
+    for (final identifier in preloadIdentifiers) {
+      print('Preloading $identifier');
+      RefreshStorageEntry<_Storage> storage = createStorage(identifier);
+
+      // Refresh the storage, if the controller is too old.
+      if (storage.value?.controller?.considerThisOld() == true) {
+        storage.dispose();
+        RefreshStorage.destroy(context: context, identifier: identifier);
+        storage = createStorage(identifier);
+      }
+
+      assert(storage?.value?.controller?.considerThisOld() != true);
+      storage.value?.controller?.load();
+      storage.dispose();
+    }
+  }
+
   _Storage _buildStorage() => _Storage(options: options);
+
+  RefreshStorageEntry<_Storage> _createStorage(String identifier) => RefreshStorage.write<_Storage>(
+        context: context,
+        identifier: identifier,
+        builder: _buildStorage,
+      );
+
+  void _preloadControllers() {
+    assert(preloadIdentifiers.where((v) => v == identifier).isEmpty); // Don't preload [identifier] itself.
+    preloadControllers(context, preloadIdentifiers, options);
+  }
 
   void _checkOldController() {
     if (_storage?.value?.controller?.considerThisOld() == true) {
@@ -48,13 +90,10 @@ abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> wi
   @mustCallSuper
   @override
   void initState() {
-    _storage = RefreshStorage.write<_Storage>(
-      context: context,
-      identifier: identifier,
-      builder: _buildStorage,
-    );
-
+    print('Creating $identifier');
+    _storage = _createStorage(identifier);
     _checkOldController();
+    _preloadControllers();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }

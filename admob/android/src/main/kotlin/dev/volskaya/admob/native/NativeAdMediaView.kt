@@ -2,6 +2,7 @@ package dev.volskaya.admob.native
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,11 +26,20 @@ class NativeAdMediaView(context: Context, data: Map<*, *>) : PlatformView {
     private val controller: NativeAdmobController? = NativeAdmobController.get(controllerId)
     private val view: ViewGroup = controller?.nativeAd?.let { nativeAd ->
         (LayoutInflater.from(context).inflate(R.layout.video_native_ad, null) as? FrameLayout)?.also { parent ->
-            val it = parent.findViewById<NativeAdView>(R.id.video_native_ad_view)
-            it.headlineView = it.findViewById<TextView>(R.id.video_native_ad_view_headline).also { textView -> textView.text = nativeAd.headline }
-            it.bodyView = it.findViewById<TextView>(R.id.video_native_ad_view_body).also { textView -> textView.text = nativeAd.body }
-            it.mediaView = it.findViewById<MediaView>(R.id.video_native_ad_view_media).also { mediaView -> mediaView.setMediaContent(nativeAd.mediaContent) }
-            it.setNativeAd(nativeAd)
+            parent.findViewById<NativeAdView>(R.id.video_native_ad_view)?.let {
+                it.headlineView = it.findViewById<TextView>(R.id.video_native_ad_view_headline).also { textView -> textView.text = nativeAd.headline }
+                it.bodyView = it.findViewById<TextView>(R.id.video_native_ad_view_body).also { textView -> textView.text = nativeAd.body }
+                it.mediaView = it.findViewById<MediaView>(R.id.video_native_ad_view_media).also { mediaView -> mediaView.setMediaContent(nativeAd.mediaContent) }
+                it.callToActionView = it.findViewById<Button>(R.id.video_native_ad_view_button).also { button -> button.text = nativeAd.callToAction }
+                it.setNativeAd(nativeAd)
+
+                if (controller.view == null) {
+                    // Assign the ghost view on the NativeAdController to allow it to call click events.
+                    controller.view = it
+                } else {
+                    Log.w("Napy", "NativeAdMediaView wasn't assigned as NativeAdController's ghost view, it already has one")
+                }
+            }
         }
     } ?: FrameLayout(context)
 
@@ -39,6 +49,8 @@ class NativeAdMediaView(context: Context, data: Map<*, *>) : PlatformView {
     }
 
     override fun getView(): View { return view }
-    override fun dispose() {}
+    override fun dispose() {
+        controller?.view?.let { ghostView -> if (ghostView == view) (ghostView.parent as ViewGroup).removeView(ghostView) }
+    }
 }
 

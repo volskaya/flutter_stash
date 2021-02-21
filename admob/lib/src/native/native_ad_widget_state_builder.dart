@@ -15,9 +15,11 @@ class NativeAdWidgetStateBuilder extends StatefulWidget {
     @required this.loadingBuilder,
     this.options = const NativeAdOptions(),
     this.layoutBuilder,
+    this.preloadIdentifiers = const <String>[],
   }) : super(key: key);
 
   final String identifier;
+  final List<String> preloadIdentifiers;
   final NativeAdOptions options;
   final Widget Function(BuildContext, NativeAdController, NativeAdData) builder;
   final Widget Function(BuildContext, NativeAdController, NativeAdErrorData) errorBuilder;
@@ -31,6 +33,9 @@ class NativeAdWidgetStateBuilder extends StatefulWidget {
 class _NativeAdWidgetStateBuilderState extends NativeAdWidgetState<NativeAdWidgetStateBuilder> {
   @override
   String get identifier => widget.identifier;
+
+  @override
+  List<String> get preloadIdentifiers => widget.preloadIdentifiers;
 
   @override
   NativeAdOptions get options => widget.options;

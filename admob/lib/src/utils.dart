@@ -215,7 +215,6 @@ abstract class AdMethodChannel<T> implements _AdMethodChannelImpl {
         .future;
   }
 
-  @protected
   @mustCallSuper
   Future dispose() async {
     assert(!disposed, 'Redundant dispose');

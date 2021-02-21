@@ -82,8 +82,6 @@ class BannerAdController extends AdMethodChannel<BannerAdEvent> with AttachableM
       case 'onAdImpression':
         // onEventController.add({BannerAdEvent.impression: null});
         break;
-      default:
-        break;
     }
   }
 

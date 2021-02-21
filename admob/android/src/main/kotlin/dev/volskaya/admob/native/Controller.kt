@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.util.Log
@@ -122,11 +121,10 @@ class NativeAdmobController(
         }
     }
 
+    private val viewParent = activity.window.decorView.findViewById(android.R.id.content) as ViewGroup
 
-    private val viewParent = activity.window.decorView as ViewGroup
-    private var mountView: Boolean = false
-    private var view: NativeAdView? = null
-
+    var view: NativeAdView? = null
+    var mountView: Boolean = false
     var disposed: Boolean = false
     var nativeAd: NativeAd? = null
 
@@ -160,36 +158,17 @@ class NativeAdmobController(
                     }
                 }
 
-                view?.let {
-                    val buttonOffset = IntArray(2)
-                    val viewOffset = IntArray(2)
-                    it.getLocationOnScreen(buttonOffset)
-                    it.callToActionView.getLocationOnScreen(buttonOffset)
-                    val viewRect = Rect(viewOffset[0], viewOffset[1], viewOffset[0] + it.width, viewOffset[1] + it.height)
-                    val buttonRect = Rect(buttonOffset[0], buttonOffset[1], buttonOffset[0] + it.callToActionView.width, buttonOffset[1] + it.callToActionView.height)
-                    Log.d("N", "Mounted ad view at $viewRect (button: $buttonRect)")
-                } ?: let {
-                    Log.d("N", "No view mounted yet ----------")
-                }
-
                 result.success(null)
             }
             "unmountView" -> {
-                mountView = false
-                view?.let { viewParent.removeView(it) }
+                if (mountView) {
+                    mountView = false
+                    view?.let { viewParent.removeView(it) }
+                }
                 result.success(null)
             }
             "click" -> {
-                view?.let {
-                    val buttonOffset = IntArray(2)
-                    val viewOffset = IntArray(2)
-                    it.getLocationOnScreen(buttonOffset)
-                    it.callToActionView.getLocationOnScreen(buttonOffset)
-                    val viewRect = Rect(viewOffset[0], viewOffset[1], viewOffset[0] + it.width, viewOffset[1] + it.height)
-                    val buttonRect = Rect(buttonOffset[0], buttonOffset[1], buttonOffset[0] + it.callToActionView.width, buttonOffset[1] + it.callToActionView.height)
-                    Log.d("N", "Clicking ad at $viewRect (button: $buttonRect)")
-                }
-                val click = (view?.callToActionView as? Button)?.performClick() ?: false
+                val click = (view?.callToActionView as? Button)?.callOnClick() ?: false
                 result.success(click)
             }
             "load" -> {
@@ -239,20 +218,20 @@ fun Drawable.toBitmapByteArray(): ByteArray {
     return byteArray
 }
 
-fun NativeAd.Image.toFlutterMap(): Map<*, *> {
-    // Flutter units don't have density applied, but native android does.
-    val density = Resources.getSystem().displayMetrics.density
-
+fun NativeAd.Image.toFlutterMap(drawBitmap: Boolean = false): Map<*, *> {
     return hashMapOf(
             "uri" to this.uri.toString(),
             "scale" to this.scale,
-            "drawable" to (this.drawable?.let {
+            "drawable" to if (drawBitmap) (this.drawable?.let {
+                // Flutter units don't have density applied, but native android does.
+                val density = Resources.getSystem().displayMetrics.density
+
                 hashMapOf<String, Any?>(
                         "width" to it.intrinsicWidth / density,
                         "height" to it.intrinsicWidth / density,
-                        "bitmap" to it.toBitmapByteArray()
+                        "bitmap" to  it.toBitmapByteArray()
                 )
-            })
+            }) else null
     )
 }
 
@@ -277,8 +256,8 @@ fun NativeAd.toFlutterMap(): Map<*, *> {
                     "duration" to this.mediaContent.duration.toDouble()
 //                    "mainImage" to this.mediaContent.mainImage?.toBitmapByteArray(),
             ),
-            "adChoicesInfo" to hashMapOf<String, Any?>(
-                    "text" to this.adChoicesInfo.text,
+            "adChoicesInfo" to hashMapOf(
+                    "text" to this.adChoicesInfo.text?.toString(),
                     "images" to this.adChoicesInfo.images.map { image -> image.toFlutterMap() }
             )
     )
