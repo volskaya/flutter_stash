@@ -3,8 +3,8 @@ import 'package:refresh_storage/refresh_storage.dart';
 
 import 'controller/controller.dart';
 
-class _Storage extends RefreshStorageItem {
-  _Storage({NativeAdOptions options})
+class NativeAdWidgetStateStorage extends RefreshStorageItem {
+  NativeAdWidgetStateStorage({NativeAdOptions options})
       : controller = NativeAdController(
           options: options ?? const NativeAdOptions(),
         );
@@ -22,63 +22,28 @@ class _Storage extends RefreshStorageItem {
 /// rebuilding it, when the controller is considered old on `initState` or app coming
 /// into the foreground.
 abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> with WidgetsBindingObserver {
-  RefreshStorageEntry<_Storage> _storage;
+  RefreshStorageEntry<NativeAdWidgetStateStorage> nativeAdWidgetStateStorage;
   String get identifier;
-  List<String> get preloadIdentifiers => const <String>[];
-  NativeAdController get controller => _storage?.value?.controller;
+  NativeAdController get controller => nativeAdWidgetStateStorage?.value?.controller;
   NativeAdOptions get options => const NativeAdOptions();
 
-  static void preloadControllers(
-    BuildContext context,
-    List<String> preloadIdentifiers, [
-    NativeAdOptions options = const NativeAdOptions(),
-  ]) {
-    if (preloadIdentifiers.isEmpty) return;
+  NativeAdWidgetStateStorage _buildStorage() => NativeAdWidgetStateStorage(options: options);
 
-    final createStorage = (String identifier) => RefreshStorage.write<_Storage>(
-          context: context,
-          identifier: identifier,
-          builder: () => _Storage(options: options),
-        );
-
-    for (final identifier in preloadIdentifiers) {
-      print('Preloading $identifier');
-      RefreshStorageEntry<_Storage> storage = createStorage(identifier);
-
-      // Refresh the storage, if the controller is too old.
-      if (storage.value?.controller?.considerThisOld() == true) {
-        storage.dispose();
-        RefreshStorage.destroy(context: context, identifier: identifier);
-        storage = createStorage(identifier);
-      }
-
-      assert(storage?.value?.controller?.considerThisOld() != true);
-      storage.value?.controller?.load();
-      storage.dispose();
-    }
-  }
-
-  _Storage _buildStorage() => _Storage(options: options);
-
-  RefreshStorageEntry<_Storage> _createStorage(String identifier) => RefreshStorage.write<_Storage>(
+  void _createStorage(String identifier) =>
+      nativeAdWidgetStateStorage = RefreshStorage.write<NativeAdWidgetStateStorage>(
         context: context,
         identifier: identifier,
         builder: _buildStorage,
       );
 
-  void _preloadControllers() {
-    assert(preloadIdentifiers.where((v) => v == identifier).isEmpty); // Don't preload [identifier] itself.
-    preloadControllers(context, preloadIdentifiers, options);
-  }
-
   void _checkOldController() {
-    if (_storage?.value?.controller?.considerThisOld() == true) {
-      _storage.value.controller.dispose();
+    if (nativeAdWidgetStateStorage?.value?.controller?.considerThisOld() == true) {
+      nativeAdWidgetStateStorage.value.controller.dispose();
       RefreshStorage.destroy(context: context, identifier: identifier);
 
       // This will build a fresh controller and fetch a new ad.
       setState(
-        () => _storage = RefreshStorage.write<_Storage>(
+        () => nativeAdWidgetStateStorage = RefreshStorage.write<NativeAdWidgetStateStorage>(
           context: context,
           identifier: identifier,
           builder: _buildStorage,
@@ -90,10 +55,8 @@ abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> wi
   @mustCallSuper
   @override
   void initState() {
-    print('Creating $identifier');
-    _storage = _createStorage(identifier);
+    _createStorage(identifier);
     _checkOldController();
-    _preloadControllers();
     WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
@@ -109,7 +72,7 @@ abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> wi
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _storage?.dispose();
+    nativeAdWidgetStateStorage?.dispose();
     super.dispose();
   }
 

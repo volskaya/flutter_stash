@@ -9,16 +9,9 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.os.AsyncTask
 import android.util.Log
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
-import androidx.asynclayoutinflater.view.AsyncLayoutInflater
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.google.android.gms.ads.nativead.NativeAdView
-import dev.volskaya.admob.*
-import dev.volskaya.admob.R
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -28,13 +21,12 @@ import java.util.*
 @SuppressLint("StaticFieldLeak")
 class NativeAdmobBuilderTask(
         val controller: NativeAdmobController,
-        val result: MethodChannel.Result,
         private val context: Context, // Expects the application context.
         private val unitId: String,
-        private val options: Map<*, *>
+        private val options: Map<*, *>,
+        private val onLoaded: (NativeAd?) -> Unit
 ) : AsyncTask<Any?, Any?, Any?>() {
     override fun doInBackground(vararg params: Any?) {
-        val timestamp = System.currentTimeMillis()
         val videoOptions = options["videoOptions"] as? Map<*, *>
         val adVideoOptions = VideoOptions.Builder().setStartMuted((videoOptions?.get("startMuted") as? Boolean) ?: true)
         val adOptions = NativeAdOptions.Builder()
@@ -45,11 +37,10 @@ class NativeAdmobBuilderTask(
                 .setRequestCustomMuteThisAd(options["requestCustomMuteThisAd"] as Boolean)
                 .setVideoOptions(adVideoOptions.build())
 
-        // Build the ad.
-        val loader = AdLoader.Builder(context, unitId)
+        // Build and load the ad.
+        AdLoader.Builder(context, unitId)
                 .forNativeAd {
                     controller.nativeAd = it
-                    val now = System.currentTimeMillis()
 
                     it.setMuteThisAdListener { controller.channel.invokeMethod("onAdMuted", it.muteThisAdReasons.map { reasons -> reasons.description }) }
                     if (controller.showVideoContent && it.mediaContent.hasVideoContent()) {
@@ -61,45 +52,21 @@ class NativeAdmobBuilderTask(
                             override fun onVideoMute(isMuted: Boolean) { controller.channel.invokeMethod("onVideoMute", isMuted) }
                         }
                     }
-
-                    Log.d("NativeAdController", "Attached listeners for NativeAd ${it.hashCode()} in ${ System.currentTimeMillis() - now} ms")
                 }
                 .withAdListener(object : AdListener() {
                     override fun onAdFailedToLoad(error: LoadAdError) {
                         super.onAdFailedToLoad(error)
-                        val response = hashMapOf(
-                                "runtimeType" to "error",
-                                "message" to error.message
-                        )
-
-                        controller.channel.invokeMethod("onAdChanged", response)
-                        result.success(response)
+                        onLoaded(null)
                     }
 
                     override fun onAdLoaded() {
                         super.onAdLoaded()
-
-                        val response = controller.nativeAd?.toFlutterMap() ?: hashMapOf(
-                                "runtimeType" to "error",
-                                "message" to "NativeAd is null"
-                        )
-
-                        if (!controller.disposed) {
-                            controller.channel.invokeMethod("onAdChanged", response)
-                        } else {
-                            controller.nativeAd?.destroy()
-                        }
-
-                        result.success(response)
+                        onLoaded(controller.nativeAd)
                     }
                 })
                 .withNativeAdOptions(adOptions.build())
                 .build()
-
-        Log.d("NativeAdController", "Constructed NativeAd builders in ${System.currentTimeMillis() - timestamp} ms")
-
-        loader.loadAd(AdRequest.Builder().build())
-        Log.d("NativeAdController", "Loaded NativeAd with a builder in ${System.currentTimeMillis() - timestamp} ms")
+                .loadAd(AdRequest.Builder().build())
     }
 }
 
@@ -121,65 +88,76 @@ class NativeAdmobController(
         }
     }
 
-    private val viewParent = activity.window.decorView.findViewById(android.R.id.content) as ViewGroup
+    private val preferPlatformView: Boolean
+        get() { return showVideoContent && nativeAd?.mediaContent?.hasVideoContent() == true }
 
-    var view: NativeAdView? = null
-    var mountView: Boolean = false
+    var shouldMountGhostView: Boolean = false // Toggled by Flutter, when it wants the ghost view active
     var disposed: Boolean = false
     var nativeAd: NativeAd? = null
+    var ghostView: NativeAdGhostView? = null
+    var platformView: NativeAdMediaView? = null
+        set(value) {
+            if (platformView != null) throw Error("This controller should have never received another platform view")
+            field = value
+
+            // If this controller prefers the platform view, but it was not ready, when Flutter
+            // called `shouldMountGhostView`, it needs to be created here.
+            //
+            // If the field was set to null, make sure the ghost view is disposed.
+            if (preferPlatformView) field?.let { mountGhostView() } ?: unmountGhostView(true)
+        }
 
     init {
         channel.setMethodCallHandler(this)
     }
 
+    // The ghost view can be forcefully unmounted, for example when the platform view has to dispose.
+    private fun unmountGhostView(force: Boolean = false) {
+        if (!force && shouldMountGhostView) return // Flutter app still expects the view to be mounted.
+        Log.d("Napy", "Unmounting ghost view $ghostView")
+        ghostView?.dispose()?.also { ghostView = null }
+    }
+
+    // Attempts to mount a ghost view, if an ad exists. If the controller prefers the platform
+    // view, uses the platform variant of ghost view instead, which might not be ready yet - the
+    // ghost view wouldn't be built.
+    //
+    // Ghost views should only be mounted, when the Flutter app has received and reacted to a native ad.
+    private fun mountGhostView() {
+        if (!shouldMountGhostView) return
+
+        // This should not happen, but clean up the existing ghost view.
+        ghostView?.dispose()?.also { ghostView = null }
+
+        if (preferPlatformView) {
+            platformView?.nativeAdView?.let { ghostView = NativeAdGhostView().also { ghost -> ghost.mountExistingView(it) } }
+        } else {
+            nativeAd?.let { nativeAd -> ghostView = NativeAdGhostView().also { it.mount(activity, nativeAd) } }
+        }
+
+        Log.d("Napy", "Mounted ghost view $ghostView")
+    }
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "mountView" -> {
-                nativeAd?.let { nativeAd ->
-                    if (showVideoContent && nativeAd.mediaContent.hasVideoContent()) return@let // Video ads are built with a PlatformView.
-                    mountView = true
-
-                    AsyncLayoutInflater(activity).inflate(R.layout.background_native_ad, viewParent) { inflatedView, _, viewParent ->
-                        val view = (inflatedView as NativeAdView)
-
-                        if (mountView) {
-                            viewParent?.let { parent ->
-                                view.headlineView = view.findViewById<TextView>(R.id.background_native_ad_view_headline).also { it.text = nativeAd.headline }
-                                view.bodyView = view.findViewById<TextView>(R.id.background_native_ad_view_body).also { it.text = nativeAd.body }
-                                view.callToActionView = view.findViewById<Button>(R.id.background_native_ad_view_button).also { it.text = nativeAd.callToAction }
-                                view.setNativeAd(nativeAd)
-
-                                parent.addView(view, 0)
-                                this.view = view
-                            } ?: view.destroy()
-                        } else {
-                            view.destroy()
-                        }
-                    }
-                }
-
+                shouldMountGhostView = true
+                mountGhostView()
                 result.success(null)
             }
             "unmountView" -> {
-                if (mountView) {
-                    mountView = false
-                    view?.let { viewParent.removeView(it) }
-                }
+                shouldMountGhostView = false
+                unmountGhostView()
                 result.success(null)
             }
-            "click" -> {
-                val click = (view?.callToActionView as? Button)?.callOnClick() ?: false
-                result.success(click)
-            }
+            "click" -> result.success(ghostView?.click() ?: false)
             "load" -> {
                 val unitId = call.argument<String>("unitId") ?: "ca-app-pub-3940256099942544/2247696110"
                 val options = call.argument<Map<String, Any>>("options")
                 loadAd(unitId, options!!, result)
             }
             "mute" -> {
-                nativeAd?.let {
-                   if (it.isCustomMuteThisAdEnabled) it.muteThisAd(it.muteThisAdReasons[call.argument<Int>("reason")!!])
-                }
+                nativeAd?.let { if (it.isCustomMuteThisAdEnabled) it.muteThisAd(it.muteThisAdReasons[call.argument<Int>("reason")!!]) }
                 result.success(null)
             }
             "dispose" -> {
@@ -192,16 +170,19 @@ class NativeAdmobController(
     }
 
     private fun dispose() {
-        view?.destroy()
-        mountView = false
         disposed = true
-        nativeAd?.destroy()
-        nativeAd = null
+        shouldMountGhostView = false
+        unmountGhostView(true)
+        nativeAd?.destroy()?.also { nativeAd = null }
     }
 
     private fun loadAd(unitId: String, options: Map<String, Any>, result: MethodChannel.Result) {
         channel.invokeMethod("onAdLoading", null)
-        NativeAdmobBuilderTask(this, result, activity, unitId, options).execute()
+        (NativeAdmobBuilderTask(this, activity.applicationContext, unitId, options) {
+            val response = it?.toFlutterMap() ?: hashMapOf( "runtimeType" to "error", "message" to "NativeAd is null" )
+            if (!disposed) { channel.invokeMethod("onAdChanged", response) } else { nativeAd?.destroy() }
+            result.success(response)
+        }).execute()
     }
 }
 

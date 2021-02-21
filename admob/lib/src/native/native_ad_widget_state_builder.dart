@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'native_ad_builder.dart';
 
-/// This widget is a wrapper around [NativeAdWidgetState] and [NativeAdBuilder].
+/// This widget is a wrapper around [NativeAdBuilder] & [NativeAdWidgetState].
 class NativeAdWidgetStateBuilder extends StatefulWidget {
   const NativeAdWidgetStateBuilder({
     Key key,
@@ -35,9 +35,6 @@ class _NativeAdWidgetStateBuilderState extends NativeAdWidgetState<NativeAdWidge
   String get identifier => widget.identifier;
 
   @override
-  List<String> get preloadIdentifiers => widget.preloadIdentifiers;
-
-  @override
   NativeAdOptions get options => widget.options;
 
   Widget _buildBody(BuildContext context, NativeAd nativeAd) {
@@ -63,5 +60,6 @@ class _NativeAdWidgetStateBuilderState extends NativeAdWidgetState<NativeAdWidge
   Widget build(BuildContext context) => NativeAdBuilder(
         controller: controller,
         builder: _buildBody,
+        preloadIdentifiers: widget.preloadIdentifiers,
       );
 }

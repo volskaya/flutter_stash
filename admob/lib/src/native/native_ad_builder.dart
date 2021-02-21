@@ -4,10 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:refresh_storage/refresh_storage.dart';
 
 import '../utils.dart';
 import 'controller/controller.dart';
 import 'controller/native_ad.dart';
+import 'native_ad_widget_state.dart';
 
 /// Child widget builder of [NativeAd].
 typedef NativeAdChildBuilder = Widget Function(BuildContext context, NativeAd nativeAd);
@@ -23,6 +25,7 @@ class NativeAdBuilder extends StatefulObserverWidget {
     Key key,
     @required this.builder,
     this.controller,
+    this.preloadIdentifiers = const <String>[],
   }) : super(key: key);
 
   /// Reactive builder of the ad. The `platformView` will be null, when the ad is not loaded.
@@ -30,6 +33,9 @@ class NativeAdBuilder extends StatefulObserverWidget {
 
   /// [NativeAdController] of [NativeAdBuilder]. If not specified, constructs its own controller.
   final NativeAdController controller;
+
+  /// [NativeAdController] IDs to preload, when this widget's deferred load has kicked in.
+  final List<String> preloadIdentifiers;
 
   /// Get the lists child count factoring in ads.
   static int childCount(int length, [int n = 20]) => length + (length / n).floor();
@@ -49,12 +55,55 @@ class NativeAdBuilder extends StatefulObserverWidget {
     return length >= n && (length % (n + 1)) == 0 ? adBuilder(adIndex) : childBuilder(i - adIndex);
   }
 
+  /// Create and load [NativeAdController]s for the given identifiers.
+  ///
+  /// [NativeAdBuilder] can call this with scroll awareness, if you pass the IDs to the widget.
+  static Future preloadControllers(
+    BuildContext context,
+    List<String> preloadIdentifiers, [
+    NativeAdOptions options = const NativeAdOptions(),
+  ]) async {
+    if (preloadIdentifiers.isEmpty) return;
+
+    final createStorage = (String identifier) => RefreshStorage.write<NativeAdWidgetStateStorage>(
+          context: context,
+          identifier: identifier,
+          builder: () => NativeAdWidgetStateStorage(options: options),
+        );
+
+    final futures = preloadIdentifiers.map(
+      (identifier) => (() async {
+        print('Preloading $identifier');
+        RefreshStorageEntry<NativeAdWidgetStateStorage> storage = createStorage(identifier);
+
+        try {
+          // Refresh the storage, if the controller is too old.
+          if (storage.value?.controller?.considerThisOld() == true) {
+            storage.dispose();
+            RefreshStorage.destroy(context: context, identifier: identifier);
+            storage = createStorage(identifier);
+          }
+
+          assert(storage?.value?.controller?.considerThisOld() != true);
+          await storage.value?.controller?.load();
+        } finally {
+          storage.dispose(); // Living in the [RefreshStorage] - not needed here anymore.
+        }
+      })(),
+    );
+
+    await Future.wait(futures);
+  }
+
   @override
   _NativeAdBuilderState createState() => _NativeAdBuilderState();
 }
 
 class _NativeAdBuilderState extends State<NativeAdBuilder> {
   NativeAdController _controller;
+
+  Future _preloadControllers() =>
+      NativeAdBuilder.preloadControllers(context, widget.preloadIdentifiers, widget.controller.options);
 
   /// Skip fetching the ad, if the user is scrolling too quick.
   Future _deferredLoad([Duration _]) async {
@@ -65,7 +114,10 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
       if (!isReady && Scrollable.recommendDeferredLoadingForContext(context)) {
         WidgetsBinding.instance.addPostFrameCallback(_deferredLoad);
       } else {
-        await _controller.load();
+        await Future.wait([
+          _controller.load(),
+          _preloadControllers(),
+        ]);
       }
     }
   }
