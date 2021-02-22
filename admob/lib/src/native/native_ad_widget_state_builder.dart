@@ -17,11 +17,11 @@ class NativeAdWidgetStateBuilder extends StatefulWidget {
     this.loadingBuilder,
     this.options = const NativeAdOptions(),
     this.layoutBuilder,
-    this.preloadIdentifiers = const <String>[],
+    this.preloadCount = 0,
   }) : super(key: key);
 
   final String identifier;
-  final List<String> preloadIdentifiers;
+  final int preloadCount;
   final NativeAdOptions options;
   final Widget Function(BuildContext, NativeAdController, NativeAdData) builder;
   final Widget Function(BuildContext, NativeAdController, NativeAdErrorData) errorBuilder;
@@ -42,7 +42,7 @@ class _NativeAdWidgetStateBuilderState extends NativeAdWidgetState<NativeAdWidge
   Widget _buildBody(BuildContext context, NativeAd nativeAd) {
     final child = nativeAd.map(
       (data) => KeyedSubtree(
-        key: ValueKey(data),
+        key: ValueKey(data.headline), // FIXME: Find a more viable variable to assert equality with.
         child: widget.builder(context, controller, data),
       ),
       loading: (data) => widget.loadingBuilder != null
@@ -66,6 +66,6 @@ class _NativeAdWidgetStateBuilderState extends NativeAdWidgetState<NativeAdWidge
   Widget build(BuildContext context) => NativeAdBuilder(
         controller: controller,
         builder: _buildBody,
-        preloadIdentifiers: widget.preloadIdentifiers,
+        preloadCount: widget.preloadCount,
       );
 }

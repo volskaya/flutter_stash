@@ -97,7 +97,7 @@ class NativeAdmobController(
     var ghostView: NativeAdGhostView? = null
     var platformView: NativeAdMediaView? = null
         set(value) {
-            if (platformView != null) throw Error("This controller should have never received another platform view")
+            if (platformView != null) Log.w("Napy", "A controller received a redundant platform view")
             field = value
 
             // If this controller prefers the platform view, but it was not ready, when Flutter
@@ -114,8 +114,10 @@ class NativeAdmobController(
     // The ghost view can be forcefully unmounted, for example when the platform view has to dispose.
     private fun unmountGhostView(force: Boolean = false) {
         if (!force && shouldMountGhostView) return // Flutter app still expects the view to be mounted.
-        Log.d("Napy", "Unmounting ghost view $ghostView")
-        ghostView?.dispose()?.also { ghostView = null }
+        ghostView?.dispose()?.also {
+            Log.d("Napy", "Unmounted ghost view $ghostView")
+            ghostView = null
+        }
     }
 
     // Attempts to mount a ghost view, if an ad exists. If the controller prefers the platform

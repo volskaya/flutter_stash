@@ -24,10 +24,8 @@ class NativeAdMediaViewFactory : PlatformViewFactory(StandardMessageCodec.INSTAN
 class NativeAdMediaView(context: Context, data: Map<*, *>) : PlatformView {
     private val controllerId: String = data["controllerId"] as String
     private val controller: NativeAdmobController? = NativeAdmobController.get(controllerId)
-    private val view: ViewGroup
-
-    val nativeAdView: NativeAdView? = controller?.nativeAd?.let { nativeAd ->
-        (LayoutInflater.from(context).inflate(R.layout.video_native_ad, null) as? FrameLayout)?.let { parent ->
+    private val view: ViewGroup = controller?.nativeAd?.let { nativeAd ->
+        (LayoutInflater.from(context).inflate(R.layout.video_native_ad, null) as? FrameLayout)?.also { parent ->
             parent.findViewById<NativeAdView>(R.id.video_native_ad_view)?.also {
                 it.headlineView = it.findViewById<TextView>(R.id.video_native_ad_view_headline).also { textView -> textView.text = nativeAd.headline }
                 it.bodyView = it.findViewById<TextView>(R.id.video_native_ad_view_body).also { textView -> textView.text = nativeAd.body }
@@ -36,10 +34,11 @@ class NativeAdMediaView(context: Context, data: Map<*, *>) : PlatformView {
                 it.setNativeAd(nativeAd)
             }
         }
-    }
+    } ?: FrameLayout(context)
+
+    val nativeAdView: NativeAdView = view.findViewById(R.id.video_native_ad_view)
 
     init {
-        view = nativeAdView ?: FrameLayout(context)
         controller?.platformView = this
 
         if (controller?.showVideoContent == false)

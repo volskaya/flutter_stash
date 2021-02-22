@@ -38,6 +38,21 @@ class RefreshStorage extends StatefulWidget {
   /// Gets the nearest [RefreshStorageState].
   static RefreshStorageState of(BuildContext context) => Provider.of<RefreshStorageState>(context, listen: false);
 
+  /// Creates a [Provider<RefreshStorageState>] that's used by [RefreshStorage].
+  static Provider<RefreshStorageState> wrapProvider({
+    Key key,
+    @required RefreshStorageState state,
+    @required Widget child,
+  }) =>
+      Provider<RefreshStorageState>.value(
+        value: state,
+        child: child,
+      );
+
+  /// Checks whether the nearest [RefreshStorage] contains this [identifier].
+  static bool contains(BuildContext context, String identifier, {RefreshStorageState storage}) =>
+      (storage ?? RefreshStorage.of(context))?.contains(identifier) ?? false;
+
   /// Write and get a value from [PageStorage]. Data are built with `builder`
   /// and are built only once.
   ///
@@ -89,6 +104,9 @@ class RefreshStorageState extends State<RefreshStorage> {
   /// Keyed by identifier string -> refresh count and the item.
   final _cache = HashMap<int, MapEntry<int, RefreshStorageItem>>();
 
+  /// True if the [_cache] contains [identifier].
+  bool contains(String identifier) => _cache.containsKey(identifier.hashCode);
+
   @override
   void dispose() {
     for (final item in _cache.values) item.value.dispose();
@@ -96,8 +114,5 @@ class RefreshStorageState extends State<RefreshStorage> {
   }
 
   @override
-  Widget build(BuildContext context) => Provider<RefreshStorageState>.value(
-        value: this,
-        child: widget.child,
-      );
+  Widget build(BuildContext context) => RefreshStorage.wrapProvider(state: this, child: widget.child);
 }

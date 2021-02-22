@@ -56,6 +56,15 @@ class NativeAdController extends _NativeAdController with _$NativeAdController {
   static String getStaticUnitId([String unitId]) =>
       unitId ?? MobileAds.instance.nativeAdUnitId ?? MobileAds.nativeAdTestUnitId;
 
+  static int getFoldedCount({
+    String unitId,
+    NativeAdOptions options = const NativeAdOptions(),
+    bool showVideoContent = true,
+  }) {
+    final hash = hashValues(getStaticUnitId(unitId), options, showVideoContent);
+    return _neverUsedControllers[hash]?.length ?? 0;
+  }
+
   /// Allow reusing never show controllers.
   static NativeAdController firstReusable({
     String unitId,
