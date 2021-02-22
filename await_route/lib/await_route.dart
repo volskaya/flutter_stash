@@ -2,6 +2,7 @@ library await_route;
 
 import 'dart:async';
 
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ abstract class AwaitRoute {
 
     final completer = Completer<void>();
     Timer? timeout;
-    timeout = Timer(const Duration(seconds: 1), () {
+    timeout = Timer(const Duration(seconds: 1) * timeDilation, () {
       if (timeout?.isActive == true) timeout?.cancel();
       completer.complete();
     });
