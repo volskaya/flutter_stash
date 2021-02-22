@@ -6,13 +6,15 @@ import 'package:flutter/material.dart';
 import 'native_ad_builder.dart';
 
 /// This widget is a wrapper around [NativeAdBuilder] & [NativeAdWidgetState].
+///
+/// [errorBuilder] & [loadingBuilder] can be left undefined to build an [SizedBox.shrink] instead.
 class NativeAdWidgetStateBuilder extends StatefulWidget {
   const NativeAdWidgetStateBuilder({
     Key key,
     @required this.identifier,
     @required this.builder,
-    @required this.errorBuilder,
-    @required this.loadingBuilder,
+    this.errorBuilder,
+    this.loadingBuilder,
     this.options = const NativeAdOptions(),
     this.layoutBuilder,
     this.preloadIdentifiers = const <String>[],
@@ -43,14 +45,18 @@ class _NativeAdWidgetStateBuilderState extends NativeAdWidgetState<NativeAdWidge
         key: ValueKey(data),
         child: widget.builder(context, controller, data),
       ),
-      loading: (data) => KeyedSubtree(
-        key: const ValueKey('loading'),
-        child: widget.loadingBuilder(context, controller, data),
-      ),
-      error: (data) => KeyedSubtree(
-        key: const ValueKey('error'),
-        child: widget.errorBuilder(context, controller, data),
-      ),
+      loading: (data) => widget.loadingBuilder != null
+          ? KeyedSubtree(
+              key: const ValueKey('loading'),
+              child: widget.loadingBuilder(context, controller, data),
+            )
+          : const SizedBox.shrink(key: ValueKey('loading')),
+      error: (data) => widget.errorBuilder != null
+          ? KeyedSubtree(
+              key: const ValueKey('error'),
+              child: widget.errorBuilder(context, controller, data),
+            )
+          : const SizedBox.shrink(key: ValueKey('error')),
     );
 
     return widget.layoutBuilder?.call(context, child) ?? child;
