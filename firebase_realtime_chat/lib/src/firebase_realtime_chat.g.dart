@@ -11,6 +11,60 @@ part of 'firebase_realtime_chat.dart';
 mixin _$_FirebaseRealtimeChatPageStorage<
         T extends FirebaseRealtimeChatMessageImpl>
     on __FirebaseRealtimeChatPageStorage<T>, Store {
+  final _$paginatedItemsAtom =
+      Atom(name: '__FirebaseRealtimeChatPageStorage.paginatedItems');
+
+  @override
+  IList<T> get paginatedItems {
+    _$paginatedItemsAtom.reportRead();
+    return super.paginatedItems;
+  }
+
+  @override
+  set paginatedItems(IList<T> value) {
+    if (super.paginatedItems != value) {
+      _$paginatedItemsAtom.reportWrite(value, super.paginatedItems, () {
+        super.paginatedItems = value;
+      });
+    }
+  }
+
+  final _$subscribedItemsAtom =
+      Atom(name: '__FirebaseRealtimeChatPageStorage.subscribedItems');
+
+  @override
+  IList<T> get subscribedItems {
+    _$subscribedItemsAtom.reportRead();
+    return super.subscribedItems;
+  }
+
+  @override
+  set subscribedItems(IList<T> value) {
+    if (super.subscribedItems != value) {
+      _$subscribedItemsAtom.reportWrite(value, super.subscribedItems, () {
+        super.subscribedItems = value;
+      });
+    }
+  }
+
+  final _$pendingItemsAtom =
+      Atom(name: '__FirebaseRealtimeChatPageStorage.pendingItems');
+
+  @override
+  IList<T> get pendingItems {
+    _$pendingItemsAtom.reportRead();
+    return super.pendingItems;
+  }
+
+  @override
+  set pendingItems(IList<T> value) {
+    if (super.pendingItems != value) {
+      _$pendingItemsAtom.reportWrite(value, super.pendingItems, () {
+        super.pendingItems = value;
+      });
+    }
+  }
+
   final _$isEndReachedAtom =
       Atom(name: '__FirebaseRealtimeChatPageStorage.isEndReached');
 
@@ -50,6 +104,9 @@ mixin _$_FirebaseRealtimeChatPageStorage<
   @override
   String toString() {
     return '''
+paginatedItems: ${paginatedItems},
+subscribedItems: ${subscribedItems},
+pendingItems: ${pendingItems},
 isEndReached: ${isEndReached},
 participants: ${participants}
     ''';

@@ -3,6 +3,7 @@ library delayed_progress_indicator;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 /// Delays the progress indicator from becoming visible, like in some
 /// Material Design concepts.
@@ -54,7 +55,7 @@ class _DelayedProgressIndicatorState extends State<DelayedProgressIndicator>
     _controller = AnimationController(vsync: this, duration: kThemeChangeDuration);
 
     if (widget.delay > Duration.zero) {
-      _timer = Timer(widget.delay, _setVisible);
+      _timer = Timer(widget.delay * timeDilation, _setVisible);
     } else {
       _visible = true;
       _controller!.value = 1.0;

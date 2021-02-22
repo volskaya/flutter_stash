@@ -21,6 +21,7 @@ dependencies:
   mobx_codegen:
   quiver: ^2.1.3
   path_provider: ^1.6.18
+  fast_immutable_collections: ^1.0.28
 
   refresh_storage:
     path: /home/projects/packages/flutter_helpers/refresh_storage
@@ -28,6 +29,8 @@ dependencies:
     path: /home/projects/packages/flutter_helpers/log
   loader_coordinator:
     path: /home/projects/packages/flutter_helpers/loader_coordinator
+  await_route:
+    path: /home/projects/packages/flutter_helpers/await_route
 
 dependency_overrides:
   # Conditionally checks if an observable should update.

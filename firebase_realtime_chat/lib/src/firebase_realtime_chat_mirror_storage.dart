@@ -97,6 +97,11 @@ class FirebaseRealtimeChatMirrorStorage {
 
   /// Unreferences and closes the database.
   Future dispose() async {
+    if (!instances.containsKey(key)) {
+      _log.w('Mirror storage of $key was disposed, but the instance cached didn\'t contain its key.');
+      return; // Already disposed? This might indicate some race condition.
+    }
+
     instances[key] = MapEntry(instances[key].key - 1, instances[key].value);
     if (instances[key].key <= 0) {
       instances.remove(key);

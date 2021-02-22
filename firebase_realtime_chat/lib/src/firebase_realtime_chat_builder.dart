@@ -8,6 +8,11 @@ typedef FirebaseRealtimeChatBuilderCallback<T extends FirebaseRealtimeChatMessag
         D extends FirebaseRealtimeChatParticipantImpl>
     = Widget Function(BuildContext context, FirebaseRealtimeChat<T, D> chat);
 
+/// Event callback of [FirebaseRealtimeChatBuilder].
+typedef FirebaseRealtimeChatEventCallback<T extends FirebaseRealtimeChatMessageImpl,
+        D extends FirebaseRealtimeChatParticipantImpl>
+    = void Function(FirebaseRealtimeChat<T, D> chat);
+
 /// Widget version of [FirebaseRealtimeChat].
 class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
     D extends FirebaseRealtimeChatParticipantImpl> extends StatefulWidget {
@@ -21,6 +26,9 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
     @required this.participantBuilder,
     this.itemsPerPage = 20,
     this.participants,
+    this.onInitState,
+    this.onFirstPagePaginated,
+    this.awaitRoute = false,
   }) : super(key: key);
 
   /// Chat room ID in the database.
@@ -45,6 +53,19 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
   /// participant IDs in the database.
   final Set<String> participants;
 
+  /// Called when the state is initialized.
+  final VoidCallback onInitState;
+
+  /// Called after the first page has paginated.
+  final FirebaseRealtimeChatEventCallback<T, D> onFirstPagePaginated;
+
+  /// Whether to await route before updating state with first page's items.
+  ///
+  /// NOTE: The items will still start being fetched when the widget first mounts, only
+  /// the observable state will be delayed. This is usually used to avoid yank mid route
+  /// change animations.
+  final bool awaitRoute;
+
   @override
   _FirebaseRealtimeChatBuilderState<T, D> createState() => _FirebaseRealtimeChatBuilderState<T, D>();
 }
@@ -52,30 +73,39 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
 class _FirebaseRealtimeChatBuilderState<T extends FirebaseRealtimeChatMessageImpl,
         D extends FirebaseRealtimeChatParticipantImpl> extends State<FirebaseRealtimeChatBuilder<T, D>>
     with WidgetsBindingObserver {
+  DisposableBuildContext _disposableBuildContext;
   FirebaseRealtimeChat<T, D> _chat;
 
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
+    _disposableBuildContext = DisposableBuildContext(this);
     _chat = FirebaseRealtimeChat<T, D>(
       collection: FirebaseDatabase.instance.reference().child('chats'),
       messageBuilder: widget.messageBuilder,
       participantBuilder: widget.participantBuilder,
       participants: widget.participants,
       itemsPerPage: widget.itemsPerPage,
+      onFirstPagePaginated: widget.onFirstPagePaginated,
+      awaitRoute: widget.awaitRoute,
     )
       ..initialize(
-        context: context,
+        context: _disposableBuildContext,
         senderId: widget.sender,
         chatId: widget.room,
       )
       ..reportPresence();
 
-    super.initState();
+    try {
+      widget.onInitState?.call();
+    } finally {
+      super.initState();
+    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    _disposableBuildContext?.dispose();
     _chat?.handleAppLifecycleStatus(state);
     super.didChangeAppLifecycleState(state);
   }
