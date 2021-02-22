@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:await_route/await_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:refresh_storage/refresh_storage.dart';
+import 'package:utils/utils.dart';
 
 import 'controller/controller.dart';
 import 'controller/native_ad.dart';
@@ -123,7 +125,7 @@ class NativeAdBuilder extends StatefulObserverWidget {
   _NativeAdBuilderState createState() => _NativeAdBuilderState();
 }
 
-class _NativeAdBuilderState extends State<NativeAdBuilder> {
+class _NativeAdBuilderState extends State<NativeAdBuilder> with InitialDependencies<NativeAdBuilder> {
   NativeAdController _controller;
   bool _hadAttachedToTheController = false;
 
@@ -132,13 +134,15 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
         widget.controller.options,
       );
 
+  bool _isControllerReady() => _controller.nativeAd?.maybeMap((_) => true, orElse: () => false);
+
   /// Skip fetching the ad, if the user is scrolling too quick.
   Future _deferredLoad([Duration _]) async {
     if (!mounted) {
       return;
     } else {
-      final isReady = _controller.nativeAd?.maybeMap((_) => true, orElse: () => false);
-      if (!isReady && Scrollable.recommendDeferredLoadingForContext(context)) {
+      if (!_isControllerReady()) await AwaitRoute.of(context);
+      if (!_isControllerReady() && Scrollable.recommendDeferredLoadingForContext(context)) {
         WidgetsBinding.instance.addPostFrameCallback(_deferredLoad);
       } else {
         _controller.attach(this);
@@ -152,9 +156,11 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> {
   }
 
   @override
+  void initDependencies() => _deferredLoad();
+
+  @override
   void initState() {
     _controller = widget.controller ?? NativeAdController.firstReusable() ?? NativeAdController();
-    _deferredLoad();
     super.initState();
   }
 

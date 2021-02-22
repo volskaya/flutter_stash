@@ -25,6 +25,8 @@ dependencies:
     path: /home/projects/packages/flutter_helpers/refresh_storage
   utils:
     path: /home/projects/packages/flutter_helpers/utils
+  await_route:
+    path: /home/projects/packages/flutter_helpers/await_route
 
 dev_dependencies:
   flutter_test:

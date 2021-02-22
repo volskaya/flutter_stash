@@ -17,6 +17,7 @@ export 'src/country_catalog.dart';
 export 'src/custom_ink_splash.dart';
 export 'src/debounce.dart';
 export 'src/exit_guard.dart';
+export 'src/initial_dependencies.dart';
 export 'src/mark_storage.dart';
 export 'src/mutex.dart';
 export 'src/observable_keep_aliver.dart';

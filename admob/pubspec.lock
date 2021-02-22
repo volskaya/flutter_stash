@@ -37,7 +37,7 @@ packages:
     source: hosted
     version: "2.5.0"
   await_route:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "/home/projects/packages/flutter_helpers/await_route"
       relative: false
