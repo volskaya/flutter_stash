@@ -120,7 +120,9 @@ class __$NativeAdVideoStateCopyWithImpl<$Res>
 }
 
 /// @nodoc
-class _$_NativeAdVideoState implements _NativeAdVideoState {
+class _$_NativeAdVideoState
+    with DiagnosticableTreeMixin
+    implements _NativeAdVideoState {
   const _$_NativeAdVideoState(
       {this.playback = NativeAdVideoPlaybackState.paused,
       this.lifecycle = NativeAdVideoLifecycle.idle,
@@ -140,8 +142,18 @@ class _$_NativeAdVideoState implements _NativeAdVideoState {
   final bool muted;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'NativeAdVideoState(playback: $playback, lifecycle: $lifecycle, muted: $muted)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'NativeAdVideoState'))
+      ..add(DiagnosticsProperty('playback', playback))
+      ..add(DiagnosticsProperty('lifecycle', lifecycle))
+      ..add(DiagnosticsProperty('muted', muted));
   }
 
   @override

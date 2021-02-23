@@ -15,14 +15,14 @@ class NativeAdWidgetStateBuilder extends StatefulWidget {
     @required this.builder,
     this.errorBuilder,
     this.loadingBuilder,
-    this.options = const NativeAdOptions(),
+    this.options = NativeAdOptions.defaultKey,
     this.layoutBuilder,
     this.preloadCount = 0,
   }) : super(key: key);
 
   final String identifier;
   final int preloadCount;
-  final NativeAdOptions options;
+  final String options;
   final Widget Function(BuildContext, NativeAdController, NativeAdData) builder;
   final Widget Function(BuildContext, NativeAdController, NativeAdErrorData) errorBuilder;
   final Widget Function(BuildContext, NativeAdController, NativeAdLoadingData) loadingBuilder;
@@ -37,7 +37,7 @@ class _NativeAdWidgetStateBuilderState extends NativeAdWidgetState<NativeAdWidge
   String get identifier => widget.identifier;
 
   @override
-  NativeAdOptions get options => widget.options;
+  String get options => widget.options;
 
   Widget _buildBody(BuildContext context, NativeAd nativeAd) {
     final child = nativeAd.map(

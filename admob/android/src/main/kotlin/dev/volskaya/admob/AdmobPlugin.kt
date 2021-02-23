@@ -29,6 +29,8 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     private lateinit var activity: Activity
     private lateinit var messenger: BinaryMessenger
 
+    private val nativeAdLoaders: HashMap<String, NativeAdLoader> = hashMapOf()
+
     override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(binding.binaryMessenger, "admob").also { it.setMethodCallHandler(this) }
         messenger = binding.binaryMessenger
@@ -52,13 +54,26 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                         }
                     }
 
+                    // Construct the native ad loaders.
+                    call.argument<Map<*, *>>("props")?.let {
+                        val nativeAd = it["nativeAd"] as Map<*, *>
+                        val unitId = nativeAd["unitId"] as String
+
+                        for (entry in nativeAd["options"] as Map<*, *>) {
+                            val key = entry.key as String
+                            val options = entry.value as Map<*, *>
+
+                            nativeAdLoaders[key] = NativeAdLoader(activity.applicationContext, unitId, options)
+                        }
+                    }
+
                     result.success(Build.VERSION.SDK_INT)
                 }
             }
             "nativeAdControllerCreate" -> {
                 val id = call.argument<String>("id")!!
-                val showVideoContent = call.argument<Boolean>("showVideoContent")!!
-                NativeAdmobController.create(id, messenger, activity, showVideoContent)
+                val options = call.argument<String>("options")!!
+                NativeAdmobController.create(id, messenger, activity, nativeAdLoaders[options]!!)
                 result.success(null)
             }
             // Banner Ads Controller.

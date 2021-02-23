@@ -49,6 +49,7 @@ abstract class VideoOptions with _$VideoOptions {
 @freezed
 abstract class NativeAdOptions with _$NativeAdOptions {
   const factory NativeAdOptions({
+    @Default(true) bool showVideoContent, // This is not an admob specific field.
     @Default(false) bool requestCustomMuteThisAd,
     @Default(false) bool requestMultipleImages,
     @Default(true) bool returnUrlsForImageAssets, // No point of preparing the native drawables.
@@ -58,4 +59,6 @@ abstract class NativeAdOptions with _$NativeAdOptions {
   }) = _NativeAdOptions;
 
   factory NativeAdOptions.fromJson(Map<String, dynamic> json) => _$NativeAdOptionsFromJson(json);
+
+  static const defaultKey = 'default';
 }

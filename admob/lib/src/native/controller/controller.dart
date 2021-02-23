@@ -43,37 +43,26 @@ abstract class NativeAdVideoState with _$NativeAdVideoState {
 ///   - https://developers.google.com/admob/ios/native/start
 class NativeAdController extends _NativeAdController with _$NativeAdController {
   NativeAdController({
-    String unitId,
-    NativeAdOptions options = const NativeAdOptions(),
-    bool showVideoContent = true,
-  }) : super(unitId, options, showVideoContent);
+    String options = NativeAdOptions.defaultKey,
+  }) : super(options);
 
   static String get testUnitId => MobileAds.nativeAdTestUnitId;
   static String get videoTestUnitId => MobileAds.nativeAdVideoTestUnitId;
 
-  static final _neverUsedControllers = HashMap<int, Queue<NativeAdController>>();
+  static final _neverUsedControllers = HashMap<String, Queue<NativeAdController>>();
 
-  static String getStaticUnitId([String unitId]) =>
-      unitId ?? MobileAds.instance.nativeAdUnitId ?? MobileAds.nativeAdTestUnitId;
+  static int getFoldedCount({String options = NativeAdOptions.defaultKey}) =>
+      _neverUsedControllers[options]?.length ?? 0;
 
-  static int getFoldedCount({
-    String unitId,
-    NativeAdOptions options = const NativeAdOptions(),
-    bool showVideoContent = true,
-  }) {
-    final hash = hashValues(getStaticUnitId(unitId), options, showVideoContent);
-    return _neverUsedControllers[hash]?.length ?? 0;
-  }
+  static NativeAdController reuseOrCreate({String options = NativeAdOptions.defaultKey}) =>
+      firstReusable(options: options) ?? NativeAdController(options: options);
 
   /// Allow reusing never show controllers.
   static NativeAdController firstReusable({
-    String unitId,
-    NativeAdOptions options = const NativeAdOptions(),
-    bool showVideoContent = true,
+    String options = NativeAdOptions.defaultKey,
     NativeAdController Function() orElse,
   }) {
-    final hash = hashValues(getStaticUnitId(unitId), options, showVideoContent);
-    final queue = _neverUsedControllers[hash];
+    final queue = _neverUsedControllers[options];
 
     while (queue?.isNotEmpty == true) {
       final controller = queue.removeFirst();
@@ -88,7 +77,7 @@ class NativeAdController extends _NativeAdController with _$NativeAdController {
       return controller;
     }
 
-    if (queue?.isEmpty == true) _neverUsedControllers.remove(hash);
+    if (queue?.isEmpty == true) _neverUsedControllers.remove(options);
     return orElse?.call();
   }
 
@@ -96,28 +85,26 @@ class NativeAdController extends _NativeAdController with _$NativeAdController {
   static void fold(NativeAdController controller) {
     assert(!controller.hasBeenAttachedTo);
     assert(!controller.disposed);
-
-    final hash = hashValues(controller.unitId, controller.options, controller.showVideoContent);
-    (_neverUsedControllers[hash] ??= Queue<NativeAdController>()).add(controller);
+    (_neverUsedControllers[controller.optionsKey] ??= Queue<NativeAdController>()).add(controller);
   }
 }
 
 abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with AttachableMixin, Store {
-  _NativeAdController(this._unitId, this.options, [this.showVideoContent = true]);
+  _NativeAdController(this.optionsKey);
 
   @override
   final String channelName = 'nativeAdController';
-  final String _unitId;
-  final NativeAdOptions options;
-  final bool showVideoContent; // Instructs the platform to build ghost views, even if the ad has video content.
+  final String optionsKey;
 
-  String get unitId => NativeAdController.getStaticUnitId(_unitId);
+  /// Options don't exist until [MobileAds.initialize] has been called.
+  NativeAdOptions get options => MobileAds.instance.nativeAd.options[optionsKey];
+
   DateTime loadTime;
-  Memoizer<NativeAd> _loadAdOperation;
-  bool get isLoaded => _loadAdOperation?.value != null;
+  Memoizer _hydrateMemoizer;
+  bool get isLoaded => _hydrateMemoizer?.value != null;
 
   @override
-  Map<String, dynamic> get initParams => <String, dynamic>{'showVideoContent': showVideoContent};
+  Map<String, dynamic> get initParams => <String, dynamic>{'options': optionsKey};
 
   @observable
   NativeAd nativeAd = NativeAd.loading();
@@ -137,9 +124,6 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
   void handleMethodCall(MethodCall call) {
     switch (call.method) {
       // Ad cases.
-      case 'onAdLoading':
-        nativeAd = NativeAd.loading();
-        break;
       case 'onAdChanged':
         nativeAd = NativeAd.fromJson(Map<String, dynamic>.from(call.arguments as Map));
         break;
@@ -177,23 +161,22 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
     await channel.invokeMethod('mountView');
   }
 
-  Future<NativeAd> _callLoadAd() async {
+  Future _hydrate() async {
     try {
-      final map = await channel.invokeMapMethod<String, dynamic>('load', {
-        'unitId': unitId,
-        'options': (options ?? const NativeAdOptions()).toJson(),
-      });
-
-      return map != null ? NativeAd.fromJson(map) : null;
+      await channel.invokeMethod('hydrate');
     } finally {
       loadTime ??= DateTime.now();
     }
   }
 
-  Future<NativeAd> load() async {
+  /// Will try to hydrate the controller one time. This callback doesn't wait till an
+  /// ad is received.
+  Future load() async {
     assert(MobileAds.instance.isInitialized);
     await init();
-    return (_loadAdOperation ??= Memoizer(_callLoadAd)).future;
+    await (_hydrateMemoizer ??= Memoizer(_hydrate)).future;
+    await asyncWhen((_) => nativeAd.maybeMap((_) => true, loading: (_) => false, orElse: () => true));
+    return nativeAd;
   }
 
   /// If the controller was never attached to, it will be folded to a queue

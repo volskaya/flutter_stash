@@ -11,7 +11,6 @@ import 'package:utils/utils.dart';
 
 import 'controller/controller.dart';
 import 'controller/native_ad.dart';
-import 'native_ad_widget_state.dart';
 
 /// Child widget builder of [NativeAd].
 typedef NativeAdChildBuilder = Widget Function(BuildContext context, NativeAd nativeAd);
@@ -100,10 +99,7 @@ class NativeAdBuilder extends StatefulObserverWidget {
   /// Create and load [NativeAdController]s for the given identifiers.
   ///
   /// [NativeAdBuilder] can call this with scroll awareness, if you pass the IDs to the widget.
-  static Future preloadControllers(
-    int count, [
-    NativeAdOptions options = const NativeAdOptions(),
-  ]) async {
+  static Future preloadControllers(int count, [String options = NativeAdOptions.defaultKey]) async {
     final currentCount = NativeAdController.getFoldedCount(options: options);
     final necessaryCount = count - currentCount;
     if (necessaryCount <= 0) return;
@@ -129,11 +125,7 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> with InitialDependenc
   NativeAdController _controller;
   bool _hadAttachedToTheController = false;
 
-  Future _preloadControllers() => NativeAdBuilder.preloadControllers(
-        widget.preloadCount,
-        widget.controller.options,
-      );
-
+  Future _preloadControllers() => NativeAdBuilder.preloadControllers(widget.preloadCount, widget.controller.optionsKey);
   bool _isControllerReady() => _controller.nativeAd?.maybeMap((_) => true, orElse: () => false);
 
   /// Skip fetching the ad, if the user is scrolling too quick.
@@ -142,15 +134,20 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> with InitialDependenc
       return;
     } else {
       if (!_isControllerReady()) await AwaitRoute.of(context);
-      if (!_isControllerReady() && Scrollable.recommendDeferredLoadingForContext(context)) {
+
+      final isReady = _isControllerReady(); // Check again.
+      if (!isReady && Scrollable.recommendDeferredLoadingForContext(context)) {
         WidgetsBinding.instance.addPostFrameCallback(_deferredLoad);
       } else {
         _controller.attach(this);
         _hadAttachedToTheController = true;
-        await Future.wait([
-          _controller.load(),
-          _preloadControllers(),
-        ]);
+
+        if (!isReady) {
+          await Future.wait([
+            _controller.load(),
+            _preloadControllers(),
+          ]);
+        }
       }
     }
   }

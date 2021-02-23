@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:admob/src/native/controller/options.dart';
+import 'package:admob/src/platform_props.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -36,8 +38,7 @@ class MobileAds {
   static String get appOpenAdTestUnitId =>
       Platform.isAndroid ? 'ca-app-pub-3940256099942544/3419835294' : 'ca-app-pub-3940256099942544/5662855259';
 
-  // Unit ids
-  String nativeAdUnitId;
+  // Unit ids.
   String bannerAdUnitId;
   String interstitialAdUnitId;
   String rewardedAdUnitId;
@@ -48,6 +49,8 @@ class MobileAds {
   bool get isInitialized => _initialized;
   int _version = 0;
   int get osVersion => _version;
+
+  NativeAdPlatformProps nativeAd;
 
   /// Before creating any native ads, you must initalize the admob.
   /// This can be done only once, ideally at app launch. If you try to
@@ -60,37 +63,34 @@ class MobileAds {
   /// }
   /// ```
   Future<void> initialize({
-    String nativeAdUnitId,
-    String bannerAdUnitId,
-    String interstitialAdUnitId,
-    String rewardedAdUnitId,
-    String appOpenAdUnitId,
+    NativeAdPlatformProps nativeAd,
     List<String> debugDeviceIds,
   }) async {
     assertPlatformIsSupported();
     assert(!isInitialized);
 
-    // Ad Ids.
-    nativeAdUnitId ??= nativeAdUnitId ?? nativeAdTestUnitId;
-    _debugCheckIsTestId(nativeAdUnitId, [nativeAdTestUnitId, nativeAdVideoTestUnitId]);
+    this.nativeAd = nativeAd;
+    _debugCheckIsTestId(nativeAd.unitId, [nativeAdTestUnitId, nativeAdVideoTestUnitId]);
 
+    // Setup old ad ids.
     bannerAdUnitId ??= bannerAdUnitId ?? bannerAdTestUnitId;
     _debugCheckIsTestId(bannerAdUnitId, [bannerAdTestUnitId]);
-
     interstitialAdUnitId ??= interstitialAdUnitId ?? interstitialAdTestUnitId;
     _debugCheckIsTestId(interstitialAdUnitId, [interstitialAdTestUnitId, interstitialAdVideoTestUnitId]);
-
     rewardedAdUnitId ??= rewardedAdUnitId ?? rewardedAdTestUnitId;
     _debugCheckIsTestId(rewardedAdUnitId, [rewardedAdTestUnitId]);
-
     appOpenAdUnitId ??= appOpenAdUnitId ?? appOpenAdTestUnitId;
     _debugCheckIsTestId(appOpenAdUnitId, [appOpenAdTestUnitId]);
 
-    // Make sure the version is supported.
-    _version = await pluginChannel.invokeMethod<int>(
-      'initialize',
-      <String, dynamic>{'debugDeviceIds': debugDeviceIds},
+    final platformProps = PlatformProps(
+      nativeAd: nativeAd,
     );
+
+    // Make sure the version is supported.
+    _version = await pluginChannel.invokeMethod<int>('initialize', <String, dynamic>{
+      'debugDeviceIds': debugDeviceIds,
+      'props': platformProps.toJson(),
+    });
 
     assertVersionIsSupported(false);
     _initialized = true;

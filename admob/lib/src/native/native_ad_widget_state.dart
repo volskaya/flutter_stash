@@ -4,9 +4,8 @@ import 'package:refresh_storage/refresh_storage.dart';
 import 'controller/controller.dart';
 
 class NativeAdWidgetStateStorage extends RefreshStorageItem {
-  NativeAdWidgetStateStorage({NativeAdOptions options})
-      : controller = NativeAdController.firstReusable(options: options ?? const NativeAdOptions()) ??
-            NativeAdController(options: options ?? const NativeAdOptions());
+  NativeAdWidgetStateStorage({String options = NativeAdOptions.defaultKey})
+      : controller = NativeAdController.reuseOrCreate(options: options ?? NativeAdOptions.defaultKey);
 
   final NativeAdController controller;
 
@@ -25,7 +24,7 @@ abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> wi
   String get identifier;
   String _oldIdentifier;
   NativeAdController get controller => storage?.value?.controller;
-  NativeAdOptions get options => const NativeAdOptions();
+  String get options => NativeAdOptions.defaultKey;
 
   NativeAdWidgetStateStorage _buildStorage() => NativeAdWidgetStateStorage(options: options);
 
