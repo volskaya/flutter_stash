@@ -21,19 +21,28 @@ import dev.volskaya.admob.native.*
 import dev.volskaya.admob.rewarded.RewardedAdControllerManager
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
+import com.google.android.ump.ConsentForm
+import com.google.android.ump.ConsentInformation
+import dev.volskaya.admob.consent.ConsentCoordinator
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
+import io.flutter.plugin.common.EventChannel
 
 class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     private lateinit var channel: MethodChannel
     private lateinit var activity: Activity
     private lateinit var messenger: BinaryMessenger
+    private lateinit var consentCoordinatorChannel: MethodChannel
+    private lateinit var consentCoordinatorEventChannel: EventChannel
 
+    private var consentCoordinator: ConsentCoordinator? = null
     private val nativeAdLoaders: HashMap<String, NativeAdLoader> = hashMapOf()
 
     override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(binding.binaryMessenger, "admob").also { it.setMethodCallHandler(this) }
         messenger = binding.binaryMessenger
+        consentCoordinatorChannel = MethodChannel(messenger, "consentCoordinator")
+        consentCoordinatorEventChannel = EventChannel(messenger, "consentCoordinator.state")
 
         binding.platformViewRegistry.registerViewFactory("banner_admob", BannerAdViewFactory())
         binding.platformViewRegistry.registerViewFactory("nativeAdVideoMedia", NativeAdMediaViewFactory())
@@ -43,8 +52,9 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         when (call.method) {
             "initialize" -> {
                 MobileAds.initialize(activity) {
-                    call.argument<List<String>>("debugDeviceIds")?.let {
-                        if (it.isNotEmpty()) {
+                    val debugDeviceIds = call.argument<List<String>>("debugDeviceIds")
+                    debugDeviceIds?.let {
+                        if (debugDeviceIds.isNotEmpty()) {
                             val configuration = MobileAds
                                     .getRequestConfiguration()
                                     .toBuilder()
@@ -53,6 +63,16 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                             MobileAds.setRequestConfiguration(configuration)
                         }
                     }
+
+                    // Construct the consent coordinator
+                    consentCoordinator = ConsentCoordinator(
+                            activity,
+                            consentCoordinatorChannel,
+                            consentCoordinatorEventChannel,
+                            call.argument<Boolean>("underAgeOfConsent")!!,
+                            call.argument<Boolean>("forceTesting")!!,
+                            debugDeviceIds
+                    )
 
                     // Construct the native ad loaders.
                     call.argument<Map<*, *>>("props")?.let {

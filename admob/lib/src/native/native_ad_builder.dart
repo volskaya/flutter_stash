@@ -96,25 +96,34 @@ class NativeAdBuilder extends StatefulObserverWidget {
     return length >= n && (length % (n + 1)) == 0 ? adBuilder(adIndex) : childBuilder(i - adIndex);
   }
 
+  static bool isPreloadingControllers = false;
+
   /// Create and load [NativeAdController]s for the given identifiers.
   ///
   /// [NativeAdBuilder] can call this with scroll awareness, if you pass the IDs to the widget.
   static Future preloadControllers(int count, [String options = NativeAdOptions.defaultKey]) async {
+    if (isPreloadingControllers) return;
+
     final currentCount = NativeAdController.getFoldedCount(options: options);
     final necessaryCount = count - currentCount;
     if (necessaryCount <= 0) return;
 
-    final futures = List<NativeAdController>.generate(
-      necessaryCount,
-      (_) => NativeAdController(options: options),
-      growable: false,
-    ).map((controller) {
-      final future = controller.load();
-      controller.dispose(); // Disposing early will move the controller to the fold cache.
-      return future;
-    });
+    isPreloadingControllers = true;
+    try {
+      final futures = List<NativeAdController>.generate(
+        necessaryCount,
+        (_) => NativeAdController(options: options),
+        growable: false,
+      ).map((controller) {
+        final future = controller.load();
+        controller.dispose(); // Disposing early will move the controller to the fold cache.
+        return future;
+      });
 
-    await Future.wait(futures);
+      await Future.wait(futures);
+    } finally {
+      isPreloadingControllers = false;
+    }
   }
 
   @override
@@ -141,24 +150,26 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> with InitialDependenc
       } else {
         _controller.attach(this);
         _hadAttachedToTheController = true;
-
-        if (!isReady) {
-          await Future.wait([
-            _controller.load(),
-            _preloadControllers(),
-          ]);
-        }
+        if (!isReady) await _controller.load();
       }
     }
   }
 
-  @override
-  void initDependencies() => _deferredLoad();
+  /// This deferral is allowed to extend past the lifecycle of the widget.
+  Future _deferredIdleLoad([Duration _]) async {
+    if (mounted) await AwaitRoute.of(context);
+    if (Scrollable.recommendIdleLoadingForContext(context)) {
+      WidgetsBinding.instance.addPostFrameCallback(_deferredIdleLoad);
+    } else {
+      await _preloadControllers();
+    }
+  }
 
   @override
-  void initState() {
+  void initDependencies() {
     _controller = widget.controller ?? NativeAdController.firstReusable() ?? NativeAdController();
-    super.initState();
+    _deferredLoad();
+    if (widget.preloadCount > 0) _deferredIdleLoad();
   }
 
   @override

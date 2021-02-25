@@ -2,6 +2,7 @@ export 'src/app_open/app_open.dart';
 export 'src/banner/banner_ad_widget.dart';
 export 'src/banner/controller.dart';
 export 'src/banner/options.dart';
+export 'src/consent/consent_coordinator.dart';
 export 'src/interstitial/interstitial.dart';
 export 'src/mobile_ads.dart';
 export 'src/native/controller/controller.dart';

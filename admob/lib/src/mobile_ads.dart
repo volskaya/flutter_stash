@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:admob/src/native/controller/options.dart';
+import 'package:admob/src/consent/consent_coordinator.dart';
 import 'package:admob/src/platform_props.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -22,6 +22,7 @@ class MobileAds {
 
   static final instance = MobileAds._();
   final pluginChannel = const MethodChannel('admob');
+  final consent = ConsentCoordinator.instance;
 
   static String get nativeAdTestUnitId =>
       Platform.isAndroid ? 'ca-app-pub-3940256099942544/2247696110' : 'ca-app-pub-3940256099942544/3986624511';
@@ -65,6 +66,7 @@ class MobileAds {
   Future<void> initialize({
     NativeAdPlatformProps nativeAd,
     List<String> debugDeviceIds,
+    bool underAgeOfConsent = false,
   }) async {
     assertPlatformIsSupported();
     assert(!isInitialized);
@@ -86,10 +88,18 @@ class MobileAds {
       nativeAd: nativeAd,
     );
 
+    bool forceTesting = false;
+    assert((() {
+      forceTesting = true;
+      return true;
+    })());
+
     // Make sure the version is supported.
     _version = await pluginChannel.invokeMethod<int>('initialize', <String, dynamic>{
       'debugDeviceIds': debugDeviceIds,
       'props': platformProps.toJson(),
+      'underAgeOfConsent': underAgeOfConsent,
+      'forceTesting': forceTesting,
     });
 
     assertVersionIsSupported(false);

@@ -19,6 +19,7 @@ Map<String, dynamic> _$_$_VideoOptionsToJson(_$_VideoOptions instance) =>
 
 _$_NativeAdOptions _$_$_NativeAdOptionsFromJson(Map json) {
   return _$_NativeAdOptions(
+    key: json['key'] as String ?? 'default',
     showVideoContent: json['showVideoContent'] as bool ?? true,
     requestCustomMuteThisAd: json['requestCustomMuteThisAd'] as bool ?? false,
     requestMultipleImages: json['requestMultipleImages'] as bool ?? false,
@@ -39,6 +40,7 @@ _$_NativeAdOptions _$_$_NativeAdOptionsFromJson(Map json) {
 
 Map<String, dynamic> _$_$_NativeAdOptionsToJson(_$_NativeAdOptions instance) =>
     <String, dynamic>{
+      'key': instance.key,
       'showVideoContent': instance.showVideoContent,
       'requestCustomMuteThisAd': instance.requestCustomMuteThisAd,
       'requestMultipleImages': instance.requestMultipleImages,

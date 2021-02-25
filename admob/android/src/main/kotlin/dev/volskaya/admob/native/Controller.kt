@@ -28,21 +28,21 @@ class NativeAdmobController(
             return NativeAdmobController(id, MethodChannel(binaryMessenger, id), activity, loader).also { controllers[id] = it }
         }
 
-        fun hydrateFirstController(nativeAd: NativeAd?): Boolean {
+        fun hydrateFirstController(key: String, nativeAd: NativeAd?): Boolean {
             Log.d(null, "Attempting to hydrate first available controller")
 
             for (controller in controllers.values) {
-                if (!controller.hydrated) {
+                if (controller.loader.key == key && !controller.hydrated) {
                     // Hydrate returns false, if the controller didn't end using the ad.
                     // In that case continue on to the next controller, if any.
                     if (controller.hydrate(nativeAd)) {
-                        Log.d(null, "Hydrating controller ${controller.id}")
+                        Log.d(null, "Hydrating controller ${controller.id} of $key")
                         return true
                     }
                 }
             }
 
-            Log.d(null, "Didn't find a controller to hydrate")
+            Log.d(null, "Didn't find a controller of $key to hydrate")
             return false // Add was consumed and should be removed from the NativeAdLoader's pool.
         }
     }
@@ -90,7 +90,7 @@ class NativeAdmobController(
                 Log.d(null, "Controller $id init hydrated an existing ad")
             }
         } ?: let {
-            Log.d(null, "Controller $id init didn't find a pooled ad to hydrate, requesting a new one")
+            Log.d(null, "Controller $id init didn't find a pooled ad to hydrate, requesting a new one from ${loader.key}")
             loader.loadNext() // If no ad was available, request one for the loader and it will eventually hydrate this controller.
         }
     }

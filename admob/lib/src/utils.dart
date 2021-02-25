@@ -157,7 +157,10 @@ abstract class AdError with _$AdError {
 mixin AttachableMixin {
   int _client;
   bool get isAttached => _client != null;
-  bool hasBeenAttachedTo = false;
+  DateTime attachTime;
+
+  /// Returns true if something attached for longer than a second.
+  bool hasBeenAttachedTo() => attachTime != null && attachTime.add(const Duration(seconds: 1)).isBefore(DateTime.now());
 
   @mustCallSuper
   void attach(dynamic object) {
@@ -167,13 +170,14 @@ mixin AttachableMixin {
     );
 
     _client = object.hashCode;
-    hasBeenAttachedTo = true;
+    attachTime = DateTime.now();
   }
 
   void detach(Object object) {
     assert(isAttached);
     assert(_client == object.hashCode, 'Tried to detatch with a different client');
     _client = null;
+    if (!hasBeenAttachedTo()) attachTime = null;
   }
 }
 

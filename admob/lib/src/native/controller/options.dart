@@ -49,6 +49,7 @@ abstract class VideoOptions with _$VideoOptions {
 @freezed
 abstract class NativeAdOptions with _$NativeAdOptions {
   const factory NativeAdOptions({
+    @Default(NativeAdOptions.defaultKey) String key,
     @Default(true) bool showVideoContent, // This is not an admob specific field.
     @Default(false) bool requestCustomMuteThisAd,
     @Default(false) bool requestMultipleImages,

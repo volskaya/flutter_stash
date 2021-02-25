@@ -73,7 +73,7 @@ class NativeAdController extends _NativeAdController with _$NativeAdController {
         continue;
       }
 
-      assert(controller.hasBeenAttachedTo == false);
+      assert(!controller.hasBeenAttachedTo());
       return controller;
     }
 
@@ -83,7 +83,7 @@ class NativeAdController extends _NativeAdController with _$NativeAdController {
 
   /// Fold a controller, if it never got used. It shouldn't be disposed.
   static void fold(NativeAdController controller) {
-    assert(!controller.hasBeenAttachedTo);
+    assert(!controller.hasBeenAttachedTo());
     assert(!controller.disposed);
     (_neverUsedControllers[controller.optionsKey] ??= Queue<NativeAdController>()).add(controller);
   }
@@ -117,7 +117,7 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
 
   bool considerThisOld() => loadTime != null && nativeAd.maybeMap((_) => true, orElse: () => false)
       ? DateTime.now().difference(loadTime) > const Duration(hours: 1)
-      : null; // Hasn't even been built yet.
+      : false; // Hasn't even been built yet.
 
   /// Handle the messages the channel sends
   @override
@@ -186,7 +186,7 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
     assert(!disposed, 'Redundant dispose');
 
     if (channel != null) {
-      if (!hasBeenAttachedTo) {
+      if (!hasBeenAttachedTo() && !considerThisOld()) {
         NativeAdController.fold(this as NativeAdController);
       } else {
         return super.dispose();
