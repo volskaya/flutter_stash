@@ -17,7 +17,7 @@ class NativeAdWidgetStateBuilder extends StatefulWidget {
     this.loadingBuilder,
     this.options = NativeAdOptions.defaultKey,
     this.layoutBuilder,
-    this.preloadCount = 0,
+    this.preloadCount = 1,
   }) : super(key: key);
 
   final String identifier;

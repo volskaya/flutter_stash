@@ -19,7 +19,7 @@ class NativeAdWidgetStateStorage extends RefreshStorageItem {
 /// State that persists a [NativeAdController] within the [RefreshStorage] as well as
 /// rebuilding it, when the controller is considered old on `initState` or app coming
 /// into the foreground.
-abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> with WidgetsBindingObserver {
+abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> {
   RefreshStorageEntry<NativeAdWidgetStateStorage> storage;
   String get identifier;
   String _oldIdentifier;
@@ -55,7 +55,6 @@ abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> wi
   void initState() {
     _createStorage(identifier);
     _checkOldController();
-    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
@@ -73,24 +72,7 @@ abstract class NativeAdWidgetState<T extends StatefulWidget> extends State<T> wi
   @mustCallSuper
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     storage?.dispose();
     super.dispose();
-  }
-
-  @mustCallSuper
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        _checkOldController();
-        break;
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.paused:
-      case AppLifecycleState.detached:
-        break; // Nothing to do.
-    }
-
-    super.didChangeAppLifecycleState(state);
   }
 }

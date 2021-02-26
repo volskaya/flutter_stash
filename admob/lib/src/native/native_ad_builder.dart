@@ -49,12 +49,6 @@ class NativeAdBuilder extends StatefulObserverWidget {
   /// The amount of [NativeAdController] to keep preloaded, after this controller is used.
   final int preloadCount;
 
-  /// Get the lists child count factoring in ads.
-  static int childCount(int length, [int n = 20]) => length + (length / n).floor();
-
-  /// Get the index of an original list item factoring in ads.
-  static int childIndex(int length, [int n = 20]) => length - (length / n).floor();
-
   /// Checks whether to show an ad based on chance.
   static bool checkChance([double rate]) => random.nextDouble() < (rate ?? defaultRate);
 
@@ -84,31 +78,53 @@ class NativeAdBuilder extends StatefulObserverWidget {
     return truthy;
   }
 
+  /// Get the lists child count factoring in ads.
+  static int childCount(int length, [int n = 20, int _offset = 0]) {
+    final offset = -_offset % (n + 1);
+    final offsetLength = offset == n || (length < n && offset > length) ? 1 : 0;
+    return length + (length / n).floor() + offsetLength;
+  }
+
+  /// Get the index of an original list item factoring in ads.
+  static int childIndex(int i, [int n = 20]) => i - ((i + 1) / n).floor();
+
+  /// Return true, if this `i` should belong to an ad item. Mimics the calculation
+  /// in [NativeAdBuilder.childBuilder].
+  static bool isAdPosition(int i, [int n = 20, int offset = 0]) {
+    final pageLength = n + 1;
+    final wrappedOffset = -offset % pageLength;
+    final position = i + 1 + wrappedOffset;
+    return (position % pageLength) == 0;
+  }
+
   /// Child builder that shows ads every `n` items.
   static Widget childBuilder(
     int i,
     int n, {
     @required Widget Function(int index) adBuilder,
     @required Widget Function(int index) childBuilder,
+    int offset = 0,
   }) {
-    final length = i + 1;
-    final adIndex = (length / (n + 1)).floor();
-    return length >= n && (length % (n + 1)) == 0 ? adBuilder(adIndex) : childBuilder(i - adIndex);
+    final pageLength = n + 1;
+    final wrappedOffset = -offset % pageLength;
+    final position = i + 1 + wrappedOffset;
+    final adIndex = (position / pageLength).floor();
+    return (position % pageLength) == 0 ? adBuilder(adIndex - 1) : childBuilder(i - adIndex);
   }
 
-  static bool isPreloadingControllers = false;
+  static bool _isPreloadingControllers = false;
 
   /// Create and load [NativeAdController]s for the given identifiers.
   ///
   /// [NativeAdBuilder] can call this with scroll awareness, if you pass the IDs to the widget.
   static Future preloadControllers(int count, [String options = NativeAdOptions.defaultKey]) async {
-    if (isPreloadingControllers) return;
+    if (_isPreloadingControllers) return;
 
     final currentCount = NativeAdController.getFoldedCount(options: options);
     final necessaryCount = count - currentCount;
     if (necessaryCount <= 0) return;
 
-    isPreloadingControllers = true;
+    _isPreloadingControllers = true;
     try {
       final futures = List<NativeAdController>.generate(
         necessaryCount,
@@ -122,7 +138,7 @@ class NativeAdBuilder extends StatefulObserverWidget {
 
       await Future.wait(futures);
     } finally {
-      isPreloadingControllers = false;
+      _isPreloadingControllers = false;
     }
   }
 
@@ -155,13 +171,16 @@ class _NativeAdBuilderState extends State<NativeAdBuilder> with InitialDependenc
     }
   }
 
-  /// This deferral is allowed to extend past the lifecycle of the widget.
   Future _deferredIdleLoad([Duration _]) async {
-    if (mounted) await AwaitRoute.of(context);
-    if (Scrollable.recommendIdleLoadingForContext(context)) {
-      WidgetsBinding.instance.addPostFrameCallback(_deferredIdleLoad);
+    if (!mounted) {
+      return;
     } else {
-      await _preloadControllers();
+      await AwaitRoute.of(context);
+      if (Scrollable.recommendIdleLoadingForContext(context)) {
+        WidgetsBinding.instance.addPostFrameCallback(_deferredIdleLoad);
+      } else {
+        await _preloadControllers();
+      }
     }
   }
 
