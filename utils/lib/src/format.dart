@@ -35,9 +35,9 @@ class Format {
   static String firebaseFunctionsErrorMessage(FirebaseFunctionsException exception) =>
       errorMessage(exception?.message ?? 'Unknown error');
 
-  static String userName([TitledModel user]) {
+  static String userName([UserModel user]) {
     if (user == null) return 'Untitled';
-    if (isNotEmpty(user.title)) return user.title;
+    if (user.banTime == null && isNotEmpty(user.title)) return user.title;
     return 'Usr. ${user.id.substring(0, 6)}';
   }
 

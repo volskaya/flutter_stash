@@ -20,6 +20,12 @@ abstract class RefreshStorageItem {
   }
 }
 
+/// Basic extension of [RefreshStorageItem].
+class BasicRefreshStorageItem<T> extends RefreshStorageItem {
+  BasicRefreshStorageItem(this.value);
+  final T value;
+}
+
 /// [RefreshStorage] abstracts [PageStorage], allowing to dispose data manually and
 /// being aware of refreshes.
 ///
@@ -67,7 +73,6 @@ class RefreshStorage extends StatefulWidget {
     @required T Function() builder,
     int refreshes,
     RefreshStorageState storage,
-    ModalRoute route,
   }) {
     final _refreshes = refreshes ?? RefreshController.of(context)?.refreshes ?? 0;
     final targetStorage = storage ?? RefreshStorage.of(context);
@@ -85,6 +90,27 @@ class RefreshStorage extends StatefulWidget {
     }
 
     return RefreshStorageEntry<T>(identifier, item.value);
+  }
+
+  /// Memoizes a basic item, that does not need to be disposed.
+  static T memoize<T>(
+    BuildContext context,
+    String identifier,
+    T Function() builder, {
+    int refreshes,
+    RefreshStorageState storage,
+  }) {
+    final item = write<BasicRefreshStorageItem<T>>(
+      context: context,
+      identifier: identifier,
+      builder: () => BasicRefreshStorageItem(builder()),
+      refreshes: refreshes,
+      storage: storage,
+    );
+
+    final value = item.value.value;
+    item.dispose(); // NOTE: [BasicRefreshStorageItem] doesn't really need to be disposed.
+    return value;
   }
 
   /// Manually destroy a [RefreshStorageItem] cached in [RefreshStorageState].
