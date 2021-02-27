@@ -8,7 +8,7 @@ import 'native_ad_builder.dart';
 /// This widget is a wrapper around [NativeAdBuilder] & [NativeAdWidgetState].
 ///
 /// [errorBuilder] & [loadingBuilder] can be left undefined to build an [SizedBox.shrink] instead.
-class NativeAdWidgetStateBuilder extends StatefulWidget {
+class NativeAdWidgetStateBuilder extends StatefulWidget implements NativeAdWidget {
   const NativeAdWidgetStateBuilder({
     Key key,
     @required this.identifier,
@@ -18,11 +18,17 @@ class NativeAdWidgetStateBuilder extends StatefulWidget {
     this.options = NativeAdOptions.defaultKey,
     this.layoutBuilder,
     this.preloadCount = 1,
+    this.controller,
   }) : super(key: key);
 
+  @override
   final String identifier;
-  final int preloadCount;
+  @override
   final String options;
+  @override
+  final NativeAdController controller;
+
+  final int preloadCount;
   final Widget Function(BuildContext, NativeAdController, NativeAdData) builder;
   final Widget Function(BuildContext, NativeAdController, NativeAdErrorData) errorBuilder;
   final Widget Function(BuildContext, NativeAdController, NativeAdLoadingData) loadingBuilder;
@@ -33,12 +39,6 @@ class NativeAdWidgetStateBuilder extends StatefulWidget {
 }
 
 class _NativeAdWidgetStateBuilderState extends NativeAdWidgetState<NativeAdWidgetStateBuilder> {
-  @override
-  String get identifier => widget.identifier;
-
-  @override
-  String get options => widget.options;
-
   Widget _buildBody(BuildContext context, NativeAd nativeAd) {
     final child = nativeAd.map(
       (data) => KeyedSubtree(

@@ -79,18 +79,21 @@ class NativeAdBuilder extends StatefulObserverWidget {
   }
 
   /// Get the lists child count factoring in ads.
-  static int childCount(int length, [int n = 20, int _offset = 0]) {
-    final offset = -_offset % (n + 1);
-    final offsetLength = offset == n || (length < n && offset > length) ? 1 : 0;
+  static int childCount(int length, int n, {int offset = 0, bool enabled = true}) {
+    assert(offset >= 0 && offset <= n);
+    if (!enabled) return length;
+    final wrappedOffset = -offset % (n + 1);
+    final offsetLength = wrappedOffset == n || (offset < length && length < n && wrappedOffset > length) ? 1 : 0;
     return length + (length / n).floor() + offsetLength;
   }
 
   /// Get the index of an original list item factoring in ads.
-  static int childIndex(int i, [int n = 20]) => i - ((i + 1) / n).floor();
+  static int childIndex(int i, int n) => i - ((i + 1) / n).floor();
 
   /// Return true, if this `i` should belong to an ad item. Mimics the calculation
   /// in [NativeAdBuilder.childBuilder].
-  static bool isAdPosition(int i, [int n = 20, int offset = 0]) {
+  static bool isAdPosition(int i, int n, [int offset = 0]) {
+    assert(offset >= 0 && offset <= n);
     final pageLength = n + 1;
     final wrappedOffset = -offset % pageLength;
     final position = i + 1 + wrappedOffset;
@@ -104,7 +107,11 @@ class NativeAdBuilder extends StatefulObserverWidget {
     @required Widget Function(int index) adBuilder,
     @required Widget Function(int index) childBuilder,
     int offset = 0,
+    bool enabled = true,
   }) {
+    assert(offset >= 0 && offset <= n);
+    if (!enabled) return childBuilder(i);
+
     final pageLength = n + 1;
     final wrappedOffset = -offset % pageLength;
     final position = i + 1 + wrappedOffset;

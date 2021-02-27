@@ -61,24 +61,35 @@ class NativeAdController extends _NativeAdController with _$NativeAdController {
   static NativeAdController firstReusable({
     String options = NativeAdOptions.defaultKey,
     NativeAdController Function() orElse,
+    bool Function(NativeAdController) where,
   }) {
     final queue = _neverUsedControllers[options];
+    final throwAways = Queue<NativeAdController>();
+
+    NativeAdController value;
 
     while (queue?.isNotEmpty == true) {
       final controller = queue.removeFirst();
 
-      // The queue could contain old controllers. Make sure they are disposed.
-      if (controller.considerThisOld() == true) {
+      if (controller.considerThisOld()) {
+        // Dispose old controllers.
         controller.dispose();
-        continue;
+      } else if (!(where?.call(controller) ?? true)) {
+        // Skip unwanted controllers. They need to be added back to the front of the queue.
+        throwAways.add(controller);
+      } else {
+        assert(!controller.hasBeenAttachedTo());
+        value = controller;
       }
-
-      assert(!controller.hasBeenAttachedTo());
-      return controller;
     }
 
-    if (queue?.isEmpty == true) _neverUsedControllers.remove(options);
-    return orElse?.call();
+    if (throwAways.isNotEmpty) {
+      _neverUsedControllers[options] = throwAways..addAll(queue);
+    } else if (queue?.isEmpty == true) {
+      _neverUsedControllers.remove(options);
+    }
+
+    return value ?? orElse?.call();
   }
 
   /// Fold a controller, if it never got used. It shouldn't be disposed.
