@@ -161,6 +161,7 @@ abstract class _NativeAdController extends AdMethodChannel<NativeAdEvent> with A
     }
   }
 
+  // FIXME: Maybe drop clicks, if the controller hasn't been attached to for more than a second.
   Future<bool> click() => channel.invokeMethod<bool>('click');
 
   /// Mutes this ad programmatically. Use `null` to mute this ad with the default reason.

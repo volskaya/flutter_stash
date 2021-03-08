@@ -4,11 +4,10 @@ import android.app.Activity
 import android.os.Build
 import android.util.Log
 import androidx.annotation.NonNull
+import com.google.android.gms.ads.*
 import dev.volskaya.admob.app_open.AppOpenAdControllerManager
 import dev.volskaya.admob.banner.*
 import dev.volskaya.admob.interstitial.InterstitialAdControllerManager
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.BinaryMessenger
@@ -19,8 +18,6 @@ import io.flutter.plugin.common.MethodChannel.Result
 
 import dev.volskaya.admob.native.*
 import dev.volskaya.admob.rewarded.RewardedAdControllerManager
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
 import com.google.android.ump.ConsentForm
 import com.google.android.ump.ConsentInformation
 import dev.volskaya.admob.consent.ConsentCoordinator
@@ -51,7 +48,10 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             "initialize" -> {
-                MobileAds.initialize(activity) {
+                // If this is enabled, there's a huge 5 second freeze on app's cold boot.
+                MobileAds.disableMediationAdapterInitialization(activity.applicationContext)
+
+                MobileAds.initialize(activity.applicationContext) {
                     val debugDeviceIds = call.argument<List<String>>("debugDeviceIds")
                     debugDeviceIds?.let {
                         if (debugDeviceIds.isNotEmpty()) {
@@ -64,7 +64,7 @@ class AdmobPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
                         }
                     }
 
-                    // Construct the consent coordinator
+                    // Construct the consent coordinator.
                     consentCoordinator = ConsentCoordinator(
                             activity,
                             consentCoordinatorChannel,

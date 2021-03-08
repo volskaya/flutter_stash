@@ -75,20 +75,18 @@ class FirebaseRealtimeChatMirrorStorage {
 
   /// Initialize a mirror storage for the key, usually chat reference's path.
   static Future<FirebaseRealtimeChatMirrorStorage> initialize(DatabaseReference reference) async {
-    instances[reference.path] ??= MapEntry(
-      (instances[reference.path]?.key ?? 0) + 1,
-      FirebaseRealtimeChatMirrorStorage._(reference.path),
-    );
+    final storage = FirebaseRealtimeChatMirrorStorage._(reference.path);
+    instances[reference.path] ??= MapEntry((instances[reference.path]?.key ?? 0) + 1, storage);
 
     // When a new instance is created, open the database.
     if (instances[reference.path].key == 1) {
       _log.i('Opening a new mirror storage under ${reference.path}');
-      await instances[reference.path].value.init(reference.path.replaceAll('/', '.'));
+      await storage.init(reference.path.replaceAll('/', '.'));
 
       // If the key was unreference while the database was initializing, dispose it.
       if ((instances[reference.path]?.key ?? 0) <= 0) {
         _log.w('Mirror ${reference.path} was unreferenced right after opening, disposing it');
-        await instances[reference.path].value.dispose();
+        await storage.dispose();
       }
     }
 
