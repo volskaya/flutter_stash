@@ -14,6 +14,7 @@ import 'package:flutter/widgets.dart';
 import 'src/mixins.dart';
 
 export 'src/country_catalog.dart';
+export 'src/corrected_media_query.dart';
 export 'src/custom_ink_splash.dart';
 export 'src/debounce.dart';
 export 'src/exit_guard.dart';
