@@ -28,12 +28,14 @@ class PeriodicChildSwitcher extends StatefulWidget {
   final void Function(int index) onChildChanged;
 
   @override
-  _PeriodicChildSwitcherState createState() => _PeriodicChildSwitcherState();
+  PeriodicChildSwitcherState createState() => PeriodicChildSwitcherState();
 }
 
-class _PeriodicChildSwitcherState extends State<PeriodicChildSwitcher> with WidgetsBindingObserver {
+class PeriodicChildSwitcherState extends State<PeriodicChildSwitcher> with WidgetsBindingObserver {
   Timer _metronome;
   int _currentIndex = 0;
+
+  int get index => _currentIndex;
 
   void _handleTimerTick([dynamic _, bool allowSkip = true]) {
     assert(mounted);

@@ -116,6 +116,8 @@ class RevealingBarControllerState extends State<RevealingBarController> {
 
   // Handles a scroll notification.
   void push(RevealingBarNotification notification) {
+    assert(notification != null);
+
     if (notification.localOffset != null) {
       _lastLocalOffset = notification.localOffset;
       _lastLocalMaxExtent = notification.maxExtent;
@@ -218,7 +220,7 @@ class RevealingBarNotifier extends StatelessWidget {
           );
         }
 
-        controller.push(update);
+        if (update != null) controller.push(update);
         return false;
       },
     );
@@ -272,7 +274,7 @@ class RevealingBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = RevealingBarController.of(context);
-    final optimizeOutOffset = optimizeOutChild ? Offset(alignment.x, alignment.y) : Offset.zero;
+    final optimizeOutOffset = optimizeOutChild ? Offset(alignment.x, alignment.y) : null;
 
     return RepaintBoundary(
       child: ValueListenableBuilder<bool>(

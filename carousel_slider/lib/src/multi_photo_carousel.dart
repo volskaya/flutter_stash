@@ -12,6 +12,7 @@ import 'package:utils/utils.dart';
 typedef MultiPhotoCarouselChildWrap = Widget Function(BuildContext context, FirebasePhotoReference photo, Widget child);
 
 class _Storage extends RefreshStorageItem {
+  _Storage({this.lastPage});
   int lastPage;
 }
 
@@ -23,7 +24,6 @@ class MultiPhotoCarousel extends StatefulWidget {
     @required this.idleChild,
     @required this.bucket,
     this.wrap,
-    this.carouselKey,
     this.initialPage,
     this.physics = const AlwaysScrollableScrollPhysics(),
     this.autoPlay = true,
@@ -38,7 +38,6 @@ class MultiPhotoCarousel extends StatefulWidget {
   }) : super(key: key);
 
   final String bucket;
-  final GlobalKey<CarouselSliderState> carouselKey;
   final int initialPage;
   final MultiPhotoCarouselChildWrap wrap;
   final Map<String, FirebasePhotoReference> photos;
@@ -59,6 +58,9 @@ class MultiPhotoCarousel extends StatefulWidget {
 }
 
 class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDependencies<MultiPhotoCarousel> {
+  final _carouselKey = GlobalKey<CarouselSliderState>();
+  final _periodicChildSwicherKey = GlobalKey<PeriodicChildSwitcherState>();
+
   RefreshStorageEntry<_Storage> _storage;
   List<FirebasePhotoReference> _photos;
 
@@ -67,6 +69,10 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
 
   FirebaseImage _getImageProvider(FirebasePhotoReference photo, [Size constraints]) =>
       photo?.getImage(_getCacheSize(photo, constraints));
+
+  int getPage() => !widget.scrollable
+      ? _periodicChildSwicherKey.currentState?.index
+      : _carouselKey.currentState?.currentPage?.round();
 
   /// Precaches the next image.
   void _handlePageChange(int page) {
@@ -108,7 +114,7 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
     _storage = RefreshStorage.write<_Storage>(
       context: context,
       identifier: 'multi_photo_carousel_${widget.bucket}',
-      builder: () => _Storage(),
+      builder: () => _Storage(lastPage: widget.initialPage),
     );
 
     super.initState();
@@ -155,6 +161,7 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
 
           if (!widget.scrollable) {
             return PeriodicChildSwitcher(
+              key: _periodicChildSwicherKey,
               autoPlay: widget.autoPlay,
               initialIndex: _storage?.value?.lastPage ?? widget.initialPage,
               childBuilder: (context, i) => _buildPhoto(context, i, constraints.biggest),
@@ -168,7 +175,7 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
           }
 
           return CarouselSlider(
-            key: widget.carouselKey,
+            key: _carouselKey,
             pageStorageKey: widget.bucket != null ? PageStorageKey<String>('$refresh-${widget.bucket}') : null,
             initialPage: _storage?.value?.lastPage ?? widget.initialPage,
             height: double.infinity,

@@ -29,8 +29,8 @@ class NativeAdMediaView(context: Context, data: Map<*, *>) : PlatformView {
             parent.findViewById<NativeAdView>(R.id.video_native_ad_view)?.also {
                 it.headlineView = it.findViewById<TextView>(R.id.video_native_ad_view_headline).also { textView -> textView.text = nativeAd.headline }
                 it.bodyView = it.findViewById<TextView>(R.id.video_native_ad_view_body).also { textView -> textView.text = nativeAd.body }
+                it.callToActionView = it.findViewById<Button>(R.id.video_native_ad_view_button).also { button -> button.text = "" }
                 it.mediaView = it.findViewById<MediaView>(R.id.video_native_ad_view_media).also { mediaView -> mediaView.setMediaContent(nativeAd.mediaContent) }
-                it.callToActionView = it.findViewById<Button>(R.id.video_native_ad_view_button).also { button -> button.text = nativeAd.callToAction }
                 it.setNativeAd(nativeAd)
             }
         }

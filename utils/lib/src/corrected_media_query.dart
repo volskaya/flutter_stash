@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+extension CorrectedMediaQueryData on MediaQueryData {
+  EdgeInsets get horizontalPadding => padding.copyWith(top: 0.0, bottom: 0.0);
+}
+
 /// Assume any bottom inset below [CorrectedMediaQuery.keyboardHeightRatioHeuristic] to
 /// not be a keyboard and move its size to regular padding.
 ///
@@ -29,7 +33,7 @@ class CorrectedMediaQuery extends StatelessWidget {
       mediaQuery = mediaQuery.copyWith(
         padding: mediaQuery.padding + EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
         viewPadding: mediaQuery.viewPadding + EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
-        viewInsets: mediaQuery.viewInsets.copyWith(bottom: 0),
+        viewInsets: mediaQuery.viewInsets.copyWith(bottom: 0.0),
       );
     }
 

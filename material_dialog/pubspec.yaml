@@ -1,0 +1,24 @@
+name: material_dialog
+version: 1.0.0
+author: Roland Volskaya
+homepage: github.com/volskaya
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.17.0 <2.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  boxy: ^1.2.0+1
+
+  animations:
+    path: /home/projects/packages/flutter_helpers/animations
+  refresh_storage:
+    path: /home/projects/packages/flutter_helpers/refresh_storage
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
