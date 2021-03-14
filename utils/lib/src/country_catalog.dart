@@ -17,7 +17,8 @@ abstract class Country with _$Country {
   }) = _Country;
 
   factory Country.fromJson(Map<String, dynamic> json) => _$CountryFromJson(json);
-  static AssetImage imageOf(Country country) => AssetImage('assets/flags/${country.alphaCode2.toLowerCase()}.png');
+  static AssetImage imageOf(Country country, {String package}) =>
+      AssetImage('flags/${country.alphaCode2.toLowerCase()}.png', package: package);
 }
 
 class CountryConverter implements JsonConverter<Country, String> {
