@@ -121,12 +121,11 @@ class FadeScaleTransition extends StatelessWidget {
   /// [animation] is typically an [AnimationController] that drives the transition
   /// animation. [animation] cannot be null.
   const FadeScaleTransition({
-    Key key,
-    @required this.animation,
-    this.child,
+    Key? key,
+    required this.animation,
+    required this.child,
     this.sliver = false,
-  })  : assert(animation != null),
-        super(key: key);
+  }) : super(key: key);
 
   /// The animation that drives the [child]'s entrance and exit.
   ///
@@ -158,15 +157,9 @@ class FadeScaleTransition extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
-    return dual_transition_builder.DualTransitionBuilder(
-      animation: animation,
-      forwardBuilder: (
-        BuildContext context,
-        Animation<double> animation,
-        Widget child,
-      ) {
-        return CustomWidgets.fade(
+  Widget build(BuildContext context) => dual_transition_builder.DualTransitionBuilder(
+        animation: animation,
+        forwardBuilder: (BuildContext context, Animation<double> animation, Widget child) => CustomWidgets.fade(
           opacity: _fadeInTransition.animate(animation),
           sliver: sliver,
           child: CustomWidgets.scale(
@@ -174,20 +167,12 @@ class FadeScaleTransition extends StatelessWidget {
             child: child,
             sliver: sliver,
           ),
-        );
-      },
-      reverseBuilder: (
-        BuildContext context,
-        Animation<double> animation,
-        Widget child,
-      ) {
-        return CustomWidgets.fade(
+        ),
+        reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => CustomWidgets.fade(
           opacity: _fadeOutTransition.animate(animation),
           child: child,
           sliver: sliver,
-        );
-      },
-      child: child,
-    );
-  }
+        ),
+        child: child,
+      );
 }

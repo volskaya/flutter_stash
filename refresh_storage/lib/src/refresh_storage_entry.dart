@@ -11,10 +11,10 @@ class RefreshStorageEntry<T> {
   bool _disposed = false;
 
   /// The data, in [RefreshStorage], referenced by this [RefreshStorageEntry].
-  T _value;
+  T? _value;
 
   /// The data, in [RefreshStorage], referenced by this [RefreshStorageEntry].
-  T get value {
+  T? get value {
     assert(!_disposed, 'RefreshStorageEntry $identifier accessed after behing disposed');
     return _value;
   }

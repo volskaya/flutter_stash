@@ -14,7 +14,7 @@ dependencies:
   mobx: ^1.2.1+1
   flutter_mobx: ^1.1.0+1
   mobx_codegen: ^1.1.0+1
-  provider: ^4.3.1
+  provider: ^5.0.0
   back_button_interceptor: ^4.3.1
   freezed_annotation:
     path: /home/projects/forks/freezed/packages/freezed_annotation

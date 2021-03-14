@@ -2,6 +2,7 @@ name: revealing_bar
 version: 1.0.0
 author: Roland Volskaya
 homepage: github.com/volskaya
+publish_to: none
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -11,11 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   freezed: ^0.12.6
-  provider: ^4.3.2
+  provider: ^5.0.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   freezed_annotation: ^0.12.0
   build_runner: ^1.10.0
 
@@ -24,5 +23,3 @@ dependency_overrides:
     path: /home/projects/forks/freezed/packages/freezed_annotation
   freezed:
     path: /home/projects/forks/freezed/packages/freezed
-
-flutter:

@@ -7,15 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:loader_coordinator/loader_coordinator.dart';
 
 /// When the [callback] is null, the button is locked/loading.
-typedef FutureButtonChildBuilder = Widget Function(BuildContext context, VoidCallback callback);
+typedef FutureButtonChildBuilder = Widget Function(BuildContext context, VoidCallback? callback);
 
 /// Builder that passes locking mechanism of [FutureCardButton].
 class FutureButtonBuilder extends StatefulWidget {
   /// Creates [FutureButtonBuilder].
   const FutureButtonBuilder({
-    Key key,
-    @required this.builder,
-    @required this.onPressed,
+    Key? key,
+    required this.builder,
+    required this.onPressed,
     this.question,
     this.family,
   }) : super(key: key);
@@ -24,22 +24,23 @@ class FutureButtonBuilder extends StatefulWidget {
   final FutureButtonChildBuilder builder;
 
   /// Future event, when the button is pressed.
-  final Future Function() onPressed;
+  final Future Function()? onPressed;
 
   /// A question callback, like a modal that returns true, to call before the [onPressed].
   ///
   /// While this callback is awaited, the [FutureButtonBuilder] will not trigger [LoaderCoordinator].
-  final Future<bool> Function() question;
+  final Future<bool> Function()? question;
 
   /// If `family` is defined, the buttons will share the same notifiers
   /// and lock/unlock at the same time
-  final String family;
+  final String? family;
 
   /// All the currently alive cached notifiers used by [FutureButtonBuilder]s.
   static final _notifiers = <String, MapEntry<int, ValueNotifier<bool>>>{};
 
   /// Returns true when the `family` is locked - `onPress` future in progress.
-  static bool isFamilyLocked(String family) => _notifiers.containsKey(family) && _notifiers[family].value.value;
+  static bool isFamilyLocked(String family) =>
+      _notifiers.containsKey(family) && _notifiers[family]?.value.value == true;
 
   /// Allows you to invoke futures on behalf of a family. If a widget is using this family,
   /// it will react to this call accordingly.
@@ -66,26 +67,26 @@ class FutureButtonBuilder extends StatefulWidget {
   static ValueNotifier<bool> _getFamilyNotifier(String family) {
     FutureButtonBuilder._notifiers[family] ??= MapEntry(0, ValueNotifier<bool>(false));
     FutureButtonBuilder._notifiers[family] = MapEntry(
-      FutureButtonBuilder._notifiers[family].key + 1, // Increment counter.
-      FutureButtonBuilder._notifiers[family].value, // Reuse the cached value.
+      FutureButtonBuilder._notifiers[family]!.key + 1, // Increment counter.
+      FutureButtonBuilder._notifiers[family]!.value, // Reuse the cached value.
     );
 
-    return FutureButtonBuilder._notifiers[family].value;
+    return FutureButtonBuilder._notifiers[family]!.value;
   }
 
   static void _disposeFamilyNotifier(String family) {
     assert(FutureButtonBuilder._notifiers.containsKey(family));
-    assert(FutureButtonBuilder._notifiers[family].key > 0); // Disposed too many times.
+    assert(FutureButtonBuilder._notifiers[family]!.key > 0); // Disposed too many times.
 
-    final currentCount = FutureButtonBuilder._notifiers[family].key;
-    if (currentCount <= 1) {
+    final currentCount = FutureButtonBuilder._notifiers[family]?.key ?? 0;
+    if (currentCount <= 1 && FutureButtonBuilder._notifiers.containsKey(family)) {
       // Time to dispose the notifier.
       final entry = FutureButtonBuilder._notifiers.remove(family);
-      entry.value.dispose();
-    } else {
+      entry?.value.dispose();
+    } else if (currentCount > 1) {
       FutureButtonBuilder._notifiers[family] = MapEntry(
         currentCount - 1,
-        FutureButtonBuilder._notifiers[family].value,
+        FutureButtonBuilder._notifiers[family]!.value,
       );
     }
   }
@@ -96,7 +97,7 @@ class FutureButtonBuilder extends StatefulWidget {
 
 /// State of [FutureButtonBuilder] that exposes [FutureBuilderState.press].
 class FutureButtonBuilderState extends State<FutureButtonBuilder> {
-  ValueNotifier<bool> _notifier;
+  late ValueNotifier<bool> _notifier;
 
   Future _handleOnPressed() async {
     if (_notifier.value) return; // Redundant, the button should be locked.
@@ -105,7 +106,7 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
     // If a question was defined, handle it first.
     if (widget.question != null) {
       try {
-        if (await widget.question() != true) {
+        if (await widget.question!() != true) {
           _notifier.value = false;
           return;
         }
@@ -143,7 +144,7 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
   @override
   void initState() {
     _notifier =
-        widget.family != null ? FutureButtonBuilder._getFamilyNotifier(widget.family) : ValueNotifier<bool>(false);
+        widget.family != null ? FutureButtonBuilder._getFamilyNotifier(widget.family!) : ValueNotifier<bool>(false);
     super.initState();
   }
 
@@ -156,9 +157,9 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
   @override
   void dispose() {
     if (widget.family != null) {
-      FutureButtonBuilder._disposeFamilyNotifier(widget.family);
+      FutureButtonBuilder._disposeFamilyNotifier(widget.family!);
     } else {
-      _notifier?.dispose();
+      _notifier.dispose();
     }
 
     super.dispose();

@@ -3,9 +3,9 @@ import 'package:sliver_transform/sliver_tranform.dart';
 
 class CustomWidgets {
   static Widget fade({
-    Key key,
-    @required Animation<double> opacity,
-    @required Widget child,
+    Key? key,
+    required Animation<double> opacity,
+    required Widget child,
     bool sliver = false,
   }) =>
       sliver
@@ -21,9 +21,9 @@ class CustomWidgets {
             );
 
   static Widget translate({
-    Key key,
-    @required Offset offset,
-    @required Widget child,
+    Key? key,
+    required Offset offset,
+    required Widget child,
     bool sliver = false,
   }) =>
       sliver
@@ -40,9 +40,9 @@ class CustomWidgets {
             );
 
   static Widget scale({
-    Key key,
-    @required Animation<double> scale,
-    @required Widget child,
+    Key? key,
+    required Animation<double> scale,
+    required Widget child,
     bool sliver = false,
   }) =>
       sliver
@@ -60,15 +60,14 @@ class CustomWidgets {
 
 class _SliverScaleTransition extends AnimatedWidget {
   const _SliverScaleTransition({
-    Key key,
-    @required Animation<double> scale,
+    Key? key,
+    required Animation<double> scale,
     this.alignment = Alignment.center,
     this.sliver,
-  })  : assert(scale != null),
-        super(key: key, listenable: scale);
+  }) : super(key: key, listenable: scale);
 
   final Alignment alignment;
-  final Widget sliver;
+  final Widget? sliver;
 
   Animation<double> get scale => listenable as Animation<double>;
 

@@ -18,14 +18,11 @@ class _ChildEntry {
   /// The [primaryController], [secondaryController], [transition] and
   /// [widgetChild] parameters must not be null.
   _ChildEntry({
-    @required this.primaryController,
-    @required this.secondaryController,
-    @required this.transition,
-    @required this.widgetChild,
-  })  : assert(primaryController != null),
-        assert(secondaryController != null),
-        assert(widgetChild != null),
-        assert(transition != null);
+    required this.primaryController,
+    required this.secondaryController,
+    required this.transition,
+    required this.widgetChild,
+  });
 
   /// The animation controller for the child's transition.
   final AnimationController primaryController;
@@ -170,18 +167,14 @@ class PageTransitionSwitcher extends StatefulWidget {
   /// The [duration], [reverse], and [transitionBuilder] parameters
   /// must not be null.
   const PageTransitionSwitcher({
-    Key key,
+    Key? key,
     this.duration = const Duration(milliseconds: 300),
     this.reverse = false,
-    @required this.transitionBuilder,
+    required this.transitionBuilder,
     this.layoutBuilder = defaultLayoutBuilder,
     this.child,
     this.alignment = Alignment.center,
-  })  : assert(duration != null),
-        assert(reverse != null),
-        assert(transitionBuilder != null),
-        assert(layoutBuilder != null),
-        super(key: key);
+  }) : super(key: key);
 
   /// The alignment of the animating children.
   final AlignmentGeometry alignment;
@@ -197,7 +190,7 @@ class PageTransitionSwitcher extends StatefulWidget {
   ///
   /// The child is considered to be "new" if it has a different type or [Key]
   /// (see [Widget.canUpdate]).
-  final Widget child;
+  final Widget? child;
 
   /// The duration of the transition from the old [child] value to the new one.
   ///
@@ -287,7 +280,7 @@ class PageTransitionSwitcher extends StatefulWidget {
 
 class _PageTransitionSwitcherState extends State<PageTransitionSwitcher> with TickerProviderStateMixin {
   final List<_ChildEntry> _activeEntries = <_ChildEntry>[];
-  _ChildEntry _currentEntry;
+  _ChildEntry? _currentEntry;
   int _childNumber = 0;
 
   @override
@@ -308,30 +301,32 @@ class _PageTransitionSwitcherState extends State<PageTransitionSwitcher> with Ti
 
     final bool hasNewChild = widget.child != null;
     final bool hasOldChild = _currentEntry != null;
-    if (hasNewChild != hasOldChild || hasNewChild && !Widget.canUpdate(widget.child, _currentEntry.widgetChild)) {
+    if (hasNewChild != hasOldChild || hasNewChild && !Widget.canUpdate(widget.child!, _currentEntry!.widgetChild)) {
       // Child has changed, fade current entry out and add new entry.
       _childNumber += 1;
       _addEntryForNewChild(shouldAnimate: true);
     } else if (_currentEntry != null) {
       assert(hasOldChild && hasNewChild);
-      assert(Widget.canUpdate(widget.child, _currentEntry.widgetChild));
+      assert(Widget.canUpdate(widget.child!, _currentEntry!.widgetChild));
+      assert(widget.child != null);
+
       // Child has been updated. Make sure we update the child widget and
       // transition in _currentEntry even though we're not going to start a new
       // animation, but keep the key from the old transition so that we
       // update the transition instead of replacing it.
-      _currentEntry.widgetChild = widget.child;
-      _updateTransitionForEntry(_currentEntry); // uses entry.widgetChild
+      _currentEntry!.widgetChild = widget.child!;
+      _updateTransitionForEntry(_currentEntry!); // uses entry.widgetChild
     }
   }
 
-  void _addEntryForNewChild({@required bool shouldAnimate}) {
+  void _addEntryForNewChild({required bool shouldAnimate}) {
     assert(shouldAnimate || _currentEntry == null);
     if (_currentEntry != null) {
       assert(shouldAnimate);
       if (widget.reverse) {
-        _currentEntry.primaryController.reverse();
+        _currentEntry!.primaryController.reverse();
       } else {
-        _currentEntry.secondaryController.forward();
+        _currentEntry!.secondaryController.forward();
       }
       _currentEntry = null;
     }
@@ -359,34 +354,30 @@ class _PageTransitionSwitcherState extends State<PageTransitionSwitcher> with Ti
       primaryController.value = 1.0;
     }
     _currentEntry = _newEntry(
-      child: widget.child,
+      child: widget.child!,
       primaryController: primaryController,
       secondaryController: secondaryController,
       builder: widget.transitionBuilder,
     );
     if (widget.reverse && _activeEntries.isNotEmpty) {
       // Add below old child.
-      _activeEntries.insert(_activeEntries.length - 1, _currentEntry);
+      _activeEntries.insert(_activeEntries.length - 1, _currentEntry!);
     } else {
       // Add on top of old child.
-      _activeEntries.add(_currentEntry);
+      _activeEntries.add(_currentEntry!);
     }
   }
 
   _ChildEntry _newEntry({
-    @required Widget child,
-    @required PageTransitionSwitcherTransitionBuilder builder,
-    @required AnimationController primaryController,
-    @required AnimationController secondaryController,
+    required Widget child,
+    required PageTransitionSwitcherTransitionBuilder builder,
+    required AnimationController primaryController,
+    required AnimationController secondaryController,
   }) {
     final Widget transition = builder(
       child,
       primaryController,
       secondaryController,
-    );
-    assert(
-      transition != null,
-      'PageTransitionSwitcher.builder must not return null.',
     );
     final _ChildEntry entry = _ChildEntry(
       widgetChild: child,
@@ -422,10 +413,6 @@ class _PageTransitionSwitcherState extends State<PageTransitionSwitcher> with Ti
       entry.widgetChild,
       entry.primaryController,
       entry.secondaryController,
-    );
-    assert(
-      transition != null,
-      'PageTransitionSwitcher.builder must not return null.',
     );
     entry.transition = KeyedSubtree(
       key: entry.transition.key,

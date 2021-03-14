@@ -70,7 +70,7 @@ class FadeThroughPageTransitionsBuilder extends PageTransitionsBuilder {
   /// The color to use for the background color during the transition.
   ///
   /// This defaults to the [Theme]'s [ThemeData.canvasColor].
-  final Color fillColor;
+  final Color? fillColor;
 
   @override
   Widget buildTransitions<T>(
@@ -167,21 +167,20 @@ class FadeThroughTransition extends StatelessWidget {
   /// The [animation] and [secondaryAnimation] argument are required and must
   /// not be null.
   const FadeThroughTransition({
-    @required this.animation,
-    @required this.secondaryAnimation,
+    required this.animation,
+    required this.secondaryAnimation,
+    required this.child,
     this.fillColor,
-    this.child,
     this.onEnd,
     this.onStatusChanged,
     this.sliver = false,
-  })  : assert(animation != null),
-        assert(secondaryAnimation != null);
+  });
 
   /// Callback to be called when the animation ends.
-  final VoidCallback onEnd;
+  final VoidCallback? onEnd;
 
   /// Callback when the animation status changes.
-  final ValueChanged<AnimationStatus> onStatusChanged;
+  final ValueChanged<AnimationStatus>? onStatusChanged;
 
   /// The animation that drives the [child]'s entrance and exit.
   ///
@@ -203,7 +202,7 @@ class FadeThroughTransition extends StatelessWidget {
   /// The color to use for the background color during the transition.
   ///
   /// This defaults to the [Theme]'s [ThemeData.canvasColor].
-  final Color fillColor;
+  final Color? fillColor;
 
   /// The widget below this widget in the tree.
   ///
@@ -241,9 +240,9 @@ class FadeThroughTransition extends StatelessWidget {
 
 class _ZoomedFadeInFadeOut extends StatelessWidget {
   const _ZoomedFadeInFadeOut({
-    Key key,
-    this.animation,
-    this.child,
+    Key? key,
+    required this.animation,
+    required this.child,
     this.onEnd,
     this.onStatusChanged,
     this.sliver = false,
@@ -251,47 +250,33 @@ class _ZoomedFadeInFadeOut extends StatelessWidget {
 
   final Animation<double> animation;
   final Widget child;
-  final VoidCallback onEnd;
-  final ValueChanged<AnimationStatus> onStatusChanged;
+  final VoidCallback? onEnd;
+  final ValueChanged<AnimationStatus>? onStatusChanged;
   final bool sliver;
 
   @override
-  Widget build(BuildContext context) {
-    return dual_transition_builder.DualTransitionBuilder(
-      animation: animation,
-      onEnd: onEnd,
-      onStatusChanged: onStatusChanged,
-      forwardBuilder: (
-        BuildContext context,
-        Animation<double> animation,
-        Widget child,
-      ) {
-        return _ZoomedFadeIn(
+  Widget build(BuildContext context) => dual_transition_builder.DualTransitionBuilder(
+        animation: animation,
+        onEnd: onEnd,
+        onStatusChanged: onStatusChanged,
+        forwardBuilder: (BuildContext context, Animation<double> animation, Widget child) => _ZoomedFadeIn(
           animation: animation,
           child: child,
           sliver: sliver,
-        );
-      },
-      reverseBuilder: (
-        BuildContext context,
-        Animation<double> animation,
-        Widget child,
-      ) {
-        return _FadeOut(
+        ),
+        reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => _FadeOut(
           child: child,
           animation: animation,
           sliver: sliver,
-        );
-      },
-      child: child,
-    );
-  }
+        ),
+        child: child,
+      );
 }
 
 class _ZoomedFadeIn extends StatelessWidget {
   const _ZoomedFadeIn({
-    this.child,
-    this.animation,
+    required this.child,
+    required this.animation,
     this.sliver = false,
   });
 
@@ -328,23 +313,21 @@ class _ZoomedFadeIn extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
-    return CustomWidgets.fade(
-      opacity: _fadeInOpacity.animate(animation),
-      sliver: sliver,
-      child: CustomWidgets.scale(
-        scale: _scaleIn.animate(animation),
-        child: child,
+  Widget build(BuildContext context) => CustomWidgets.fade(
+        opacity: _fadeInOpacity.animate(animation),
         sliver: sliver,
-      ),
-    );
-  }
+        child: CustomWidgets.scale(
+          scale: _scaleIn.animate(animation),
+          child: child,
+          sliver: sliver,
+        ),
+      );
 }
 
 class _FadeOut extends StatelessWidget {
   const _FadeOut({
-    this.child,
-    this.animation,
+    required this.child,
+    required this.animation,
     this.sliver = false,
   });
 
@@ -369,11 +352,9 @@ class _FadeOut extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
-    return CustomWidgets.fade(
-      opacity: _fadeOutOpacity.animate(animation),
-      child: child,
-      sliver: sliver,
-    );
-  }
+  Widget build(BuildContext context) => CustomWidgets.fade(
+        opacity: _fadeOutOpacity.animate(animation),
+        child: child,
+        sliver: sliver,
+      );
 }

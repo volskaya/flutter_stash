@@ -22,7 +22,10 @@ abstract class RefreshStorageItem {
 
 /// Basic extension of [RefreshStorageItem].
 class BasicRefreshStorageItem<T> extends RefreshStorageItem {
+  /// Creates [BasicRefreshStorageItem].
   BasicRefreshStorageItem(this.value);
+
+  /// Value of [BasicRefreshStorageItem].
   final T value;
 }
 
@@ -34,8 +37,8 @@ class BasicRefreshStorageItem<T> extends RefreshStorageItem {
 class RefreshStorage extends StatefulWidget {
   /// Creates [RefreshStorage].
   const RefreshStorage({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
   }) : super(key: key);
 
   /// The child of [RefreshStorage]. All descending widgets will cache their data in the state here.
@@ -46,9 +49,9 @@ class RefreshStorage extends StatefulWidget {
 
   /// Creates a [Provider<RefreshStorageState>] that's used by [RefreshStorage].
   static Provider<RefreshStorageState> wrapProvider({
-    Key key,
-    @required RefreshStorageState state,
-    @required Widget child,
+    Key? key,
+    required RefreshStorageState state,
+    required Widget child,
   }) =>
       Provider<RefreshStorageState>.value(
         value: state,
@@ -56,8 +59,8 @@ class RefreshStorage extends StatefulWidget {
       );
 
   /// Checks whether the nearest [RefreshStorage] contains this [identifier].
-  static bool contains(BuildContext context, String identifier, {RefreshStorageState storage}) =>
-      (storage ?? RefreshStorage.of(context))?.contains(identifier) ?? false;
+  static bool contains(BuildContext context, String identifier, {RefreshStorageState? storage}) =>
+      (storage ?? RefreshStorage.of(context)).contains(identifier);
 
   /// Write and get a value from [PageStorage]. Data are built with `builder`
   /// and are built only once.
@@ -68,28 +71,28 @@ class RefreshStorage extends StatefulWidget {
   /// [RefreshStorage] will call dispose when a new refresh is used with the
   /// same identifier or when the route pops.
   static RefreshStorageEntry<T> write<T extends RefreshStorageItem>({
-    @required BuildContext context,
-    @required String identifier,
-    @required T Function() builder,
-    int refreshes,
-    RefreshStorageState storage,
+    required BuildContext context,
+    required String identifier,
+    required T Function() builder,
+    int? refreshes,
+    RefreshStorageState? storage,
   }) {
     final _refreshes = refreshes ?? RefreshController.of(context)?.refreshes ?? 0;
     final targetStorage = storage ?? RefreshStorage.of(context);
 
     assert(_refreshes >= 0);
-    var item = targetStorage._cache[identifier.hashCode] as MapEntry<int, T>;
+    var item = targetStorage._cache[identifier.hashCode] as MapEntry<int, T>?;
 
     if ((item?.key ?? -1) < _refreshes) {
       // Dispose the previous refresh.
-      if (item?.value != null) WidgetsBinding.instance.addPostFrameCallback(item.value.dispose);
+      if (item?.value != null) WidgetsBinding.instance!.addPostFrameCallback(item!.value.dispose);
 
       // Build the new item.
       item = MapEntry(_refreshes, builder());
       targetStorage._cache[identifier.hashCode] = item;
     }
 
-    return RefreshStorageEntry<T>(identifier, item.value);
+    return RefreshStorageEntry<T>(identifier, item!.value);
   }
 
   /// Memoizes a basic item, that does not need to be disposed.
@@ -97,8 +100,8 @@ class RefreshStorage extends StatefulWidget {
     BuildContext context,
     String identifier,
     T Function() builder, {
-    int refreshes,
-    RefreshStorageState storage,
+    int? refreshes,
+    RefreshStorageState? storage,
   }) {
     final item = write<BasicRefreshStorageItem<T>>(
       context: context,
@@ -108,18 +111,18 @@ class RefreshStorage extends StatefulWidget {
       storage: storage,
     );
 
-    final value = item.value.value;
+    final value = item.value!.value;
     item.dispose(); // NOTE: [BasicRefreshStorageItem] doesn't really need to be disposed.
     return value;
   }
 
   /// Manually destroy a [RefreshStorageItem] cached in [RefreshStorageState].
   static void destroy({
-    @required BuildContext context,
-    @required String identifier,
-    RefreshStorageState storage,
+    required BuildContext context,
+    required String identifier,
+    RefreshStorageState? storage,
   }) =>
-      (storage ?? RefreshStorage.of(context))._cache.remove(identifier.hashCode)?.value?.dispose();
+      (storage ?? RefreshStorage.of(context))._cache.remove(identifier.hashCode)?.value.dispose();
 
   @override
   RefreshStorageState createState() => RefreshStorageState();

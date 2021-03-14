@@ -38,23 +38,20 @@ class DualTransitionBuilder extends StatefulWidget {
   /// The [animation], [forwardBuilder], and [reverseBuilder] arguments are
   /// required and must not be null.
   const DualTransitionBuilder({
-    Key key,
-    @required this.animation,
-    @required this.forwardBuilder,
-    @required this.reverseBuilder,
-    this.child,
+    Key? key,
+    required this.animation,
+    required this.forwardBuilder,
+    required this.reverseBuilder,
+    required this.child,
     this.onEnd,
     this.onStatusChanged,
-  })  : assert(animation != null),
-        assert(forwardBuilder != null),
-        assert(reverseBuilder != null),
-        super(key: key);
+  }) : super(key: key);
 
   /// Callback to run when the forward builder finishes animating.
-  final VoidCallback onEnd;
+  final VoidCallback? onEnd;
 
   /// Callback to run when the animation status changes.
-  final ValueChanged<AnimationStatus> onStatusChanged;
+  final ValueChanged<AnimationStatus>? onStatusChanged;
 
   /// The animation that drives the [child]'s transition.
   ///
@@ -104,9 +101,10 @@ class DualTransitionBuilder extends StatefulWidget {
 }
 
 class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
-  AnimationStatus _effectiveAnimationStatus;
   final ProxyAnimation _forwardAnimation = ProxyAnimation();
   final ProxyAnimation _reverseAnimation = ProxyAnimation();
+
+  late AnimationStatus _effectiveAnimationStatus;
 
   @override
   void initState() {
@@ -152,11 +150,9 @@ class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
   // yield a disjoint experience since the forward and reverse transitions are
   // very different.
   AnimationStatus _calculateEffectiveAnimationStatus({
-    @required AnimationStatus lastEffective,
-    @required AnimationStatus current,
+    required AnimationStatus lastEffective,
+    required AnimationStatus current,
   }) {
-    assert(current != null);
-    assert(lastEffective != null);
     switch (current) {
       case AnimationStatus.dismissed:
       case AnimationStatus.completed:
@@ -169,6 +165,7 @@ class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
             return current;
           case AnimationStatus.reverse:
             return lastEffective;
+          default:
         }
         break;
       case AnimationStatus.reverse:
@@ -180,9 +177,10 @@ class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
           case AnimationStatus.forward:
             return lastEffective;
         }
+      default:
         break;
     }
-    return null; // unreachable
+    throw 'Unreachable code reached';
   }
 
   void _updateAnimations() {
@@ -211,15 +209,9 @@ class _DualTransitionBuilderState extends State<DualTransitionBuilder> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return widget.forwardBuilder(
-      context,
-      _forwardAnimation,
-      widget.reverseBuilder(
+  Widget build(BuildContext context) => widget.forwardBuilder(
         context,
-        _reverseAnimation,
-        widget.child,
-      ),
-    );
-  }
+        _forwardAnimation,
+        widget.reverseBuilder(context, _reverseAnimation, widget.child),
+      );
 }

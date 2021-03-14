@@ -5,7 +5,7 @@ export 'package:logger/logger.dart' show Level;
 
 /// Easy logger constructor.
 class Log extends LogPrinter {
-  Log._(this.label) : assert(label?.isNotEmpty == true);
+  Log._(this.label) : assert(label.isNotEmpty == true);
 
   /// Label that's prepended before the log entry.
   final String label;
@@ -25,8 +25,8 @@ class Log extends LogPrinter {
 
   @override
   List<String> log(LogEvent event) {
-    final color = PrettyPrinter.levelColors[event.level];
-    final emoji = PrettyPrinter.levelEmojis[event.level];
+    final color = PrettyPrinter.levelColors[event.level]!;
+    final emoji = PrettyPrinter.levelEmojis[event.level]!;
 
     return [
       color('$emoji $label: ${event.message}'),

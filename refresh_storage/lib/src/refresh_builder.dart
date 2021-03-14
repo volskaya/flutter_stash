@@ -30,9 +30,9 @@ class RefreshControllerNotication extends Notification {
 class RefreshBuilder extends StatefulWidget {
   /// Creates the [RefreshBuilder] without the support for [NestedScrollView].
   const RefreshBuilder({
-    Key key,
-    @required this.builder,
-    @required this.bucket,
+    Key? key,
+    required this.builder,
+    required this.bucket,
     this.enforceSafeArea = false,
     this.notificationPredicate = defaultScrollNotificationPredicate,
     this.overscrollPredicate = defaultOverscrollIndicatorNotificationPredicate,
@@ -74,7 +74,7 @@ class RefreshController extends State<RefreshBuilder> {
 
   /// Get a reference to above [RefrshController].
   /// Returns null, if there are none.
-  static RefreshController of(BuildContext context) {
+  static RefreshController? of(BuildContext context) {
     try {
       return Provider.of<RefreshController>(context, listen: false);
     } catch (e) {
@@ -82,15 +82,15 @@ class RefreshController extends State<RefreshBuilder> {
     }
   }
 
-  RefreshStorageEntry<RefreshControllerStorage> _storage;
+  late RefreshStorageEntry<RefreshControllerStorage> _storage;
   int _bucketChanges = 0; // Incremented every time the widget's bucket changes.
 
   /// Number of times this container has been refreshed.
-  int get refreshes => (_storage?.value?.refreshes ?? 0) + _bucketChanges;
+  int get refreshes => (_storage.value?.refreshes ?? 0) + _bucketChanges;
 
   /// Refresh the controller.
   void refresh() {
-    if (_storage?.value != null) setState(() => _storage.value.refreshes += 1);
+    if (_storage.value != null) setState(() => _storage.value!.refreshes += 1);
     RefreshControllerNotication(refreshes).dispatch(context);
   }
 
@@ -110,7 +110,7 @@ class RefreshController extends State<RefreshBuilder> {
   @override
   void didUpdateWidget(covariant RefreshBuilder oldWidget) {
     if (oldWidget.bucket != widget.bucket) {
-      _storage?.dispose();
+      _storage.dispose();
       _bucketChanges += 1;
       _storage = RefreshStorage.write(
         context: context,
@@ -122,7 +122,7 @@ class RefreshController extends State<RefreshBuilder> {
       // Get the storage early, in case the state is unmounted, and
       // destroy the old refresh storage item.
       final storage = RefreshStorage.of(context);
-      WidgetsBinding.instance.addPostFrameCallback(
+      WidgetsBinding.instance!.addPostFrameCallback(
         (_) => RefreshStorage.destroy(
           context: context,
           identifier: oldWidget.bucket + RefreshController.storageIdentifierPostfix,
@@ -136,7 +136,7 @@ class RefreshController extends State<RefreshBuilder> {
 
   @override
   void dispose() {
-    _storage?.dispose();
+    _storage.dispose();
     super.dispose();
   }
 

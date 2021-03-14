@@ -3,16 +3,11 @@ description: A progress indicator with water-like effect in Flutter. Works simil
 version: 0.0.1
 author: Roland Volskaya
 homepage: https://github.com/volskaya/flutter_helpers
+publish_to: none
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-flutter:

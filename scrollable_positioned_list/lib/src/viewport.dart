@@ -6,7 +6,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:meta/meta.dart';
 
 /// A render object that is bigger on the inside.
 ///
@@ -15,13 +14,13 @@ import 'package:meta/meta.dart';
 /// for more information.
 class UnboundedViewport extends Viewport {
   UnboundedViewport({
-    Key key,
+    Key? key,
     AxisDirection axisDirection = AxisDirection.down,
-    AxisDirection crossAxisDirection,
+    AxisDirection? crossAxisDirection,
     double anchor = 0.0,
-    @required ViewportOffset offset,
-    Key center,
-    double cacheExtent,
+    required ViewportOffset offset,
+    Key? center,
+    double? cacheExtent,
     List<Widget> slivers = const <Widget>[],
     Clip clipBehavior = Clip.hardEdge,
   })  : _anchor = anchor,
@@ -68,12 +67,12 @@ class UnboundedRenderViewport extends RenderViewport {
   /// Creates a viewport for [RenderSliver] objects.
   UnboundedRenderViewport({
     AxisDirection axisDirection = AxisDirection.down,
-    @required AxisDirection crossAxisDirection,
-    @required ViewportOffset offset,
+    required AxisDirection crossAxisDirection,
+    required ViewportOffset offset,
     double anchor = 0.0,
-    List<RenderSliver> children,
-    RenderSliver center,
-    double cacheExtent,
+    List<RenderSliver>? children,
+    RenderSliver? center,
+    double? cacheExtent,
     Clip clipBehavior = Clip.hardEdge,
   })  : _anchor = anchor,
         super(
@@ -91,8 +90,8 @@ class UnboundedRenderViewport extends RenderViewport {
   double _anchor;
 
   // Out-of-band data computed during layout.
-  double _minScrollExtent;
-  double _maxScrollExtent;
+  double? _minScrollExtent;
+  double? _maxScrollExtent;
   bool _hasVisualOverflow = false;
 
   @override
@@ -100,7 +99,6 @@ class UnboundedRenderViewport extends RenderViewport {
 
   @override
   set anchor(double value) {
-    assert(value != null);
     if (value == _anchor) return;
     _anchor = value;
     markNeedsLayout();
@@ -132,7 +130,7 @@ class UnboundedRenderViewport extends RenderViewport {
       offset.applyContentDimensions(0.0, 0.0);
       return;
     }
-    assert(center.parent == this);
+    assert(center!.parent == this);
 
     double mainAxisExtent;
     double crossAxisExtent;
@@ -147,19 +145,18 @@ class UnboundedRenderViewport extends RenderViewport {
         break;
     }
 
-    final centerOffsetAdjustment = center.centerOffsetAdjustment;
+    final centerOffsetAdjustment = center!.centerOffsetAdjustment;
 
     double correction;
     var count = 0;
     do {
-      assert(offset.pixels != null);
       correction = _attemptLayout(mainAxisExtent, crossAxisExtent, offset.pixels + centerOffsetAdjustment);
       if (correction != 0.0) {
         offset.correctBy(correction);
       } else {
         // *** Difference from [RenderViewport].
-        final top = _minScrollExtent + mainAxisExtent * anchor;
-        final bottom = _maxScrollExtent - mainAxisExtent * (1.0 - anchor);
+        final top = _minScrollExtent! + mainAxisExtent * anchor;
+        final bottom = _maxScrollExtent! - mainAxisExtent * (1.0 - anchor);
         final maxScrollOffset = math.max(math.min(0.0, top), bottom);
         final minScrollOffset = math.min(top, maxScrollOffset);
         if (offset.applyContentDimensions(minScrollOffset, maxScrollOffset)) break;
@@ -208,13 +205,13 @@ class UnboundedRenderViewport extends RenderViewport {
     final double reverseDirectionRemainingPaintExtent = centerOffset.clamp(0.0, mainAxisExtent);
     final double forwardDirectionRemainingPaintExtent = (mainAxisExtent - centerOffset).clamp(0.0, mainAxisExtent);
 
-    final fullCacheExtent = mainAxisExtent + 2 * cacheExtent;
-    final centerCacheOffset = centerOffset + cacheExtent;
+    final fullCacheExtent = mainAxisExtent + 2 * (cacheExtent ?? 0.0);
+    final centerCacheOffset = centerOffset + (cacheExtent ?? 0.0);
     final double reverseDirectionRemainingCacheExtent = centerCacheOffset.clamp(0.0, fullCacheExtent);
     final double forwardDirectionRemainingCacheExtent =
         (fullCacheExtent - centerCacheOffset).clamp(0.0, fullCacheExtent);
 
-    final leadingNegativeChild = childBefore(center);
+    final leadingNegativeChild = center != null ? childBefore(center!) : null;
 
     if (leadingNegativeChild != null) {
       // negative scroll offsets
@@ -229,7 +226,7 @@ class UnboundedRenderViewport extends RenderViewport {
         growthDirection: GrowthDirection.reverse,
         advance: childBefore,
         remainingCacheExtent: reverseDirectionRemainingCacheExtent,
-        cacheOrigin: (mainAxisExtent - centerOffset).clamp(-cacheExtent, 0.0),
+        cacheOrigin: (mainAxisExtent - centerOffset).clamp(-(cacheExtent ?? 0.0), 0.0),
       );
       if (result != 0.0) return -result;
     }
@@ -246,7 +243,7 @@ class UnboundedRenderViewport extends RenderViewport {
       growthDirection: GrowthDirection.forward,
       advance: childAfter,
       remainingCacheExtent: forwardDirectionRemainingCacheExtent,
-      cacheOrigin: centerOffset.clamp(-cacheExtent, 0.0),
+      cacheOrigin: centerOffset.clamp(-(cacheExtent ?? 0.0), 0.0),
     );
   }
 
@@ -257,10 +254,10 @@ class UnboundedRenderViewport extends RenderViewport {
   void updateOutOfBandData(GrowthDirection growthDirection, SliverGeometry childLayoutGeometry) {
     switch (growthDirection) {
       case GrowthDirection.forward:
-        _maxScrollExtent += childLayoutGeometry.scrollExtent;
+        _maxScrollExtent = (_maxScrollExtent ?? 0.0) + childLayoutGeometry.scrollExtent;
         break;
       case GrowthDirection.reverse:
-        _minScrollExtent -= childLayoutGeometry.scrollExtent;
+        _minScrollExtent = (_minScrollExtent ?? 0.0) - childLayoutGeometry.scrollExtent;
         break;
     }
     if (childLayoutGeometry.hasVisualOverflow) _hasVisualOverflow = true;

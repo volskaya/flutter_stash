@@ -21,10 +21,11 @@ abstract class ItemPositionsListener {
 /// Position information for an item in the list.
 class ItemPosition {
   /// Create an [ItemPosition].
-  const ItemPosition(
-      {@required this.index,
-      @required this.itemLeadingEdge,
-      @required this.itemTrailingEdge});
+  const ItemPosition({
+    required this.index,
+    required this.itemLeadingEdge,
+    required this.itemTrailingEdge,
+  });
 
   /// Index of the item.
   final int index;
@@ -51,9 +52,7 @@ class ItemPosition {
   }
 
   @override
-  int get hashCode =>
-      31 * (31 * (7 + index.hashCode) + itemLeadingEdge.hashCode) +
-      itemTrailingEdge.hashCode;
+  int get hashCode => 31 * (31 * (7 + index.hashCode) + itemLeadingEdge.hashCode) + itemTrailingEdge.hashCode;
 
   @override
   String toString() =>

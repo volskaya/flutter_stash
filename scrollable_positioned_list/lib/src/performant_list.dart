@@ -2,17 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
-import 'item_positions_listener.dart';
-import 'item_positions_notifier.dart';
 import 'positioned_list.dart';
-import 'post_mount_callback.dart';
 
 /// Number of screens to scroll when scrolling a long distance.
 const int _screenScrollCount = 2;
@@ -36,38 +31,36 @@ class PerformantList extends StatefulWidget {
   /// Create a [PerformantList] whose items are provided by
   /// [itemBuilder].
   const PerformantList.builder({
-    @required this.itemCount,
-    @required this.itemBuilder,
-    Key key,
+    required this.itemCount,
+    required this.itemBuilder,
+    Key? key,
     this.controller,
     this.initialScrollIndex = 0,
     this.initialAlignment = 0,
     this.scrollDirection = Axis.vertical,
     this.reverse = false,
-    this.physics,
+    this.physics = const AlwaysScrollableScrollPhysics(),
     this.semanticChildCount,
     this.padding,
     this.addSemanticIndexes = true,
     this.addAutomaticKeepAlives = true,
     this.addRepaintBoundaries = true,
     this.minCacheExtent,
-  })  : assert(itemCount != null),
-        assert(itemBuilder != null),
-        separatorBuilder = null,
+  })  : separatorBuilder = null,
         super(key: key);
 
   /// Create a [PerformantList] whose items are provided by
   /// [itemBuilder] and separators provided by [separatorBuilder].
   const PerformantList.separated({
-    @required this.itemCount,
-    @required this.itemBuilder,
-    @required this.separatorBuilder,
-    Key key,
+    required this.itemCount,
+    required this.itemBuilder,
+    required this.separatorBuilder,
+    Key? key,
     this.initialScrollIndex = 0,
     this.initialAlignment = 0,
     this.scrollDirection = Axis.vertical,
     this.reverse = false,
-    this.physics,
+    this.physics = const AlwaysScrollableScrollPhysics(),
     this.semanticChildCount,
     this.padding,
     this.addSemanticIndexes = true,
@@ -75,10 +68,7 @@ class PerformantList extends StatefulWidget {
     this.addRepaintBoundaries = true,
     this.minCacheExtent,
     this.controller,
-  })  : assert(itemCount != null),
-        assert(itemBuilder != null),
-        assert(separatorBuilder != null),
-        super(key: key);
+  }) : super(key: key);
 
   /// Number of items the [itemBuilder] can produce.
   final int itemCount;
@@ -89,7 +79,7 @@ class PerformantList extends StatefulWidget {
 
   /// Called to build separators for between each item in the list.
   /// Called with 0 <= index < itemCount - 1.
-  final IndexedWidgetBuilder separatorBuilder;
+  final IndexedWidgetBuilder? separatorBuilder;
 
   /// Index of an item to initially align within the viewport.
   final int initialScrollIndex;
@@ -121,10 +111,10 @@ class PerformantList extends StatefulWidget {
   /// The number of children that will contribute semantic information.
   ///
   /// See [ScrollView.semanticChildCount] for more information.
-  final int semanticChildCount;
+  final int? semanticChildCount;
 
   /// The amount of space by which to inset the children.
-  final EdgeInsets padding;
+  final EdgeInsets? padding;
 
   /// Whether to wrap each child in an [IndexedSemantics].
   ///
@@ -148,16 +138,16 @@ class PerformantList extends StatefulWidget {
   /// scrolls, so using the [ScrollController.scrollTo] method may result
   /// in builds of widgets that would otherwise already be built in the
   /// cache extent.
-  final double minCacheExtent;
+  final double? minCacheExtent;
 
-  final ScrollController controller;
+  final ScrollController? controller;
 
   @override
   State<StatefulWidget> createState() => _PerformantListState();
 }
 
 class _PerformantListState extends State<PerformantList> with TickerProviderStateMixin {
-  ScrollController controller;
+  late final ScrollController controller;
   int backTarget = 0;
   double backAlignment = 0;
   void Function() startAnimationCallback = () {};
@@ -166,7 +156,7 @@ class _PerformantListState extends State<PerformantList> with TickerProviderStat
       ? constraints.maxHeight * _screenScrollCount
       : max(
           constraints.maxHeight * _screenScrollCount,
-          widget.minCacheExtent,
+          widget.minCacheExtent!,
         );
 
   @override
@@ -177,7 +167,7 @@ class _PerformantListState extends State<PerformantList> with TickerProviderStat
 
   @override
   void dispose() {
-    if (widget.controller == null) controller?.dispose();
+    if (widget.controller == null) controller.dispose();
     super.dispose();
   }
 
@@ -185,13 +175,11 @@ class _PerformantListState extends State<PerformantList> with TickerProviderStat
   void didUpdateWidget(PerformantList oldWidget) {
     assert((oldWidget.controller != null) == (widget.controller != null));
 
-    if (widget.itemCount != null) {
-      if (widget.itemCount == 0) {
-        backTarget = 0;
-      } else {
-        if (backTarget > widget.itemCount - 1) {
-          backTarget = widget.itemCount - 1;
-        }
+    if (widget.itemCount == 0) {
+      backTarget = 0;
+    } else {
+      if (backTarget > widget.itemCount - 1) {
+        backTarget = widget.itemCount - 1;
       }
     }
     super.didUpdateWidget(oldWidget);

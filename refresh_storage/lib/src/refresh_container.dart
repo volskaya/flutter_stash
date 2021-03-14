@@ -10,9 +10,9 @@ import 'package:refresh_storage/src/refresh_builder.dart';
 class RefreshContainer extends StatelessWidget {
   /// Creates the [RefreshContainer] without the support for [NestedScrollView].
   const RefreshContainer({
-    Key key,
-    @required this.child,
-    @required this.bucket,
+    Key? key,
+    required this.child,
+    required this.bucket,
     this.enforceSafeArea = false,
     this.fillColor = Colors.transparent,
     this.duration = const Duration(milliseconds: 300),
@@ -47,7 +47,7 @@ class RefreshContainer extends StatelessWidget {
   final ScrollNotificationPredicate notificationPredicate;
 
   /// Passes this key to the [RefreshBuilder], that this [RefreshContainer] wraps.
-  final GlobalKey<RefreshController> controllerKey;
+  final GlobalKey<RefreshController>? controllerKey;
 
   /// A check that specifies whether a [OverscrollNotification] should be
   /// handled by this widget.
