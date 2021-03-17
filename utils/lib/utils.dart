@@ -13,7 +13,6 @@ import 'package:flutter/widgets.dart';
 
 import 'src/mixins.dart';
 
-export 'src/country_catalog.dart';
 export 'src/corrected_media_query.dart';
 export 'src/custom_ink_splash.dart';
 export 'src/debounce.dart';
@@ -33,6 +32,7 @@ export 'src/mixins.dart';
 export 'src/converters.dart';
 export 'src/format.dart';
 export 'src/memoizer.dart';
+export 'src/l10n/utils_localizations.dart';
 
 abstract class Utils {
   static int androidSdkVersion;

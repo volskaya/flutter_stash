@@ -1,0 +1,76 @@
+{
+  "soon": "Soon",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "justNow": "Just now",
+  "weekdayWithDate": "{weekday}, {date}",
+  "@weekdayWithDate": {
+    "placeholders": {
+      "weekday": {
+        "type": "DateTime",
+        "format": "EEEE"
+      },
+      "date": {
+        "type": "DateTime",
+        "format": "yMd"
+      }
+    }
+  },
+  "@durationAgo": { "placeholders": { "duration": {} } },
+  "durationAgo": "{duration} ago",
+  "@durationAgo": { "placeholders": { "duration": {} } },
+  "remainingDuration": "{minutes}:{seconds}",
+  "@remainingDuration": {
+    "placeholders": {
+      "minutes": {},
+      "seconds": {}
+    }
+  },
+  "weekdayDate": "{date}",
+  "@weekdayDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "EEEE"
+      }
+    }
+  },
+  "date": "{date}",
+  "@date": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMd"
+      }
+    }
+  },
+  "createDate": "{date} {time}",
+  "@createDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMd"
+      },
+      "time": {
+        "type": "DateTime",
+        "format": "jm"
+      }
+    }
+  },
+
+  "durationDays": "{count, plural, =1{1 day} =other{{count} days}}",
+  "durationHours": "{count, plural, =1{1 hour} =other{{count} hours}}",
+  "durationHoursTail": "{count, plural, =1{, 1 hour} =other{, {count} hours}}",
+  "durationMinutes": "{count, plural, =1{1 min} =other{{count} min}}",
+  "durationMinutesTail": "{count, plural, =1{, 1 min} =other{, {count} min}}",
+  "durationSeconds": "{count, plural, =1{1 second} =other{{count} seconds}}",
+  "durationSecondsTail": "{count, plural, =1{, 1 second} =other{, {count} seconds}}",
+
+  "@durationDays": { "placeholders": { "count": {} } },
+  "@durationHours": { "placeholders": { "count": {} } },
+  "@durationHoursTail": { "placeholders": { "count": {} } },
+  "@durationMinutes": { "placeholders": { "count": {} } },
+  "@durationMinutesTail": { "placeholders": { "count": {} } },
+  "@durationSeconds": { "placeholders": { "count": {} } },
+  "@durationSecondsTail": { "placeholders": { "count": {} } }
+}
