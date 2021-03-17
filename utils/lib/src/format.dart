@@ -29,13 +29,11 @@ class Format {
     return Format.capitalize(message).replaceAll('-', ' ');
   }
 
-  // TODO: Return null, if there's no message.
-  static String platformExceptionMessage(PlatformException exception) =>
-      errorMessage((exception?.details as Map ?? {})['message'] as String ?? 'Unknown error');
+  static String platformExceptionMessage(PlatformException exception, {String orElse = '???'}) =>
+      errorMessage((exception?.details as Map ?? {})['message'] as String ?? orElse);
 
-  // TODO: Return null, if there's no message.
-  static String firebaseFunctionsErrorMessage(FirebaseFunctionsException exception) =>
-      errorMessage(exception?.message ?? 'Unknown error');
+  static String firebaseFunctionsErrorMessage(FirebaseFunctionsException exception, {String orElse = '???'}) =>
+      errorMessage(exception?.message ?? orElse);
 
   static String userName([UserModel user]) {
     if (user == null) return 'Untitled';
