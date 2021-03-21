@@ -4,6 +4,7 @@ import 'package:material_dialog/src/material_dialog_attachment_delegate.dart';
 import 'package:material_dialog/src/material_dialog_box.dart';
 import 'package:material_dialog/src/material_dialog_divider.dart';
 import 'package:refresh_storage/refresh_storage.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class MaterialDialogSimpleContainer extends StatelessWidget {
   const MaterialDialogSimpleContainer({
@@ -61,26 +62,29 @@ class MaterialDialogContainer extends StatelessWidget {
   static Future<bool> askQuestion(
     BuildContext context, {
     @required String question,
-    String cancelText = 'CANCEL',
-    String continueText = 'OK',
+    String cancelText,
+    String continueText,
     Color continueTextColor,
   }) =>
       showModal<bool>(
         context: context,
-        builder: (context) => MaterialDialogSimpleContainer(
-          text: Text(question),
-          buttons: [
-            TextButton(
-              child: Text(cancelText, layoutTwice: true),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text(continueText, layoutTwice: true),
-              onPressed: () => Navigator.pop(context, true),
-              style: continueTextColor != null ? TextButton.styleFrom(primary: continueTextColor) : null,
-            ),
-          ],
-        ),
+        builder: (context) {
+          final strings = MaterialLocalizations.of(context);
+          return MaterialDialogSimpleContainer(
+            text: Text(question),
+            buttons: [
+              TextButton(
+                child: Text(cancelText ?? strings.cancelButtonLabel ?? 'CANCEL', layoutTwice: true),
+                onPressed: () => Navigator.pop(context),
+              ),
+              TextButton(
+                child: Text(continueText ?? strings.continueButtonLabel ?? 'CONTINUE', layoutTwice: true),
+                onPressed: () => Navigator.pop(context, true),
+                style: continueTextColor != null ? TextButton.styleFrom(primary: continueTextColor) : null,
+              ),
+            ],
+          );
+        },
       );
 
   @override

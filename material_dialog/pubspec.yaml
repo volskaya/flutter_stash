@@ -10,8 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  boxy: ^1.2.0+1
+  flutter_localizations:
+    sdk: flutter
 
+  boxy: ^1.2.0+1
   animations:
     path: /home/projects/packages/flutter_helpers/animations
   refresh_storage:
@@ -20,5 +22,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+dependency_overrides:
+  intl: 0.17.0
 
 flutter:

@@ -70,31 +70,33 @@ class Format {
     DateSkeleton skeleton = DateSkeleton.yMd,
     Locale locale = const Locale('en'),
   ]) {
-    _dateFormatters[locale.toLanguageTag()] ??= <DateSkeleton, DateFormat>{};
-    if (!_dateFormatters[locale.toLanguageTag()].containsKey(skeleton)) {
+    final localeTag = locale.toLanguageTag();
+
+    _dateFormatters[localeTag] ??= <DateSkeleton, DateFormat>{};
+    if (!_dateFormatters[localeTag].containsKey(skeleton)) {
       switch (skeleton) {
         case DateSkeleton.yMd_jm:
-          _dateFormatters[locale.toLanguageTag()][skeleton] = DateFormat.yMd().add_jm();
+          _dateFormatters[localeTag][skeleton] = DateFormat.yMd().add_jm();
           break;
         case DateSkeleton.keyboard:
         case DateSkeleton.yMd:
-          _dateFormatters[locale.toLanguageTag()][skeleton] = DateFormat.yMd();
+          _dateFormatters[localeTag][skeleton] = DateFormat.yMd();
           break;
         case DateSkeleton.jm:
-          _dateFormatters[locale.toLanguageTag()][skeleton] = DateFormat.jm();
+          _dateFormatters[localeTag][skeleton] = DateFormat.jm();
           break;
         case DateSkeleton.EEEE:
-          _dateFormatters[locale.toLanguageTag()][skeleton] = DateFormat.EEEE();
+          _dateFormatters[localeTag][skeleton] = DateFormat.EEEE();
           break;
         case DateSkeleton.yMMMd:
-          _dateFormatters[locale.toLanguageTag()][skeleton] = DateFormat.yMMMd();
+          _dateFormatters[localeTag][skeleton] = DateFormat.yMMMd();
           break;
         default:
           throw UnimplementedError();
       }
     }
 
-    return _dateFormatters['en'][skeleton];
+    return _dateFormatters[localeTag][skeleton];
   }
 
   static String duration(Duration _duration, [UtilsLocalizations strings]) {
