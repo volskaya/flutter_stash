@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'utils_localizations_en.dart';
+import 'utils_localizations_lv.dart';
 
 /// Callers can lookup localized strings with an instance of UtilsLocalizations returned
 /// by `UtilsLocalizations.of(context)`.
@@ -91,7 +92,8 @@ abstract class UtilsLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
-    Locale('en')
+    Locale('en'),
+    Locale('lv')
   ];
 
   /// No description provided for @soon.
@@ -206,7 +208,7 @@ class _UtilsLocalizationsDelegate extends LocalizationsDelegate<UtilsLocalizatio
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'lv'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_UtilsLocalizationsDelegate old) => false;
@@ -219,6 +221,7 @@ UtilsLocalizations _lookupUtilsLocalizations(Locale locale) {
 // Lookup logic when only language code is specified.
 switch (locale.languageCode) {
   case 'en': return UtilsLocalizationsEn();
+    case 'lv': return UtilsLocalizationsLv();
 }
 
 

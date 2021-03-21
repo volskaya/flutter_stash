@@ -1,8 +1,8 @@
 {
-  "soon": "Soon",
-  "today": "Today",
-  "yesterday": "Yesterday",
-  "justNow": "Just now",
+  "soon": "Drīz",
+  "today": "Šodien",
+  "yesterday": "Vakar",
+  "justNow": "Tik tiko",
   "weekdayWithDate": "{weekday}, {date}",
   "@weekdayWithDate": {
     "placeholders": {
@@ -16,7 +16,7 @@
       }
     }
   },
-  "durationAgo": "{duration} ago",
+  "durationAgo": "{duration} atpakaļ",
   "@durationAgo": { "placeholders": { "duration": {} } },
   "remainingDuration": "{minutes}:{seconds}",
   "@remainingDuration": {
@@ -57,13 +57,13 @@
     }
   },
 
-  "durationDays": "{count, plural, =1{1 day} =other{{count} days}}",
-  "durationHours": "{count, plural, =1{1 hour} =other{{count} hours}}",
-  "durationHoursTail": "{count, plural, =1{, 1 hour} =other{, {count} hours}}",
+  "durationDays": "{count, plural, =1{1 dienu} =other{{count} dienas}}",
+  "durationHours": "{count, plural, =1{1 stundu} =other{{count} stundas}}",
+  "durationHoursTail": "{count, plural, =1{, 1 stundu} =other{, {count} stundas}}",
   "durationMinutes": "{count, plural, =1{1 min} =other{{count} min}}",
   "durationMinutesTail": "{count, plural, =1{, 1 min} =other{, {count} min}}",
-  "durationSeconds": "{count, plural, =1{1 second} =other{{count} seconds}}",
-  "durationSecondsTail": "{count, plural, =1{, 1 second} =other{, {count} seconds}}",
+  "durationSeconds": "{count, plural, =1{1 sekundi} =other{{count} sekundes}}",
+  "durationSecondsTail": "{count, plural, =1{, 1 seskundi} =other{, {count} sekundes}}",
 
   "@durationDays": { "placeholders": { "count": {} } },
   "@durationHours": { "placeholders": { "count": {} } },
