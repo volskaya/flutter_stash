@@ -9,8 +9,8 @@ const _kLandscapeHeaderWidth = 168.0;
 /// after the content.
 class MaterialDialogBox extends StatelessWidget {
   const MaterialDialogBox({
-    Key key,
-    @required this.content,
+    Key? key,
+    required this.content,
     this.header,
     this.footer,
     this.orientation = Orientation.portrait,
@@ -18,33 +18,45 @@ class MaterialDialogBox extends StatelessWidget {
   }) : super(key: key);
 
   final Widget content;
-  final Widget header;
-  final Widget footer;
+  final Widget? header;
+  final Widget? footer;
   final Orientation orientation;
-  final Widget divider;
+  final Widget? divider;
 
   @override
   Widget build(BuildContext context) => CustomBoxy(
-        delegate: _Delegate(orientation, divider),
+        delegate: _Delegate(
+          orientation,
+          divider,
+          showFooter: footer != null,
+          showHeader: header != null,
+        ),
         children: [
           LayoutId(id: 'content', child: content),
-          if (footer != null) LayoutId(id: 'footer', child: footer),
-          if (header != null) LayoutId(id: 'header', child: header),
+          if (footer != null) LayoutId(id: 'footer', child: footer!),
+          if (header != null) LayoutId(id: 'header', child: header!),
         ],
       );
 }
 
 class _Delegate extends BoxyDelegate {
-  _Delegate(this.orientation, this.dividerWidget);
+  _Delegate(
+    this.orientation,
+    this.dividerWidget, {
+    this.showFooter = false,
+    this.showHeader = false,
+  });
 
   final Orientation orientation;
-  final Widget dividerWidget;
+  final Widget? dividerWidget;
+  final bool showFooter;
+  final bool showHeader;
 
   @override
   Size layout() {
-    final content = getChild('content');
-    final header = getChild('header');
-    final footer = getChild('footer');
+    final content = getChild('content')!;
+    final header = showHeader ? getChild('header') : null;
+    final footer = showFooter ? getChild('footer') : null;
 
     switch (orientation) {
       case Orientation.portrait:
@@ -59,31 +71,31 @@ class _Delegate extends BoxyDelegate {
         final showDividers = contentSize.height >= contentConstraints.maxHeight && dividerWidget != null;
 
         if (showDividers) {
-          if (footer != null) inflate(dividerWidget, id: 'footerDivider');
-          if (header != null) inflate(dividerWidget, id: 'headerDivider');
+          if (footer != null) inflate(dividerWidget!, id: 'footerDivider');
+          if (header != null) inflate(dividerWidget!, id: 'headerDivider');
         }
 
         final headerDivider = getChild('headerDivider');
         final footerDivider = getChild('footerDivider');
 
         if (footerDivider != null && footer != null) {
-          footerDivider?.layout(constraints.copyWith(maxHeight: 1, minHeight: 1));
-          footerDivider?.position(Offset(0.0, content.rect.bottom));
+          footerDivider.layout(constraints.copyWith(maxHeight: 1, minHeight: 1));
+          footerDivider.position(Offset(0.0, content.rect.bottom));
         }
 
         if (footer != null) {
-          footer?.layout(constraints.copyWith(maxHeight: _kFooterHeight, minHeight: _kFooterHeight));
-          footer?.position(Offset(0.0, content.rect.bottom));
+          footer.layout(constraints.copyWith(maxHeight: _kFooterHeight, minHeight: _kFooterHeight));
+          footer.position(Offset(0.0, content.rect.bottom));
         }
 
         if (header != null) {
-          header?.layout(constraints.copyWith(maxHeight: _kHeaderHeight, minHeight: _kHeaderHeight));
-          header?.position(Offset.zero);
+          header.layout(constraints.copyWith(maxHeight: _kHeaderHeight, minHeight: _kHeaderHeight));
+          header.position(Offset.zero);
         }
 
         if (headerDivider != null && header != null) {
-          headerDivider?.layout(constraints.copyWith(maxHeight: 1, minHeight: 1));
-          headerDivider?.position(const Offset(0.0, _kHeaderHeight - 1.0));
+          headerDivider.layout(constraints.copyWith(maxHeight: 1, minHeight: 1));
+          headerDivider.position(const Offset(0.0, _kHeaderHeight - 1.0));
         }
 
         return Size(
@@ -107,8 +119,8 @@ class _Delegate extends BoxyDelegate {
         final showDividers = contentSize.height >= contentConstraints.maxHeight && dividerWidget != null;
 
         // Header divider is always used, since it's vertical.
-        if (header != null && dividerWidget != null) inflate(dividerWidget, id: 'headerDivider');
-        if (showDividers && footer != null) inflate(dividerWidget, id: 'footerDivider');
+        if (header != null && dividerWidget != null) inflate(dividerWidget!, id: 'headerDivider');
+        if (showDividers && footer != null) inflate(dividerWidget!, id: 'footerDivider');
 
         final headerDivider = getChild('headerDivider');
         final footerDivider = getChild('footerDivider');
@@ -121,23 +133,23 @@ class _Delegate extends BoxyDelegate {
         );
 
         if (footerDivider != null && footer != null) {
-          footerDivider?.layout(contentConstraints.copyWith(maxHeight: 1, minHeight: 1));
-          footerDivider?.position(Offset(headerWidth, content.rect.bottom));
+          footerDivider.layout(contentConstraints.copyWith(maxHeight: 1, minHeight: 1));
+          footerDivider.position(Offset(headerWidth, content.rect.bottom));
         }
 
         if (footer != null) {
-          footer?.layout(contentConstraints.copyWith(maxHeight: _kFooterHeight, minHeight: _kFooterHeight));
-          footer?.position(Offset(headerWidth, content.rect.bottom));
+          footer.layout(contentConstraints.copyWith(maxHeight: _kFooterHeight, minHeight: _kFooterHeight));
+          footer.position(Offset(headerWidth, content.rect.bottom));
         }
 
         if (header != null) {
-          header?.layout(headerConstraints);
-          header?.position(Offset.zero);
+          header.layout(headerConstraints);
+          header.position(Offset.zero);
         }
 
         if (headerDivider != null && header != null) {
-          final headerDividerSize = headerDivider?.layout(constraints.copyWith(maxWidth: 1, minWidth: 1));
-          headerDivider?.position(Offset(headerWidth - headerDividerSize.width, 0.0));
+          final headerDividerSize = headerDivider.layout(constraints.copyWith(maxWidth: 1, minWidth: 1));
+          headerDivider.position(Offset(headerWidth - headerDividerSize.width, 0.0));
         }
 
         return Size(
@@ -145,10 +157,9 @@ class _Delegate extends BoxyDelegate {
           contentSize.height + (footer != null ? _kFooterHeight : 0.0),
         );
     }
-
-    return constraints.biggest;
   }
 
   @override
-  bool shouldRelayout(_Delegate old) => old.orientation != orientation;
+  bool shouldRelayout(_Delegate old) =>
+      old.orientation != orientation || old.showFooter != showFooter || old.showHeader || showHeader;
 }

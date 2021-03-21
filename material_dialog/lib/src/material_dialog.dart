@@ -4,12 +4,11 @@ import 'package:material_dialog/src/material_dialog_attachment_delegate.dart';
 import 'package:material_dialog/src/material_dialog_box.dart';
 import 'package:material_dialog/src/material_dialog_divider.dart';
 import 'package:refresh_storage/refresh_storage.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 class MaterialDialogSimpleContainer extends StatelessWidget {
   const MaterialDialogSimpleContainer({
-    Key key,
-    @required this.text,
+    Key? key,
+    required this.text,
     this.buttons = const <Widget>[],
   }) : super(key: key);
 
@@ -26,7 +25,7 @@ class MaterialDialogSimpleContainer extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: DefaultTextStyle(
           child: text,
-          style: theme.textTheme.bodyText1,
+          style: theme.textTheme.bodyText1!,
         ),
       ),
     );
@@ -35,8 +34,8 @@ class MaterialDialogSimpleContainer extends StatelessWidget {
 
 class MaterialDialogContainer extends StatelessWidget {
   const MaterialDialogContainer({
-    Key key,
-    @required this.content,
+    Key? key,
+    required this.content,
     this.title,
     this.buttons = const <Widget>[],
     this.overlapsContent = false,
@@ -45,13 +44,13 @@ class MaterialDialogContainer extends StatelessWidget {
     this.attachment,
   }) : super(key: key);
 
-  final Widget title;
+  final Widget? title;
   final List<Widget> buttons;
   final Widget content;
   final bool overlapsContent;
   final bool showFullWidth;
   final bool showFullHeight;
-  final MaterialDialogAttachmentDelegate attachment;
+  final MaterialDialogAttachmentDelegate? attachment;
 
   static ShapeBorder shape = const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(6.0)));
 
@@ -59,12 +58,12 @@ class MaterialDialogContainer extends StatelessWidget {
   static const constraintsPortrait = BoxConstraints(maxWidth: 280, maxHeight: 560);
   static const constraintsLandscape = BoxConstraints(maxWidth: 560, maxHeight: 560);
 
-  static Future<bool> askQuestion(
+  static Future<bool?> askQuestion(
     BuildContext context, {
-    @required String question,
-    String cancelText,
-    String continueText,
-    Color continueTextColor,
+    required String question,
+    String? cancelText,
+    String? continueText,
+    Color? continueTextColor,
   }) =>
       showModal<bool>(
         context: context,
@@ -74,11 +73,13 @@ class MaterialDialogContainer extends StatelessWidget {
             text: Text(question),
             buttons: [
               TextButton(
-                child: Text(cancelText ?? strings.cancelButtonLabel ?? 'CANCEL', layoutTwice: true),
+                // ignore: invalid_null_aware_operator
+                child: Text(cancelText ?? strings?.cancelButtonLabel ?? 'CANCEL', layoutTwice: true),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
-                child: Text(continueText ?? strings.continueButtonLabel ?? 'CONTINUE', layoutTwice: true),
+                // ignore: invalid_null_aware_operator
+                child: Text(continueText ?? strings?.continueButtonLabel ?? 'CONTINUE', layoutTwice: true),
                 onPressed: () => Navigator.pop(context, true),
                 style: continueTextColor != null ? TextButton.styleFrom(primary: continueTextColor) : null,
               ),
@@ -136,8 +137,8 @@ class MaterialDialogContainer extends StatelessWidget {
               child: Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: DefaultTextStyle(
-                  child: title,
-                  style: theme.textTheme.headline6.apply(color: headerTextColor),
+                  child: title!,
+                  style: theme.textTheme.headline6!.apply(color: headerTextColor),
                 ),
               ),
             ),
@@ -170,8 +171,8 @@ class MaterialDialogContainer extends StatelessWidget {
         ? MaterialDialogAttachmentContainer(
             child: material,
             attachment: RefreshStorage.wrapProvider(
-              state: attachment.storage,
-              child: attachment.widget,
+              state: attachment!.storage,
+              child: attachment!.widget,
             ),
           )
         : material;
@@ -187,9 +188,9 @@ class MaterialDialogContainer extends StatelessWidget {
 
 class MaterialDialogAttachmentContainer extends StatelessWidget {
   const MaterialDialogAttachmentContainer({
-    Key key,
-    @required this.attachment,
-    @required this.child,
+    Key? key,
+    required this.attachment,
+    required this.child,
   }) : super(key: key);
 
   final Widget child;

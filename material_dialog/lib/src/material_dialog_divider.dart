@@ -1,10 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
 class MaterialDialogDivider extends StatelessWidget {
   const MaterialDialogDivider({
-    Key key,
+    Key? key,
     this.width = 2.0,
     this.color,
     this.padding = const EdgeInsets.all(16),
@@ -14,10 +12,10 @@ class MaterialDialogDivider extends StatelessWidget {
   }) : super(key: key);
 
   final double width;
-  final Color color;
+  final Color? color;
   final EdgeInsets padding;
-  final bool capStart;
-  final bool capEnd;
+  final bool? capStart;
+  final bool? capEnd;
   final Axis axis;
 
   @override
@@ -36,7 +34,13 @@ class MaterialDialogDivider extends StatelessWidget {
       padding: padding,
       child: CustomPaint(
         size: size,
-        painter: _Painter(width, padding, color ?? Theme.of(context).dividerColor, capStart, capEnd),
+        painter: _Painter(
+          width,
+          padding,
+          color ?? Theme.of(context).dividerColor,
+          capStart ?? padding.left != 0,
+          capEnd ?? padding.right != 0,
+        ),
       ),
     );
   }
@@ -63,8 +67,6 @@ class _Painter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     assert(size.height >= width);
 
-    final capStart = this.capStart ?? padding.left != 0;
-    final capEnd = this.capEnd ?? padding.right != 0;
     final axis = size.aspectRatio >= 1 ? Axis.horizontal : Axis.vertical;
 
     Rect rect;
