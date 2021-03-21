@@ -10,23 +10,23 @@ part 'encapsulated_notification_item.freezed.dart';
 typedef EncapsulatedNotificationItemBuilder = Widget Function(
   BuildContext overlayContext,
   VoidCallback dismiss,
-  Animation<double> timeoutAnimation,
+  Animation<double>? timeoutAnimation,
 );
 
 /// Props provided to descending notifications.
 @freezed
-abstract class EncapsulatedNotificationProps with _$EncapsulatedNotificationProps {
+class EncapsulatedNotificationProps with _$EncapsulatedNotificationProps {
   /// Creates [EncapsulatedNotificationProps].
   const factory EncapsulatedNotificationProps({
     /// Callable to dismiss the notification.
-    @required VoidCallback dismiss,
+    required VoidCallback dismiss,
 
     /// Progress animation of the notifications dismiss timeout.
     /// Is null when the notification is built without a timeout.
-    Animation<double> dismissAnimation,
+    Animation<double>? dismissAnimation,
 
     /// Reference to the [EncapsulatedNotificationItem] these props belong to.
-    @required EncapsulatedNotificationItem reference,
+    required EncapsulatedNotificationItem reference,
   }) = _EncapsulatedNotificationProps;
   // const EncapsulatedNotificationProps(this.dismiss, this.dismissAnimation, this.reference);
 
@@ -45,23 +45,22 @@ abstract class EncapsulatedNotificationProps with _$EncapsulatedNotificationProp
 /// [EncapsulatedNotificationItem] that's used for [EncapsulatedNotificationOverlay]
 /// overlay entries.
 @freezed
-abstract class EncapsulatedNotificationItem implements _$EncapsulatedNotificationItem {
+class EncapsulatedNotificationItem with _$EncapsulatedNotificationItem {
   /// Creates [EncapsulatedNotificationItem].
-  @Assert('timeout == null || timeout >= const Duration(seconds: 5)')
-  @Assert('important == false || timeout == null')
+  @Assert('timeout == null || timeout >= const Duration(seconds: 5)') @Assert('important == false || timeout == null')
   factory EncapsulatedNotificationItem({
     /// Tag to differentiate multiple active notifications.
-    String tag,
+    String? tag,
 
     /// Notification widget builder. If [timeout] is null, [timeoutAnimation] will be passed as null as well.
-    @required EncapsulatedNotificationItemBuilder builder,
+    required EncapsulatedNotificationItemBuilder builder,
 
     /// Fade out time of the notification. Set null to keep the item on screen
     /// till user interaction.
-    @Default(Duration(seconds: 5)) @nullable Duration timeout,
+    @Default(Duration(seconds: 5)) Duration? timeout,
 
     /// Callback on dismiss.
-    VoidCallback onDismissed,
+    VoidCallback? onDismissed,
 
     /// Dim the background behind the notification and intercept pop.
     @Default(false) bool important,
@@ -70,16 +69,15 @@ abstract class EncapsulatedNotificationItem implements _$EncapsulatedNotificatio
     @Default(true) bool dismissible,
 
     /// Reference to the previous [EncapsulatedNotificationItem].
-    EncapsulatedNotificationItem previous,
+    EncapsulatedNotificationItem? previous,
   }) = _EncapsulatedNotificationItem;
 
   EncapsulatedNotificationItem._();
-  EncapsulatedScaffoldStore _store;
+  EncapsulatedScaffoldStore? _store;
 
   /// Deliver this notification to the nearest [EncapsulatedNotificationOverlayController].
   void push(BuildContext context, [Set<String> replacements = const <String>{}]) {
-    _store = EncapsulatedScaffoldStore.of(context);
-    _store.pushNotification(this, replacements);
+    _store = EncapsulatedScaffoldStore.of(context)..pushNotification(this, replacements);
   }
 
   /// Remove this item from the [EncapsulatedNotificationOverlayController].

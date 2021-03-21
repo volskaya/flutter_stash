@@ -14,15 +14,15 @@ part 'revealing_bar.freezed.dart';
 typedef RevealingBarConditional = bool Function(bool shouldHide);
 
 /// [RevealingBar] child's custom builder.
-typedef RevealingBarBuilder = Widget Function(BuildContext context, Widget child, bool hide);
+typedef RevealingBarBuilder = Widget Function(BuildContext context, Widget? child, bool hide);
 
 /// Notification sent out by [RevealingBarNotifier] to [RevealingBarController]s.
 @freezed
-abstract class RevealingBarNotification with _$RevealingBarNotification {
+class RevealingBarNotification with _$RevealingBarNotification {
   const factory RevealingBarNotification({
-    @required double maxExtent,
-    double localOffset,
-    double remoteOffset,
+    required double maxExtent,
+    double? localOffset,
+    double? remoteOffset,
   }) = _RevealingBarNotification;
 }
 
@@ -31,8 +31,8 @@ abstract class RevealingBarNotification with _$RevealingBarNotification {
 class RevealingBarController extends StatefulWidget {
   /// Creates [RevealingBarController].
   const RevealingBarController({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.safeArea = 0,
     this.onlyShowBelowSafeArea = false,
     this.local,
@@ -46,10 +46,10 @@ class RevealingBarController extends StatefulWidget {
   final Widget child;
 
   /// If not null, will automatically wrap child in a [RevealingBarNotifier] with a local position.
-  final int local;
+  final int? local;
 
   /// If not null, will automatically wrap child in a [RevealingBarNotifier] with a remote position.
-  final int remote;
+  final int? remote;
 
   /// The offset past which to hide the bar.
   final double safeArea;
@@ -76,7 +76,7 @@ class RevealingBarControllerState extends State<RevealingBarController> {
   final _locks = HashSet<dynamic>();
 
   /// Holds the boolean of whether the bars should be hidden.
-  ValueNotifier<bool> notifier;
+  late final ValueNotifier<bool> notifier;
   bool get locked => _locks.isNotEmpty;
   double get _globalScrollOffset => _lastLocalOffset + _lastRemoteOffset;
   double get _globalMaxExtent => _lastLocalMaxExtent + _lastRemoteMaxExtent;
@@ -116,14 +116,12 @@ class RevealingBarControllerState extends State<RevealingBarController> {
 
   // Handles a scroll notification.
   void push(RevealingBarNotification notification) {
-    assert(notification != null);
-
     if (notification.localOffset != null) {
-      _lastLocalOffset = notification.localOffset;
+      _lastLocalOffset = notification.localOffset!;
       _lastLocalMaxExtent = notification.maxExtent;
     }
     if (notification.remoteOffset != null) {
-      _lastRemoteOffset = notification.remoteOffset;
+      _lastRemoteOffset = notification.remoteOffset!;
       _lastRemoteMaxExtent = notification.maxExtent;
     }
 
@@ -166,7 +164,7 @@ class RevealingBarControllerState extends State<RevealingBarController> {
     final provider = Provider<RevealingBarControllerState>.value(value: this, child: widget.child);
     return widget.local != null
         ? RevealingBarNotifier(
-            local: widget.local,
+            local: widget.local!,
             remote: widget.remote,
             child: provider,
           )
@@ -178,8 +176,8 @@ class RevealingBarControllerState extends State<RevealingBarController> {
 class RevealingBarNotifier extends StatelessWidget {
   /// Creates [RevealingBarNotifier].
   const RevealingBarNotifier({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.local = 0,
     this.remote,
   })  : assert(local >= 0),
@@ -190,7 +188,7 @@ class RevealingBarNotifier extends StatelessWidget {
   final int local;
 
   /// Remote scroll controller index, in case of a nested scroll view.
-  final int remote;
+  final int? remote;
 
   /// Child scrollable widget.
   final Widget child;
@@ -204,9 +202,9 @@ class RevealingBarNotifier extends StatelessWidget {
       child: child,
       onNotification: (notification) {
         // Ignore notifications from animating out routes.
-        if (!route.isCurrent) return false;
+        if (route?.isCurrent != true) return false;
 
-        RevealingBarNotification update;
+        RevealingBarNotification? update;
 
         if (notification.depth == local) {
           update = RevealingBarNotification(
@@ -231,7 +229,7 @@ class RevealingBarNotifier extends StatelessWidget {
 class RevealingBar extends StatelessWidget {
   /// Creates [RevealingBar]
   const RevealingBar({
-    Key key,
+    Key? key,
     this.child,
     this.conditional,
     this.alignment = Alignment.topCenter,
@@ -245,19 +243,19 @@ class RevealingBar extends StatelessWidget {
         super(key: key);
 
   /// Optional child widget. If this is null, [build] must be defined.
-  final Widget child;
+  final Widget? child;
 
   /// Return `true` to indicate the bar should be hidden.
-  final RevealingBarConditional conditional;
+  final RevealingBarConditional? conditional;
 
   /// Alignment of the slide animation.
   final Alignment alignment;
 
   /// Optional custom builder, makes [child] ineffective.
-  final RevealingBarBuilder builder;
+  final RevealingBarBuilder? builder;
 
   /// Whether the pointer should be ignored.
-  final bool ignoring;
+  final bool? ignoring;
 
   /// Whether to use a bounce out curve, for the reveal animation.
   final bool bounceOut;

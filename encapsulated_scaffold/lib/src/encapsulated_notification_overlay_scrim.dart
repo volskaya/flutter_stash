@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 class EncapsulatedNotificationOverlayScrim extends StatefulWidget {
   /// Creates [EncapsulatedNotificationOverlayScrim].
   const EncapsulatedNotificationOverlayScrim({
-    Key key,
-    @required this.onDismissed,
+    Key? key,
+    required this.onDismissed,
     this.toggled = false,
     this.duration = kThemeAnimationDuration,
   }) : super(key: key);
@@ -27,8 +27,8 @@ class EncapsulatedNotificationOverlayScrim extends StatefulWidget {
 
 class _EncapsulatedNotificationOverlayScrimState extends State<EncapsulatedNotificationOverlayScrim>
     with SingleTickerProviderStateMixin<EncapsulatedNotificationOverlayScrim> {
-  AnimationController _controller;
-  Animation<Color> _colorAnimation;
+  late final AnimationController _controller;
+  late final Animation<Color?> _colorAnimation;
   bool _buildScrim = false;
 
   TickerFuture close() => _controller.reverse();
@@ -68,7 +68,7 @@ class _EncapsulatedNotificationOverlayScrimState extends State<EncapsulatedNotif
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _controller.dispose();
     super.dispose();
   }
 

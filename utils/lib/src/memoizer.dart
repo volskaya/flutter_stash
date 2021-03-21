@@ -27,23 +27,21 @@ class Memoizer<T> {
     _hasResolved = true;
   }
 
-  Completer<T> _completer = Completer<T>();
+  final Completer<T?> _completer = Completer<T?>();
   bool _hasResolved = false;
   bool _invalidated = false;
-  T value;
+  T? value;
 
   bool get isCompleted => _completer.isCompleted || value != null;
 
   /// If the value is ready, it is returned with a [SynchronousFuture].
-  Future<T> get future {
+  Future<T?> get future {
     assert(!_invalidated);
-    return _hasResolved ? SynchronousFuture<T>(value) : _completer.future;
+    return _hasResolved ? SynchronousFuture<T?>(value) : _completer.future;
   }
 
   void invalidate() {
     _invalidated = true;
-    if (!_completer.isCompleted) _completer.complete(null);
-    value = null;
-    _completer = null;
+    if (!_completer.isCompleted) _completer.complete();
   }
 }

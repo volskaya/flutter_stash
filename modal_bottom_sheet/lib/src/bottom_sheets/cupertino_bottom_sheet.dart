@@ -259,14 +259,11 @@ class _CupertinoModalTransition extends StatelessWidget {
 }
 
 class _CupertinoScaffold extends InheritedWidget {
-  final AnimationController animation;
-
-  final Radius topRadius;
-
-  @override
-  final Widget child;
-
   const _CupertinoScaffold({Key key, this.animation, this.child, this.topRadius}) : super(key: key, child: child);
+
+  final AnimationController animation;
+  final Radius topRadius;
+  @override final Widget child;
 
   @override
   bool updateShouldNotify(InheritedWidget oldWidget) {

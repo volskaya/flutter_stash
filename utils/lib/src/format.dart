@@ -23,21 +23,21 @@ class Format {
   static String currencyString(double amount) => '€ ${amount.toStringAsFixed(2)}';
   static String coinAsCurrency(int coin) => currencyString(coin / 100);
 
-  static String errorMessage(String message) {
+  static String? errorMessage(String message) {
     if (isEmpty(message)) return null;
     if (message.length == 1) return message.toUpperCase();
     return Format.capitalize(message).replaceAll('-', ' ');
   }
 
-  static String platformExceptionMessage(PlatformException exception, {String orElse = '???'}) =>
-      errorMessage((exception?.details as Map ?? {})['message'] as String ?? orElse);
+  static String? platformExceptionMessage(PlatformException exception, {String orElse = '???'}) =>
+      errorMessage((exception.details)['message'] as String? ?? orElse);
 
-  static String firebaseFunctionsErrorMessage(FirebaseFunctionsException exception, {String orElse = '???'}) =>
-      errorMessage(exception?.message ?? orElse);
+  static String? firebaseFunctionsErrorMessage(FirebaseFunctionsException exception, {String orElse = '???'}) =>
+      errorMessage(exception.message ?? orElse);
 
-  static String userName([UserModel user]) {
-    if (user == null) return 'Untitled';
-    if (user.banTime == null && isNotEmpty(user.title)) return user.title;
+  static String userName([UserModel? user]) {
+    if (user == null) return '???';
+    if (user.banTime == null && isNotEmpty(user.title)) return user.title!;
     return '${user.id.substring(0, 6)}';
   }
 
@@ -50,7 +50,7 @@ class Format {
     bool upperCase = false,
     String singularSuffix = '',
     String pluralSuffix = 's',
-    String countAlternative,
+    String? countAlternative,
     bool omitNumber = false,
   }) {
     final buffer = StringBuffer();
@@ -73,33 +73,33 @@ class Format {
     final localeTag = locale.toLanguageTag();
 
     _dateFormatters[localeTag] ??= <DateSkeleton, DateFormat>{};
-    if (!_dateFormatters[localeTag].containsKey(skeleton)) {
+    if (!_dateFormatters[localeTag]!.containsKey(skeleton)) {
       switch (skeleton) {
         case DateSkeleton.yMd_jm:
-          _dateFormatters[localeTag][skeleton] = DateFormat.yMd().add_jm();
+          _dateFormatters[localeTag]![skeleton] = DateFormat.yMd().add_jm();
           break;
         case DateSkeleton.keyboard:
         case DateSkeleton.yMd:
-          _dateFormatters[localeTag][skeleton] = DateFormat.yMd();
+          _dateFormatters[localeTag]![skeleton] = DateFormat.yMd();
           break;
         case DateSkeleton.jm:
-          _dateFormatters[localeTag][skeleton] = DateFormat.jm();
+          _dateFormatters[localeTag]![skeleton] = DateFormat.jm();
           break;
         case DateSkeleton.EEEE:
-          _dateFormatters[localeTag][skeleton] = DateFormat.EEEE();
+          _dateFormatters[localeTag]![skeleton] = DateFormat.EEEE();
           break;
         case DateSkeleton.yMMMd:
-          _dateFormatters[localeTag][skeleton] = DateFormat.yMMMd();
+          _dateFormatters[localeTag]![skeleton] = DateFormat.yMMMd();
           break;
         default:
           throw UnimplementedError();
       }
     }
 
-    return _dateFormatters[localeTag][skeleton];
+    return _dateFormatters[localeTag]![skeleton]!;
   }
 
-  static String duration(Duration _duration, [UtilsLocalizations strings]) {
+  static String duration(Duration _duration, [UtilsLocalizations? strings]) {
     // Don't print duration under 0.
     final duration = _duration >= Duration.zero ? _duration : Duration.zero;
     final buffer = StringBuffer();
@@ -127,7 +127,42 @@ class Format {
     return buffer.toString();
   }
 
-  static String remainingDuration(Duration duration, [UtilsLocalizations strings]) {
+  static String durationShort(Duration _duration, [UtilsLocalizations? strings]) {
+    // Don't print duration under 0.
+    final duration = _duration >= Duration.zero ? _duration : Duration.zero;
+    final buffer = StringBuffer();
+
+    if (duration.inHours >= Duration.hoursPerDay) {
+      buffer.write(strings?.durationDaysShort(duration.inDays) ?? Format.counted(duration.inDays, 'day'));
+      final remainder = duration.inHours % Duration.hoursPerDay;
+
+      if (remainder > 0) {
+        buffer.write(strings?.durationHoursTailShort(remainder) ?? ', ${Format.counted(remainder, "hour")}');
+      }
+    } else if (duration.inMinutes >= Duration.minutesPerHour) {
+      buffer.write(strings?.durationHoursShort(duration.inHours) ?? Format.counted(duration.inHours, 'hour'));
+      final remainder = duration.inMinutes % Duration.minutesPerHour;
+
+      if (remainder > 0) {
+        buffer.write(strings?.durationMinutesTailShort(remainder) ?? ', $remainder min');
+      }
+    } else if (duration.inSeconds >= Duration.secondsPerMinute) {
+      buffer.write(strings?.durationMinutesShort(duration.inMinutes) ?? '${duration.inMinutes} min');
+    } else {
+      buffer.write(strings?.durationSecondsShort(duration.inSeconds) ?? Format.counted(duration.inSeconds, 'second'));
+    }
+
+    return buffer.toString();
+  }
+
+  static String dateShort(DateTime date, [UtilsLocalizations? strings]) {
+    final showTimeInstead = DateTime.now().difference(date) < const Duration(days: 1);
+    return showTimeInstead
+        ? (strings?.time(date) ?? Format.dateFormatOf(DateSkeleton.jm).format(date))
+        : (strings?.textualDate(date) ?? Format.dateFormatOf(DateSkeleton.yMMMd).format(date));
+  }
+
+  static String remainingDuration(Duration duration, [UtilsLocalizations? strings]) {
     assert(duration.inHours == 0);
     if (duration < Duration.zero) return strings?.soon ?? 'Soon';
 
@@ -139,10 +174,10 @@ class Format {
 
   static String date(
     DateTime date, {
-    DateTime anchor,
+    DateTime? anchor,
     bool useWords = false,
     bool prependDay = false,
-    UtilsLocalizations strings,
+    UtilsLocalizations? strings,
   }) {
     final now = anchor ?? DateTime.now();
 
@@ -168,19 +203,30 @@ class Format {
   static final _defaultCreateTimeFormat = Format.dateFormatOf(DateSkeleton.yMd_jm);
   static String trimRedundantLines(String str) => str.replaceAll(_redundantNewLineRegExp, '\n');
 
-  static String createTime(DateTime time, [DateFormat format, UtilsLocalizations strings]) {
+  static String createTime(DateTime? time, [DateFormat? format, UtilsLocalizations? strings]) {
     final duration = time != null ? DateTime.now().difference(time) : Duration.zero;
     if (duration < Duration.zero) {
       return strings?.justNow ?? 'Just now';
     } else if (duration > const Duration(days: 1)) {
       if (strings == null) {
         final formatter = format ?? _defaultCreateTimeFormat;
-        return formatter.format(time);
+        return formatter.format(time!);
       }
 
-      return strings.createDate(time, time);
+      return strings.createDate(time!, time);
     } else {
       return strings?.durationAgo(duration) ?? '${Format.duration(duration, strings)} ago';
     }
   }
+
+  /// If the number is higher than 1000, returns it as 1K or 44.2K.
+  static String thousand(num number) =>
+      number < 1000 ? number.toString() : (number / 1000).toStringAsPrecision(0) + 'k';
+
+  /// Formats price.
+  static String price(double price, String? currency, Locale? locale) => NumberFormat.simpleCurrency(
+        locale: locale?.languageCode ?? 'en',
+        name: currency ?? '',
+        decimalDigits: 2,
+      ).format(price);
 }

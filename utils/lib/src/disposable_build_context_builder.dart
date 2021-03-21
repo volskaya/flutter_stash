@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class DisposableBuildContextBuilder extends StatefulWidget {
   const DisposableBuildContextBuilder({
-    Key key,
-    @required this.builder,
+    Key? key,
+    required this.builder,
   }) : super(key: key);
 
   final Widget Function(
@@ -16,7 +16,7 @@ class DisposableBuildContextBuilder extends StatefulWidget {
 }
 
 class _DisposableBuildContextBuilderState extends State<DisposableBuildContextBuilder> {
-  DisposableBuildContext<_DisposableBuildContextBuilderState> _disposableBuildContext;
+  late final DisposableBuildContext<_DisposableBuildContextBuilderState> _disposableBuildContext;
 
   @override
   void initState() {
@@ -26,7 +26,7 @@ class _DisposableBuildContextBuilderState extends State<DisposableBuildContextBu
 
   @override
   void dispose() {
-    _disposableBuildContext?.dispose();
+    _disposableBuildContext.dispose();
     super.dispose();
   }
 

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 /// Allows to tween over a to b, while skipping a range inbetween.
 class RangeTween<T extends num> extends Tween<double> {
   RangeTween({
-    @required Offset begin,
-    @required Offset end,
+    required Offset begin,
+    required Offset end,
   })  : assert(begin.dy > begin.dx),
         assert(end.dx > begin.dy),
         assert(end.dy > begin.dx),

@@ -1,10 +1,10 @@
 name: utils
-version: 0.0.1
+version: 0.1.1
 author: Roland Volskaya
 homepage: github.com/volskaya/flutter_helpers
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
@@ -13,14 +13,14 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  mobx: ^1.2.1+2
-  firebase_storage: ^4.0.0
-  freezed: ^0.12.6
-  intl: ^0.16.1
-  cloud_functions: ^0.7.1
-  cloud_firestore: ^0.14.0+2
-  quiver: ^2.1.3
-  json_annotation:
+  mobx: ^2.0.0-nullsafety.5
+  firebase_storage: ^8.0.0
+  freezed_annotation: ^0.14.1
+  intl: ^0.17.0
+  cloud_functions: ^1.0.0
+  cloud_firestore: ^1.0.1
+  quiver: ^3.0.0
+  json_annotation: ^4.0.1
 
   loader_coordinator:
     path: /home/projects/packages/flutter_helpers/loader_coordinator
@@ -30,12 +30,11 @@ dependencies:
     path: /home/projects/packages/flutter_helpers/refresh_storage
 
 dev_dependencies:
-  json_serializable:
+  json_serializable: ^4.1.0
   build_runner: ^1.10.0
-  freezed_annotation: ^0.12.0
+  freezed: ^0.14.1+1
 
 dependency_overrides:
-  intl: 0.17.0
   freezed_annotation:
     path: /home/projects/forks/freezed/packages/freezed_annotation
   freezed:

@@ -74,12 +74,12 @@ class MaterialDialogContainer extends StatelessWidget {
             buttons: [
               TextButton(
                 // ignore: invalid_null_aware_operator
-                child: Text(cancelText ?? strings?.cancelButtonLabel ?? 'CANCEL', layoutTwice: true),
+                child: Text(cancelText ?? strings.cancelButtonLabel, layoutTwice: true),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
                 // ignore: invalid_null_aware_operator
-                child: Text(continueText ?? strings?.continueButtonLabel ?? 'CONTINUE', layoutTwice: true),
+                child: Text(continueText ?? strings.continueButtonLabel, layoutTwice: true),
                 onPressed: () => Navigator.pop(context, true),
                 style: continueTextColor != null ? TextButton.styleFrom(primary: continueTextColor) : null,
               ),
@@ -172,7 +172,7 @@ class MaterialDialogContainer extends StatelessWidget {
             child: material,
             attachment: RefreshStorage.wrapProvider(
               state: attachment!.storage,
-              child: attachment!.widget,
+              child: attachment!.widget!,
             ),
           )
         : material;

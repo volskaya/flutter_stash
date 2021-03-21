@@ -1,7 +1,6 @@
 
 import 'dart:async';
 
-// ignore: unused_import
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -64,10 +63,9 @@ import 'utils_localizations_lv.dart';
 abstract class UtilsLocalizations {
   UtilsLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
-  // ignore: unused_field
   final String localeName;
 
-  static UtilsLocalizations of(BuildContext context) {
+  static UtilsLocalizations? of(BuildContext context) {
     return Localizations.of<UtilsLocalizations>(context, UtilsLocalizations);
   }
 
@@ -150,6 +148,18 @@ abstract class UtilsLocalizations {
   /// **'{date}'**
   String date(DateTime date);
 
+  /// No description provided for @textualDate.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}'**
+  String textualDate(DateTime date);
+
+  /// No description provided for @time.
+  ///
+  /// In en, this message translates to:
+  /// **'{time}'**
+  String time(DateTime time);
+
   /// No description provided for @createDate.
   ///
   /// In en, this message translates to:
@@ -197,6 +207,48 @@ abstract class UtilsLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{, 1 second} =other{, {count} seconds}}'**
   String durationSecondsTail(int count);
+
+  /// No description provided for @durationDaysShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}d'**
+  String durationDaysShort(Object count);
+
+  /// No description provided for @durationHoursShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}h'**
+  String durationHoursShort(Object count);
+
+  /// No description provided for @durationHoursTailShort.
+  ///
+  /// In en, this message translates to:
+  /// **', {count}h'**
+  String durationHoursTailShort(Object count);
+
+  /// No description provided for @durationMinutesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}min'**
+  String durationMinutesShort(Object count);
+
+  /// No description provided for @durationMinutesTailShort.
+  ///
+  /// In en, this message translates to:
+  /// **', {count}min'**
+  String durationMinutesTailShort(Object count);
+
+  /// No description provided for @durationSecondsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}s'**
+  String durationSecondsShort(Object count);
+
+  /// No description provided for @durationSecondsTailShort.
+  ///
+  /// In en, this message translates to:
+  /// **', {count}s'**
+  String durationSecondsTailShort(Object count);
 }
 
 class _UtilsLocalizationsDelegate extends LocalizationsDelegate<UtilsLocalizations> {

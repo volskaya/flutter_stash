@@ -14,8 +14,8 @@ extension CorrectedMediaQueryData on MediaQueryData {
 /// the inset to to padding by itself.
 class CorrectedMediaQuery extends StatelessWidget {
   const CorrectedMediaQuery({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.onBuild,
   }) : super(key: key);
 
@@ -23,7 +23,7 @@ class CorrectedMediaQuery extends StatelessWidget {
   static const keyboardHeightRatioHeuristic = 0.18;
 
   final Widget child;
-  final ValueChanged<MediaQueryData> onBuild;
+  final ValueChanged<MediaQueryData>? onBuild;
 
   @override
   Widget build(BuildContext context) {

@@ -28,8 +28,8 @@ class MarkStorage extends RefreshStorageItem {
 
   static Future mark(
     BuildContext context, {
-    @required FutureOr<void> Function() callback,
-    @required String bucket,
+    required FutureOr<void> Function() callback,
+    required String bucket,
   }) {
     final identifier = '${bucket}_mark_write';
     final storage = RefreshStorage.write(
@@ -40,7 +40,7 @@ class MarkStorage extends RefreshStorageItem {
     );
 
     try {
-      return !storage.value._marked ? storage.value.handleMark() : SynchronousFuture(null);
+      return !storage.value!._marked ? storage.value!.handleMark() : SynchronousFuture(null);
     } finally {
       storage.dispose();
     }

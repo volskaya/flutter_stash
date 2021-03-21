@@ -91,23 +91,14 @@ class _ModalRoute<T> extends PopupRoute<T> {
     this.barrierDismissible = true,
     this.barrierLabel,
     required this.builder,
-  })   : assert(!barrierDismissible || barrierLabel != null),
+  })  : assert(!barrierDismissible || barrierLabel != null),
         _transitionBuilder = transitionBuilder;
 
-  @override
-  final Color? barrierColor;
-
-  @override
-  final bool barrierDismissible;
-
-  @override
-  final String? barrierLabel;
-
-  @override
-  final Duration transitionDuration;
-
-  @override
-  final Duration reverseTransitionDuration;
+  @override final Color? barrierColor;
+  @override final bool barrierDismissible;
+  @override final String? barrierLabel;
+  @override final Duration transitionDuration;
+  @override final Duration reverseTransitionDuration;
 
   /// The primary contents of the modal.
   final WidgetBuilder builder;

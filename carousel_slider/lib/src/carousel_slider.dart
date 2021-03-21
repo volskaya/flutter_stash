@@ -9,9 +9,9 @@ typedef IndicatorBuilder = Widget Function(BuildContext context, ValueListenable
 
 class CarouselSlider extends StatefulWidget {
   const CarouselSlider({
-    Key key,
-    @required this.itemBuilder,
-    @required this.itemCount,
+    Key? key,
+    required this.itemBuilder,
+    required this.itemCount,
     this.pageStorageKey,
     this.pageController,
     this.height,
@@ -24,34 +24,36 @@ class CarouselSlider extends StatefulWidget {
     this.pauseAutoPlayOnTouch,
     this.enlargeCenterPage = false,
     this.onPageChanged,
-    this.scrollPhysics,
+    this.scrollPhysics = const AlwaysScrollableScrollPhysics(),
     this.scrollDirection = Axis.horizontal,
     this.shouldSkip,
     this.indicatorBuilder,
     this.initialPage,
+    this.children = const <Widget>[],
   }) : super(key: key);
 
   static const int _kRealPage = 10000;
 
-  final PageStorageKey pageStorageKey;
-  final bool Function() shouldSkip;
+  final PageStorageKey? pageStorageKey;
+  final bool Function()? shouldSkip;
   final IndexedWidgetBuilder itemBuilder;
   final int itemCount;
-  final double height;
-  final double aspectRatio;
+  final double? height;
+  final double? aspectRatio;
   final bool enableInfiniteScroll;
   final bool autoPlay;
   final Duration autoPlayInterval;
   final Duration autoPlayAnimationDuration;
   final Curve autoPlayCurve;
-  final Duration pauseAutoPlayOnTouch;
+  final Duration? pauseAutoPlayOnTouch;
   final bool enlargeCenterPage;
   final Axis scrollDirection;
-  final ValueChanged<int> onPageChanged;
+  final ValueChanged<int>? onPageChanged;
   final ScrollPhysics scrollPhysics;
-  final PageController pageController;
-  final IndicatorBuilder indicatorBuilder;
-  final int initialPage;
+  final PageController? pageController;
+  final IndicatorBuilder? indicatorBuilder;
+  final int? initialPage;
+  final List<Widget> children;
 
   static PageController getPageController({int initialPage = 0}) => PageController(
         viewportFraction: 1,
@@ -64,11 +66,11 @@ class CarouselSlider extends StatefulWidget {
 
 class CarouselSliderState extends State<CarouselSlider>
     with TickerProviderStateMixin<CarouselSlider>, WidgetsBindingObserver {
-  PageController _pageController;
-  PageControllerValueListenable _pageControllerValueListenable;
-  Timer _metronome; // Slide metronome.
-  Timer _timer; // Pause timer.
-  double get currentPage => (_pageController?.page ?? 0.0) % CarouselSlider._kRealPage;
+  late final PageController _pageController;
+  late final PageControllerValueListenable _pageControllerValueListenable;
+  Timer? _metronome; // Slide metronome.
+  Timer? _timer; // Pause timer.
+  double get currentPage => (_pageController.page ?? 0.0) % CarouselSlider._kRealPage;
 
   int _getRealIndex(int index) {
     final remainder = (index - CarouselSlider._kRealPage) % widget.itemCount;
@@ -77,7 +79,10 @@ class CarouselSliderState extends State<CarouselSlider>
 
   void _handleTimerTick([dynamic _]) {
     assert(mounted);
-    if (widget.autoPlay && mounted && ModalRoute.of(context).isCurrent && !(widget.shouldSkip?.call() == true)) {
+    if (widget.autoPlay &&
+        mounted &&
+        ModalRoute.of(context)?.isCurrent == true &&
+        !(widget.shouldSkip?.call() == true)) {
       _pageController.nextPage(
         duration: widget.autoPlayAnimationDuration,
         curve: widget.autoPlayCurve,
@@ -86,24 +91,24 @@ class CarouselSliderState extends State<CarouselSlider>
   }
 
   void _buildMetronome() {
-    assert(_timer == null || !_timer.isActive);
+    assert(_timer == null || !_timer!.isActive);
     assert(_metronome == null);
     _metronome?.cancel();
     _metronome = Timer.periodic(widget.autoPlayInterval, _handleTimerTick);
   }
 
-  /// Cancel the metronome
-  void _handlePanDown([DragDownDetails _]) {
+  /// Cancel the metronome.
+  void _handlePanDown([DragDownDetails? _]) {
     _timer?.cancel();
     _metronome?.cancel();
-    _metronome = null; // Metronome will be rebuilt with a new anchor
+    _metronome = null; // Metronome will be rebuilt with a new anchor.
   }
 
-  /// Resume the metronome after [CarouselSlider.pauseAutoPlayOnTouch] duration
-  void _handlePanEnd([DragEndDetails _]) {
+  /// Resume the metronome after [CarouselSlider.pauseAutoPlayOnTouch] duration.
+  void _handlePanEnd([DragEndDetails? _]) {
     _metronome?.cancel();
     _timer?.cancel();
-    _timer = Timer(widget.pauseAutoPlayOnTouch, _buildMetronome);
+    _timer = Timer(widget.pauseAutoPlayOnTouch!, _buildMetronome);
   }
 
   void _handlePageChange(int index) => widget.onPageChanged?.call(_getRealIndex(index));
@@ -117,34 +122,42 @@ class CarouselSliderState extends State<CarouselSlider>
     );
 
     _buildMetronome();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance!.removeObserver(this);
     _metronome?.cancel();
     _timer?.cancel();
-    if (widget.pageController == null) _pageController?.dispose();
+    if (widget.pageController == null) _pageController.dispose();
     super.dispose();
   }
+
+  bool? _toggledLifecycle;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
       case AppLifecycleState.inactive:
-        if (_metronome?.isActive != true) _buildMetronome(); // Resume animations.
+        if (_toggledLifecycle != true && _metronome?.isActive != true) {
+          _toggledLifecycle = true;
+          _buildMetronome(); // Resume animations.
+        }
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.detached:
-        _handlePanDown(); // Disposes metronome.
+        if (_toggledLifecycle != false) {
+          _toggledLifecycle = false;
+          _handlePanDown(); // Disposes metronome.
+        }
         break;
     }
   }
 
-  Widget _buildGestureDetector({@required Widget child}) => GestureDetector(
+  Widget _buildGestureDetector({required Widget child}) => GestureDetector(
         onPanDown: _handlePanDown,
         onPanEnd: _handlePanEnd,
         onPanCancel: _handlePanEnd,
@@ -181,7 +194,7 @@ class CarouselSliderState extends State<CarouselSlider>
     if (widget.height != null) {
       pageView = SizedBox(height: widget.height, child: pageView);
     } else if (widget.aspectRatio != null) {
-      pageView = AspectRatio(aspectRatio: widget.aspectRatio, child: pageView);
+      pageView = AspectRatio(aspectRatio: widget.aspectRatio!, child: pageView);
     }
 
     if (widget.autoPlay && widget.pauseAutoPlayOnTouch != null) {
@@ -194,7 +207,9 @@ class CarouselSliderState extends State<CarouselSlider>
         fit: StackFit.passthrough,
         children: <Widget>[
           pageView,
-          widget.indicatorBuilder(context, _pageControllerValueListenable, widget.itemCount),
+          if (widget.indicatorBuilder != null)
+            widget.indicatorBuilder!(context, _pageControllerValueListenable, widget.itemCount),
+          ...widget.children,
         ],
       );
     }

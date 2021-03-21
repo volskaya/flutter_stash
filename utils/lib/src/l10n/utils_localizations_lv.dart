@@ -1,9 +1,7 @@
 
-// ignore: unused_import
+
 import 'package:intl/intl.dart' as intl;
 import 'utils_localizations.dart';
-
-// ignore_for_file: unnecessary_brace_in_string_interps
 
 /// The translations for Latvian (`lv`).
 class UtilsLocalizationsLv extends UtilsLocalizations {
@@ -28,17 +26,17 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
     final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
     final String dateString = dateDateFormat.format(date);
 
-    return '${weekdayString}, ${dateString}';
+    return '$weekdayString, $dateString';
   }
 
   @override
   String durationAgo(Object duration) {
-    return '${duration} atpakaļ';
+    return '$duration atpakaļ';
   }
 
   @override
   String remainingDuration(Object minutes, Object seconds) {
-    return '${minutes}:${seconds}';
+    return '$minutes:$seconds';
   }
 
   @override
@@ -46,7 +44,7 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
     final intl.DateFormat dateDateFormat = intl.DateFormat.EEEE(localeName);
     final String dateString = dateDateFormat.format(date);
 
-    return '${dateString}';
+    return '$dateString';
   }
 
   @override
@@ -54,7 +52,23 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
     final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
     final String dateString = dateDateFormat.format(date);
 
-    return '${dateString}';
+    return '$dateString';
+  }
+
+  @override
+  String textualDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
+  String time(DateTime time) {
+    final intl.DateFormat timeDateFormat = intl.DateFormat.jm(localeName);
+    final String timeString = timeDateFormat.format(time);
+
+    return '$timeString';
   }
 
   @override
@@ -64,7 +78,7 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
     final intl.DateFormat timeDateFormat = intl.DateFormat.jm(localeName);
     final String timeString = timeDateFormat.format(time);
 
-    return '${dateString} ${timeString}';
+    return '$dateString $timeString';
   }
 
   @override
@@ -73,7 +87,7 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
       count,
       locale: localeName,
       one: '1 dienu',
-      other: '${count} dienas',
+      other: '$count dienas',
     );
   }
 
@@ -83,7 +97,7 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
       count,
       locale: localeName,
       one: '1 stundu',
-      other: '${count} stundas',
+      other: '$count stundas',
     );
   }
 
@@ -93,7 +107,7 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
       count,
       locale: localeName,
       one: ', 1 stundu',
-      other: ', ${count} stundas',
+      other: ', $count stundas',
     );
   }
 
@@ -103,7 +117,7 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
       count,
       locale: localeName,
       one: '1 min',
-      other: '${count} min',
+      other: '$count min',
     );
   }
 
@@ -113,7 +127,7 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
       count,
       locale: localeName,
       one: ', 1 min',
-      other: ', ${count} min',
+      other: ', $count min',
     );
   }
 
@@ -123,7 +137,7 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
       count,
       locale: localeName,
       one: '1 sekundi',
-      other: '${count} sekundes',
+      other: '$count sekundes',
     );
   }
 
@@ -133,7 +147,42 @@ class UtilsLocalizationsLv extends UtilsLocalizations {
       count,
       locale: localeName,
       one: ', 1 seskundi',
-      other: ', ${count} sekundes',
+      other: ', $count sekundes',
     );
+  }
+
+  @override
+  String durationDaysShort(Object count) {
+    return '${count}d';
+  }
+
+  @override
+  String durationHoursShort(Object count) {
+    return '${count}h';
+  }
+
+  @override
+  String durationHoursTailShort(Object count) {
+    return ', ${count}h';
+  }
+
+  @override
+  String durationMinutesShort(Object count) {
+    return '${count}min';
+  }
+
+  @override
+  String durationMinutesTailShort(Object count) {
+    return ', ${count}min';
+  }
+
+  @override
+  String durationSecondsShort(Object count) {
+    return '${count}s';
+  }
+
+  @override
+  String durationSecondsTailShort(Object count) {
+    return ', ${count}s';
   }
 }

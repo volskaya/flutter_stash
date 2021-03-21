@@ -29,7 +29,7 @@ class FutureButtonBuilder extends StatefulWidget {
   /// A question callback, like a modal that returns true, to call before the [onPressed].
   ///
   /// While this callback is awaited, the [FutureButtonBuilder] will not trigger [LoaderCoordinator].
-  final Future<bool> Function()? question;
+  final Future<bool?> Function()? question;
 
   /// If `family` is defined, the buttons will share the same notifiers
   /// and lock/unlock at the same time

@@ -6,11 +6,16 @@ mixin PictureInPictureObserver {
 
 mixin TitledModel {
   String get id;
-  String get title;
+  String? get title;
 }
 
 mixin UserModel {
   String get id;
-  String get title;
-  Timestamp get banTime;
+  String? get title;
+  Timestamp? get banTime;
+}
+
+mixin OwnedModel {
+  String get id;
+  String? get owner;
 }

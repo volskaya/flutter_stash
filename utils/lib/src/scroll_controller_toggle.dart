@@ -7,9 +7,9 @@ import '../utils.dart';
 /// past a certain offset.
 class ScrollControllerToggle extends ChangeNotifier implements ValueListenable<bool> {
   ScrollControllerToggle({
-    @required this.controller,
+    required this.controller,
     this.offset = 0,
-    bool initialValue,
+    bool? initialValue,
     bool calculateInitialValuePostFrame = false,
   }) {
     controller.addListener(_handleChange);
@@ -17,7 +17,7 @@ class ScrollControllerToggle extends ChangeNotifier implements ValueListenable<b
     if (initialValue != null) {
       _value = initialValue;
     } else if (calculateInitialValuePostFrame) {
-      WidgetsBinding.instance.addPostFrameCallback(
+      WidgetsBinding.instance!.addPostFrameCallback(
         (_) => _value = Utils.isScrolled(controller, offset),
       );
     } else {

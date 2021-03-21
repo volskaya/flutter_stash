@@ -17,6 +17,7 @@ export 'src/corrected_media_query.dart';
 export 'src/custom_ink_splash.dart';
 export 'src/debounce.dart';
 export 'src/disposable_build_context_builder.dart';
+export 'src/draggable_key.dart';
 export 'src/exit_guard.dart';
 export 'src/initial_dependencies.dart';
 export 'src/mark_storage.dart';
@@ -27,25 +28,44 @@ export 'src/range_tween.dart';
 export 'src/proxy_widget_builder.dart';
 export 'src/scroll_controller_toggle.dart';
 export 'src/storage_upload.dart';
+export 'src/list_chrome.dart';
 export 'src/enums.dart';
 export 'src/mixins.dart';
 export 'src/converters.dart';
 export 'src/format.dart';
 export 'src/memoizer.dart';
+export 'src/overlayed_ink_well.dart';
+export 'src/transform_value_notifier.dart';
 export 'src/l10n/utils_localizations.dart';
 
-abstract class Utils {
-  static int androidSdkVersion;
-  static PictureInPictureObserver pictureInPictureObserver;
+String trimString(String string) => string.trim();
+String notBlankString(String? string) {
+  final trimmedString = string?.trim();
+  return trimmedString?.isNotEmpty == true ? trimmedString ?? '' : '';
+}
 
-  static double clampAspectRatio(double aspectRatio) => aspectRatio.clamp(9 / 16, 16 / 9).toDouble();
+String? notBlankStringN(String? string) {
+  final trimmedString = string?.trim();
+  return trimmedString?.isNotEmpty == true ? trimmedString : null;
+}
+
+abstract class Utils {
+  static int? androidSdkVersion;
+  static PictureInPictureObserver? pictureInPictureObserver;
+
+  static double clampAspectRatio(
+    double aspectRatio, {
+    double min = 9.0 / 16.0,
+    double max = 16.0 / 9.0,
+  }) =>
+      aspectRatio.clamp(min, max).toDouble();
 
   static bool isPictureInPicture(MediaQueryData mediaQuery) {
     assert(androidSdkVersion != null && pictureInPictureObserver != null);
 
     if ((androidSdkVersion ?? 0) < 24) {
       return false; // Not supported;
-    } else if (androidSdkVersion > 26) {
+    } else if (androidSdkVersion! > 26) {
       // Above api 26 the PIP window is set to be a square. So using the window size,
       // since it will be updated faster than the method channel event.
       return nearEqual(mediaQuery.size.aspectRatio, 1.0, Tolerance.defaultTolerance.distance);
@@ -60,7 +80,7 @@ abstract class Utils {
 
   static Future<Duration> awaitPostframe() async {
     final completer = Completer<Duration>();
-    WidgetsBinding.instance.addPostFrameCallback(completer.complete);
+    WidgetsBinding.instance!.addPostFrameCallback(completer.complete);
     return completer.future;
   }
 
@@ -75,11 +95,18 @@ abstract class Utils {
     Iterable<Widget> children, {
     bool top = true,
     bool bottom = true,
+    EdgeInsets insets = EdgeInsets.zero,
   }) =>
       [
-        if (top) const SliverSafeArea(bottom: false, sliver: SliverPadding(padding: EdgeInsets.zero)),
+        if (top)
+          (insets.top > 0
+              ? SliverSafeArea(bottom: false, sliver: SliverPadding(padding: EdgeInsets.only(top: insets.top)))
+              : const SliverSafeArea(bottom: false, sliver: SliverPadding(padding: EdgeInsets.zero))),
         ...children,
-        if (bottom) const SliverSafeArea(top: false, sliver: SliverPadding(padding: EdgeInsets.zero)),
+        if (bottom)
+          (insets.bottom > 0
+              ? SliverSafeArea(top: false, sliver: SliverPadding(padding: EdgeInsets.only(bottom: insets.bottom)))
+              : const SliverSafeArea(top: false, sliver: SliverPadding(padding: EdgeInsets.zero))),
       ];
 
   /// The app has 2 navigators. Make sure [WillPopScope] doesn't
@@ -87,7 +114,7 @@ abstract class Utils {
   static Future<bool> protectRootNavigator(BuildContext context, FutureOr<bool> Function() callback) async {
     final rootNavigator = Navigator.of(context, rootNavigator: true);
 
-    if (rootNavigator?.canPop() == true) {
+    if (rootNavigator.canPop()) {
       rootNavigator.pop();
       return false;
     }
@@ -101,7 +128,7 @@ abstract class Utils {
     Map<String, dynamic> params,
     String viewType, [
     bool useHybridComposition = false,
-    void Function(int) onPlatformViewCreated,
+    void Function(int)? onPlatformViewCreated,
   ]) =>
       !useHybridComposition
           ? RepaintBoundary(
@@ -134,4 +161,25 @@ abstract class Utils {
                 })
                 ..create(),
             );
+
+  /// Defer the [callback] to a postframe, if [shouldDefer] returns true.
+  static FutureOr<T> maybeDeferFuture<T>(
+    bool Function() shouldDefer,
+    FutureOr<T> Function() callback,
+  ) {
+    if (shouldDefer()) {
+      final completer = Completer<T>();
+      WidgetsBinding.instance!.addPostFrameCallback((_) async {
+        try {
+          final v = await callback();
+          completer.complete(v);
+        } catch (e, t) {
+          completer.completeError(e, t);
+        }
+      });
+      return completer.future;
+    } else {
+      return callback();
+    }
+  }
 }

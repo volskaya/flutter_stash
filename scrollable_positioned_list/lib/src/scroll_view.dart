@@ -22,6 +22,9 @@ class UnboundedCustomScrollView extends CustomScrollView {
     int? semanticChildCount,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
     Clip clipBehavior = Clip.hardEdge,
+    ScrollBehavior? scrollBehavior,
+    String? restorationId,
+    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.onDrag,
   })  : _anchor = anchor,
         super(
           key: key,
@@ -37,6 +40,10 @@ class UnboundedCustomScrollView extends CustomScrollView {
           dragStartBehavior: dragStartBehavior,
           slivers: slivers,
           clipBehavior: clipBehavior,
+          scrollBehavior: scrollBehavior,
+          anchor: anchor,
+          restorationId: restorationId,
+          keyboardDismissBehavior: keyboardDismissBehavior,
         );
 
   // [CustomScrollView] enforces constraints on [CustomScrollView.anchor], so
@@ -47,8 +54,7 @@ class UnboundedCustomScrollView extends CustomScrollView {
   double get anchor => _anchor;
 
   /// Build the viewport.
-  @override
-  @protected
+  @override @protected
   Widget buildViewport(
     BuildContext context,
     ViewportOffset offset,

@@ -1,36 +1,38 @@
 name: encapsulated_scaffold
 description: Scaffold awareness for easier deep-linking and reactions.
-version: 0.0.2
+version: 0.1.2
 author: Roland Volskaya
 homepage: github.com/volskaya/encapsulated_scaffold
+publish_to: none
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.17.0 <2.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  mobx: ^1.2.1+1
-  flutter_mobx: ^1.1.0+1
-  mobx_codegen: ^1.1.0+1
+
+  mobx: ^2.0.0-nullsafety.5
+  flutter_mobx: ^2.0.0-nullsafety.3
+  mobx_codegen: ^2.0.0-nullsafety.2
   provider: ^5.0.0
-  back_button_interceptor: ^4.3.1
-  freezed_annotation:
-    path: /home/projects/forks/freezed/packages/freezed_annotation
+  back_button_interceptor: ^5.0.0
+  json_annotation: ^4.0.1
+  freezed_annotation: ^0.14.1
+
   fancy_switcher:
     path: /home/projects/packages/fancy_switcher
 
-dependency_overrides:
-  # Conditionally checks if an observable should update.
-  mobx_codegen:
-    path: /home/projects/forks/mobx.dart/mobx_codegen
-
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  build_runner: ^1.10.0
+  build_runner: ^1.11.1
+  json_serializable: ^4.1.0
+  freezed: ^0.14.1+1
+
+dependency_overrides:
+  freezed_annotation:
+    path: /home/projects/forks/freezed/packages/freezed_annotation
   freezed:
     path: /home/projects/forks/freezed/packages/freezed
-
-flutter:
+  mobx_codegen:
+    path: /home/projects/forks/mobx.dart/mobx_codegen

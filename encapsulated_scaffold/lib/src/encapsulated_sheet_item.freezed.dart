@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
 
 part of 'encapsulated_sheet_item.dart';
 
@@ -9,16 +9,19 @@ part of 'encapsulated_sheet_item.dart';
 
 T _$identity<T>(T value) => value;
 
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+
 /// @nodoc
 class _$EncapsulatedSheetItemTearOff {
   const _$EncapsulatedSheetItemTearOff();
 
-// ignore: unused_element
   _EncapsulatedSheetItem call(
-      {String tag,
-      @required Widget Function(BuildContext, void Function()) builder,
-      Widget Function(BuildContext, Animation<double>, Widget) containerBuilder,
-      void Function() onDismissed,
+      {String? tag,
+      required Widget Function(BuildContext, void Function()) builder,
+      Widget Function(BuildContext, Animation<double>, Widget)?
+          containerBuilder,
+      void Function()? onDismissed,
       bool dismissible = true}) {
     return _EncapsulatedSheetItem(
       tag: tag,
@@ -31,27 +34,30 @@ class _$EncapsulatedSheetItemTearOff {
 }
 
 /// @nodoc
-// ignore: unused_element
 const $EncapsulatedSheetItem = _$EncapsulatedSheetItemTearOff();
 
 /// @nodoc
 mixin _$EncapsulatedSheetItem {
   /// Tag to differentiate multiple active notifications.
-  String get tag;
+  String? get tag => throw _privateConstructorUsedError;
 
   /// Sheet body builder.
-  Widget Function(BuildContext, void Function()) get builder;
+  Widget Function(BuildContext, void Function()) get builder =>
+      throw _privateConstructorUsedError;
 
   /// Sheet body's container builder.
-  Widget Function(BuildContext, Animation<double>, Widget) get containerBuilder;
+  Widget Function(BuildContext, Animation<double>, Widget)?
+      get containerBuilder => throw _privateConstructorUsedError;
 
   /// Callback on dismiss.
-  void Function() get onDismissed;
+  void Function()? get onDismissed => throw _privateConstructorUsedError;
 
   /// Wether the user is allowed to manually dismiss this notification.
-  bool get dismissible;
+  bool get dismissible => throw _privateConstructorUsedError;
 
-  $EncapsulatedSheetItemCopyWith<EncapsulatedSheetItem> get copyWith;
+  @JsonKey(ignore: true)
+  $EncapsulatedSheetItemCopyWith<EncapsulatedSheetItem> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -60,10 +66,11 @@ abstract class $EncapsulatedSheetItemCopyWith<$Res> {
           $Res Function(EncapsulatedSheetItem) then) =
       _$EncapsulatedSheetItemCopyWithImpl<$Res>;
   $Res call(
-      {String tag,
+      {String? tag,
       Widget Function(BuildContext, void Function()) builder,
-      Widget Function(BuildContext, Animation<double>, Widget) containerBuilder,
-      void Function() onDismissed,
+      Widget Function(BuildContext, Animation<double>, Widget)?
+          containerBuilder,
+      void Function()? onDismissed,
       bool dismissible});
 }
 
@@ -78,26 +85,33 @@ class _$EncapsulatedSheetItemCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object tag = freezed,
-    Object builder = freezed,
-    Object containerBuilder = freezed,
-    Object onDismissed = freezed,
-    Object dismissible = freezed,
+    Object? tag = freezed,
+    Object? builder = freezed,
+    Object? containerBuilder = freezed,
+    Object? onDismissed = freezed,
+    Object? dismissible = freezed,
   }) {
     return _then(_value.copyWith(
-      tag: tag == freezed ? _value.tag : tag as String,
+      tag: tag == freezed
+          ? _value.tag
+          : tag // ignore: cast_nullable_to_non_nullable
+              as String?,
       builder: builder == freezed
           ? _value.builder
-          : builder as Widget Function(BuildContext, void Function()),
+          : builder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(BuildContext, void Function()),
       containerBuilder: containerBuilder == freezed
           ? _value.containerBuilder
-          : containerBuilder as Widget Function(
-              BuildContext, Animation<double>, Widget),
+          : containerBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(BuildContext, Animation<double>, Widget)?,
       onDismissed: onDismissed == freezed
           ? _value.onDismissed
-          : onDismissed as void Function(),
-      dismissible:
-          dismissible == freezed ? _value.dismissible : dismissible as bool,
+          : onDismissed // ignore: cast_nullable_to_non_nullable
+              as void Function()?,
+      dismissible: dismissible == freezed
+          ? _value.dismissible
+          : dismissible // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -110,10 +124,11 @@ abstract class _$EncapsulatedSheetItemCopyWith<$Res>
       __$EncapsulatedSheetItemCopyWithImpl<$Res>;
   @override
   $Res call(
-      {String tag,
+      {String? tag,
       Widget Function(BuildContext, void Function()) builder,
-      Widget Function(BuildContext, Animation<double>, Widget) containerBuilder,
-      void Function() onDismissed,
+      Widget Function(BuildContext, Animation<double>, Widget)?
+          containerBuilder,
+      void Function()? onDismissed,
       bool dismissible});
 }
 
@@ -130,26 +145,33 @@ class __$EncapsulatedSheetItemCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object tag = freezed,
-    Object builder = freezed,
-    Object containerBuilder = freezed,
-    Object onDismissed = freezed,
-    Object dismissible = freezed,
+    Object? tag = freezed,
+    Object? builder = freezed,
+    Object? containerBuilder = freezed,
+    Object? onDismissed = freezed,
+    Object? dismissible = freezed,
   }) {
     return _then(_EncapsulatedSheetItem(
-      tag: tag == freezed ? _value.tag : tag as String,
+      tag: tag == freezed
+          ? _value.tag
+          : tag // ignore: cast_nullable_to_non_nullable
+              as String?,
       builder: builder == freezed
           ? _value.builder
-          : builder as Widget Function(BuildContext, void Function()),
+          : builder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(BuildContext, void Function()),
       containerBuilder: containerBuilder == freezed
           ? _value.containerBuilder
-          : containerBuilder as Widget Function(
-              BuildContext, Animation<double>, Widget),
+          : containerBuilder // ignore: cast_nullable_to_non_nullable
+              as Widget Function(BuildContext, Animation<double>, Widget)?,
       onDismissed: onDismissed == freezed
           ? _value.onDismissed
-          : onDismissed as void Function(),
-      dismissible:
-          dismissible == freezed ? _value.dismissible : dismissible as bool,
+          : onDismissed // ignore: cast_nullable_to_non_nullable
+              as void Function()?,
+      dismissible: dismissible == freezed
+          ? _value.dismissible
+          : dismissible // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -158,18 +180,16 @@ class __$EncapsulatedSheetItemCopyWithImpl<$Res>
 class _$_EncapsulatedSheetItem extends _EncapsulatedSheetItem {
   _$_EncapsulatedSheetItem(
       {this.tag,
-      @required this.builder,
+      required this.builder,
       this.containerBuilder,
       this.onDismissed,
       this.dismissible = true})
-      : assert(builder != null),
-        assert(dismissible != null),
-        super._();
+      : super._();
 
   @override
 
   /// Tag to differentiate multiple active notifications.
-  final String tag;
+  final String? tag;
   @override
 
   /// Sheet body builder.
@@ -177,12 +197,12 @@ class _$_EncapsulatedSheetItem extends _EncapsulatedSheetItem {
   @override
 
   /// Sheet body's container builder.
-  final Widget Function(BuildContext, Animation<double>, Widget)
+  final Widget Function(BuildContext, Animation<double>, Widget)?
       containerBuilder;
   @override
 
   /// Callback on dismiss.
-  final void Function() onDismissed;
+  final void Function()? onDismissed;
   @JsonKey(defaultValue: true)
   @override
 
@@ -223,6 +243,7 @@ class _$_EncapsulatedSheetItem extends _EncapsulatedSheetItem {
       const DeepCollectionEquality().hash(onDismissed) ^
       const DeepCollectionEquality().hash(dismissible);
 
+  @JsonKey(ignore: true)
   @override
   _$EncapsulatedSheetItemCopyWith<_EncapsulatedSheetItem> get copyWith =>
       __$EncapsulatedSheetItemCopyWithImpl<_EncapsulatedSheetItem>(
@@ -230,34 +251,39 @@ class _$_EncapsulatedSheetItem extends _EncapsulatedSheetItem {
 }
 
 abstract class _EncapsulatedSheetItem extends EncapsulatedSheetItem {
-  _EncapsulatedSheetItem._() : super._();
   factory _EncapsulatedSheetItem(
-      {String tag,
-      @required Widget Function(BuildContext, void Function()) builder,
-      Widget Function(BuildContext, Animation<double>, Widget) containerBuilder,
-      void Function() onDismissed,
+      {String? tag,
+      required Widget Function(BuildContext, void Function()) builder,
+      Widget Function(BuildContext, Animation<double>, Widget)?
+          containerBuilder,
+      void Function()? onDismissed,
       bool dismissible}) = _$_EncapsulatedSheetItem;
+  _EncapsulatedSheetItem._() : super._();
 
   @override
 
   /// Tag to differentiate multiple active notifications.
-  String get tag;
+  String? get tag => throw _privateConstructorUsedError;
   @override
 
   /// Sheet body builder.
-  Widget Function(BuildContext, void Function()) get builder;
+  Widget Function(BuildContext, void Function()) get builder =>
+      throw _privateConstructorUsedError;
   @override
 
   /// Sheet body's container builder.
-  Widget Function(BuildContext, Animation<double>, Widget) get containerBuilder;
+  Widget Function(BuildContext, Animation<double>, Widget)?
+      get containerBuilder => throw _privateConstructorUsedError;
   @override
 
   /// Callback on dismiss.
-  void Function() get onDismissed;
+  void Function()? get onDismissed => throw _privateConstructorUsedError;
   @override
 
   /// Wether the user is allowed to manually dismiss this notification.
-  bool get dismissible;
+  bool get dismissible => throw _privateConstructorUsedError;
   @override
-  _$EncapsulatedSheetItemCopyWith<_EncapsulatedSheetItem> get copyWith;
+  @JsonKey(ignore: true)
+  _$EncapsulatedSheetItemCopyWith<_EncapsulatedSheetItem> get copyWith =>
+      throw _privateConstructorUsedError;
 }

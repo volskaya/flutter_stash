@@ -19,8 +19,8 @@ class Mutex {
   Future protectTillSuccess(
     Function criticalSection, {
     int retries = 5000,
-    String tag,
-    ValueChanged<bool> onEnd,
+    String? tag,
+    ValueChanged<bool>? onEnd,
     bool showLoader = false,
   }) =>
       protect(() async {
@@ -42,12 +42,12 @@ class Mutex {
       }, tag: tag, showLoader: showLoader);
 
   /// If `tag` is used, make sure the callback is idempotent.
-  Future<T> protect<T>(
+  Future<T?> protect<T>(
     Function criticalSection, {
-    String tag,
+    String? tag,
     bool showLoader = false,
   }) async {
-    T value;
+    T? value;
     if (tag != null && _tags.contains(tag)) {
       if (_tags.contains(tag)) {
         _log.wtf('Dropped a redundant call on $tag');
@@ -70,7 +70,7 @@ class Mutex {
 }
 
 class _ReadWriteMutexRequest {
-  _ReadWriteMutexRequest({this.isRead});
+  _ReadWriteMutexRequest({required this.isRead});
 
   /// Indicates if this is a read or write lock.
   final bool isRead; // true = read lock requested; false = write lock requested.

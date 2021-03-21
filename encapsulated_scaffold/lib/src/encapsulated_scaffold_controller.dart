@@ -1,4 +1,3 @@
-import 'package:encapsulated_scaffold/src/encapsulated_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
 import 'package:provider/provider.dart';
@@ -9,8 +8,8 @@ import 'package:provider/provider.dart';
 class EncapsulatedScaffoldController extends StatefulWidget {
   /// Creates [EncapsulatedScaffoldController].
   const EncapsulatedScaffoldController({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.onInit,
     this.onDispose,
   }) : super(key: key);
@@ -19,10 +18,10 @@ class EncapsulatedScaffoldController extends StatefulWidget {
   final Widget child;
 
   /// Callback when the widget is initialized.
-  final ValueChanged<EncapsulatedScaffoldStore> onInit;
+  final ValueChanged<EncapsulatedScaffoldStore>? onInit;
 
   /// Callback when the widget is disposed.
-  final ValueChanged<EncapsulatedScaffoldStore> onDispose;
+  final ValueChanged<EncapsulatedScaffoldStore>? onDispose;
 
   /// Get the nearest [EncapsulatedScaffoldStore].
   static EncapsulatedScaffoldStore of(BuildContext context) =>
@@ -33,7 +32,7 @@ class EncapsulatedScaffoldController extends StatefulWidget {
 }
 
 class _EncapsulatedScaffoldControllerState extends State<EncapsulatedScaffoldController> {
-  EncapsulatedScaffoldStore _store;
+  late final EncapsulatedScaffoldStore _store;
 
   @override
   void initState() {
@@ -45,7 +44,7 @@ class _EncapsulatedScaffoldControllerState extends State<EncapsulatedScaffoldCon
   @override
   void dispose() {
     widget.onDispose?.call(_store);
-    _store?.dispose();
+    _store.dispose();
     super.dispose();
   }
 

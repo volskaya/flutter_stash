@@ -24,9 +24,9 @@ class _FadingTileControllerStorage extends RefreshStorageItem {
 /// Holds and schedules [AnimationController]s of [FadingTile]s.
 class FadingTileController extends StatefulWidget {
   const FadingTileController._({
-    Key key,
-    @required this.type,
-    @required this.child,
+    Key? key,
+    required this.type,
+    required this.child,
     this.bucket,
     this.pageSize = 20,
     this.staggerDuration = const Duration(milliseconds: 20),
@@ -42,8 +42,8 @@ class FadingTileController extends StatefulWidget {
 
   /// Creates [FadingTileController] with no sizing animation.
   const FadingTileController({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.bucket,
     this.pageSize = 20,
     this.staggerDuration = const Duration(milliseconds: 20),
@@ -60,8 +60,8 @@ class FadingTileController extends StatefulWidget {
 
   /// Creates [FadingTileController] with sizing animation.
   const FadingTileController.size({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.bucket,
     this.pageSize = 20,
     this.staggerDuration = const Duration(milliseconds: 20),
@@ -80,7 +80,7 @@ class FadingTileController extends StatefulWidget {
   final _FadingTileType type;
 
   /// Page storage bucket identifier.
-  final String bucket;
+  final String? bucket;
 
   /// Child widget that builds the descendant [FadeTile]s.
   final Widget child;
@@ -90,11 +90,11 @@ class FadingTileController extends StatefulWidget {
 
   /// Optional expected item count to better allow the [FadingTileController]
   /// to optimize offscreen items.
-  final int expectedItemCount;
+  final int? expectedItemCount;
 
   /// Getter function of the last mounted item index, within the list, to better
   /// optimize out the tiles that don't need fade anymore.
-  final int Function() lastMountedItem;
+  final int Function()? lastMountedItem;
 
   /// Delay between every next fade in animation. If set to null,
   /// every next fade will start after the previous one finishes.
@@ -106,7 +106,7 @@ class FadingTileController extends StatefulWidget {
   /// When the controller is initialized, overrides the currently accounted
   /// highest child index, so all children with the index lower than the
   /// [initialOffset] don't get faded.
-  final int Function() initialOffset;
+  final int Function()? initialOffset;
 
   /// Whether to only start animating after the route has finished animating.
   final bool awaitRoute;
@@ -127,7 +127,7 @@ class FadingTileController extends StatefulWidget {
       Provider.of<_FadingTileControllerState>(context, listen: false);
 
   FadingTileController copyWith({
-    Widget child,
+    required Widget child,
   }) =>
       FadingTileController._(
         key: key,
@@ -147,7 +147,7 @@ class FadingTileController extends StatefulWidget {
 class _FadingTileControllerState extends State<FadingTileController>
     with TickerProviderStateMixin<FadingTileController> {
   static final _log = Log.named('FadingTileController');
-  final _controllers = HashMap<int, AnimationController>();
+  final _controllers = HashMap<int, AnimationController?>();
   final _indexes = <int>[];
 
   // int get _lowestIndex => _indexes.isNotEmpty ? _indexes.first : 0;
@@ -157,7 +157,7 @@ class _FadingTileControllerState extends State<FadingTileController>
   /// of animating controllers.
   bool _animationInProgress = false;
   int _highestRequestedIndex = -1;
-  RefreshStorageEntry<_FadingTileControllerStorage> _storage;
+  late final RefreshStorageEntry<_FadingTileControllerStorage> _storage;
 
   /// If [considerInitial], this will be the first controller, that starts animating.
   /// Rest of the controllers should either be null or sometimes dismissed.
@@ -169,8 +169,6 @@ class _FadingTileControllerState extends State<FadingTileController>
   /// seek to the index of the earliest dismissed controller and begin animating from that.
   Future _scheduleController(int index, {bool considerInitial = false}) async {
     var targetIndex = index;
-
-    // if (!considerInitial) await Utils.awaitPostframe();
 
     if (considerInitial) {
       if (widget.poolControllers) {
@@ -195,7 +193,7 @@ class _FadingTileControllerState extends State<FadingTileController>
       return true;
     })(), 'Frozen controllers found before index: $targetIndex');
 
-    if (!considerInitial && widget.staggerDuration != null) {
+    if (!considerInitial && widget.staggerDuration > Duration.zero) {
       await Future<void>.delayed(widget.staggerDuration * timeDilation); // Stagger the animation.
     } else if (widget.optimizeOutFades &&
         !considerInitial &&
@@ -219,17 +217,20 @@ class _FadingTileControllerState extends State<FadingTileController>
       for (var i = targetIndex; i < optimizationSize - 1; i += 1) {
         if (_controllers[i] == null) break;
         _log.d('Optimized out fade controller of $i / ${_controllers.length - 1}');
-        _controllers[i].dispose();
+        _controllers[i]!.dispose();
         _controllers[i] = null;
       }
 
       _highestRequestedIndex = optimizationSize - 1;
       _animationInProgress = false;
-      _storage.value.maxIndex = math.max(_highestRequestedIndex, _storage.value.maxIndex);
+      if (_storage.value != null) _storage.value!.maxIndex = math.max(_highestRequestedIndex, _storage.value!.maxIndex);
     } else {
-      mounted && _controllers.containsKey(targetIndex)
-          ? _controllers[targetIndex].forward()
-          : _animationInProgress = false;
+      if (!mounted) return;
+      if (_controllers[targetIndex] != null) {
+        _controllers[targetIndex]!.forward();
+      } else if (targetIndex >= (_storage.value?.maxIndex ?? 0)) {
+        _animationInProgress = false;
+      }
     }
   }
 
@@ -239,20 +240,18 @@ class _FadingTileControllerState extends State<FadingTileController>
       case AnimationStatus.reverse:
         break; // Ignore.
       case AnimationStatus.forward:
-        if (widget.staggerDuration != null) _scheduleController(index + 1);
+        if (widget.staggerDuration > Duration.zero) _scheduleController(index + 1);
         _animationInProgress = true;
         break;
       case AnimationStatus.completed:
-        if (widget.staggerDuration == null) _scheduleController(index + 1);
-        _storage.value.maxIndex = math.max(index, _storage.value.maxIndex);
-        _controllers.remove(index).dispose();
+        if (widget.staggerDuration == Duration.zero) _scheduleController(index + 1);
+        if (_storage.value != null) _storage.value!.maxIndex = math.max(index, _storage.value!.maxIndex);
+        _controllers.remove(index)?.dispose();
         break;
     }
   }
 
   void _registerIndex(int index) {
-    // assert(!_indexes.contains(index));
-
     if (_indexes.isEmpty) {
       _indexes.add(index);
     } else {
@@ -271,15 +270,14 @@ class _FadingTileControllerState extends State<FadingTileController>
   }
 
   void _unregisterIndex(int index) {
-    // assert(_indexes.contains(index));
     _indexes.remove(index);
   }
 
   /// If the animation has finished, the controller is disposed and this function
   /// returns null.
-  AnimationController getController(int index) {
+  AnimationController? getController(int index) {
     if (index < widget.startFrom) return null;
-    if (index <= _storage.value.maxIndex) return null;
+    if (index <= (_storage.value?.maxIndex ?? 0)) return null;
 
     _highestRequestedIndex = index;
 
@@ -307,17 +305,18 @@ class _FadingTileControllerState extends State<FadingTileController>
     assert(oldWidget.type == widget.type);
 
     if (widget.optimizeOutFades && (oldWidget.expectedItemCount ?? 0) < (widget.expectedItemCount ?? 0)) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_highestIndex < widget.expectedItemCount && !_animationInProgress) {
-          for (var i = _highestRequestedIndex + 1; i < widget.expectedItemCount; i += 1) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        if (_highestIndex < widget.expectedItemCount! && !_animationInProgress) {
+          for (var i = _highestRequestedIndex + 1; i < widget.expectedItemCount!; i += 1) {
             if (_controllers[i] == null) break;
-            _log.d('Optimized out fade controller of $i / ${widget.expectedItemCount - 1}');
-            _controllers[i].dispose();
+            _log.d('Optimized out fade controller of $i / ${widget.expectedItemCount! - 1}');
+            _controllers[i]!.dispose();
             _controllers[i] = null;
           }
 
-          _storage.value.maxIndex = math.max(widget.expectedItemCount - 1, _storage.value.maxIndex);
-          _highestRequestedIndex = widget.expectedItemCount - 1;
+          if (_storage.value != null)
+            _storage.value!.maxIndex = math.max(widget.expectedItemCount! - 1, _storage.value!.maxIndex);
+          _highestRequestedIndex = widget.expectedItemCount! - 1;
         }
       });
     }
@@ -335,14 +334,14 @@ class _FadingTileControllerState extends State<FadingTileController>
         : RefreshStorageEntry(identifier, _FadingTileControllerStorage());
 
     final initialOffset = widget.initialOffset?.call();
-    if (initialOffset != null) _storage.value.maxIndex = initialOffset;
+    if (initialOffset != null) _storage.value!.maxIndex = initialOffset;
     super.initState();
   }
 
   @override
   void dispose() {
-    for (final controller in _controllers.values.where((val) => val != null)) controller.dispose();
-    _storage?.dispose();
+    for (final controller in _controllers.values.where((val) => val != null)) controller!.dispose();
+    _storage.dispose();
     super.dispose();
   }
 
@@ -359,9 +358,9 @@ class _FadingTileControllerState extends State<FadingTileController>
 class FadingTile extends HookWidget {
   /// Creates [FadingTile] without size animation.
   const FadingTile({
-    Key key,
-    @required this.child,
-    @required this.index,
+    Key? key,
+    required this.child,
+    required this.index,
     this.paginatorIndex,
     this.fade = true,
     this.paginator,
@@ -374,9 +373,9 @@ class FadingTile extends HookWidget {
 
   /// Creates [FadingTile] with size animation.
   const FadingTile.size({
-    Key key,
-    @required this.child,
-    @required this.index,
+    Key? key,
+    required this.child,
+    required this.index,
     this.paginatorIndex,
     this.alignment = Alignment.topCenter,
     this.axis = Axis.vertical,
@@ -394,16 +393,16 @@ class FadingTile extends HookWidget {
   final int index;
 
   /// Index of the child in the list.
-  final int paginatorIndex;
+  final int? paginatorIndex;
 
   /// Fade in animation type.
   final _FadingTileType type;
 
   /// Alignment of the child in the size animation.
-  final Alignment alignment;
+  final Alignment? alignment;
 
   /// Scroll axis of the list, where this [FadingTile] is built.
-  final Axis axis;
+  final Axis? axis;
 
   /// The [Clip] to pass to the nested size animation.
   final Clip clipBehavior;
@@ -416,7 +415,7 @@ class FadingTile extends HookWidget {
   final bool fade;
 
   /// Callback to call when the element for this widget is mounted.
-  final VoidCallback Function(int index) paginator;
+  final VoidCallback? Function(int index)? paginator;
 
   @override
   Widget build(BuildContext context) {
@@ -447,8 +446,8 @@ class FadingTile extends HookWidget {
         tile = _SizeInTransition(
           animation: animation,
           child: child,
-          alignment: alignment,
-          axis: axis,
+          alignment: alignment!,
+          axis: axis!,
           clip: clipBehavior != Clip.none,
           optimizeOutChild: optimizeOutChild,
           fade: fade,
@@ -461,7 +460,10 @@ class FadingTile extends HookWidget {
 }
 
 class _FadeTroughTransitionZoomedFadeIn extends StatelessWidget {
-  const _FadeTroughTransitionZoomedFadeIn({this.child, this.animation});
+  const _FadeTroughTransitionZoomedFadeIn({
+    required this.child,
+    required this.animation,
+  });
 
   final Widget child;
   final Animation<double> animation;
@@ -492,8 +494,8 @@ class _FadeTroughTransitionZoomedFadeIn extends StatelessWidget {
 
 class _SizeInTransition extends StatelessWidget {
   const _SizeInTransition({
-    @required this.child,
-    @required this.animation,
+    required this.child,
+    required this.animation,
     this.alignment = Alignment.topCenter,
     this.axis = Axis.vertical,
     this.clip = true,

@@ -43,6 +43,24 @@
       }
     }
   },
+  "textualDate": "{date}",
+  "@textualDate": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "time": "{time}",
+  "@time": {
+    "placeholders": {
+      "time": {
+        "type": "DateTime",
+        "format": "jm"
+      }
+    }
+  },
   "createDate": "{date} {time}",
   "@createDate": {
     "placeholders": {
@@ -71,5 +89,21 @@
   "@durationMinutes": { "placeholders": { "count": {} } },
   "@durationMinutesTail": { "placeholders": { "count": {} } },
   "@durationSeconds": { "placeholders": { "count": {} } },
-  "@durationSecondsTail": { "placeholders": { "count": {} } }
+  "@durationSecondsTail": { "placeholders": { "count": {} } },
+
+  "durationDaysShort": "{count}d",
+  "durationHoursShort": "{count}h",
+  "durationHoursTailShort": ", {count}h",
+  "durationMinutesShort": "{count}min",
+  "durationMinutesTailShort": ", {count}min",
+  "durationSecondsShort": "{count}s",
+  "durationSecondsTailShort": ", {count}s",
+
+  "@durationDaysShort": { "placeholders": { "count": {} } },
+  "@durationHoursShort": { "placeholders": { "count": {} } },
+  "@durationHoursTailShort": { "placeholders": { "count": {} } },
+  "@durationMinutesShort": { "placeholders": { "count": {} } },
+  "@durationMinutesTailShort": { "placeholders": { "count": {} } },
+  "@durationSecondsShort": { "placeholders": { "count": {} } },
+  "@durationSecondsTailShort": { "placeholders": { "count": {} } }
 }

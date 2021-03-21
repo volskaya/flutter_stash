@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// depending on [base].
 class PageControllerValueListenable implements ValueListenable<double> {
   const PageControllerValueListenable({
-    @required this.controller,
+    required this.controller,
     this.base = 0,
   });
 
@@ -20,5 +20,5 @@ class PageControllerValueListenable implements ValueListenable<double> {
   void removeListener(VoidCallback listener) => controller.removeListener(listener);
 
   @override
-  double get value => controller.page % math.max(base, 1);
+  double get value => (controller.page ?? 0.0) % math.max(base, 1);
 }

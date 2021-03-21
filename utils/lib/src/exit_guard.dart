@@ -7,7 +7,7 @@ class ExitGuard {
   ExitGuard._();
 
   static final instance = ExitGuard._();
-  Timer _timer;
+  Timer? _timer;
 
   /// [WillPopScope] callback.
   Future<bool> handleExit(VoidCallback onIntercepted) async {

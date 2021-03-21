@@ -17,25 +17,33 @@ typedef EncapsulatedNotificationPushCallback = void Function(EncapsulatedNotific
 class EncapsulatedScaffoldStore extends _EncapsulatedScaffoldStore with _$EncapsulatedScaffoldStore {
   /// Creates [EncapsulatedScaffoldStore].
   EncapsulatedScaffoldStore({
-    EncapsulatedNotificationPushCallback onPushingNotification,
+    EncapsulatedNotificationPushCallback? onPushingNotification,
   }) : super(onPushingNotification: onPushingNotification);
 
   /// Get the nearest [EncapsulatedScaffoldStore].
   static EncapsulatedScaffoldStore of(BuildContext context) =>
       Provider.of<EncapsulatedScaffoldStore>(context, listen: false);
 
+  /// Closes sheets of [EncapsulatedScaffoldStore].
+  static bool closeSheetsOf(BuildContext context) {
+    final encapsulatedStore = EncapsulatedScaffoldStore.of(context);
+    final closeSheets = encapsulatedStore.sheets.isNotEmpty;
+    encapsulatedStore.sheets.clear();
+    return closeSheets;
+  }
+
   /// Attempts to find the overlay that's used to build [EncapsulatedScaffoldOverlay],
   /// if the [EncapsulatedScaffoldStore.overlayKey] is used, else lookup regular root overlay.
-  static OverlayState overlayOf(BuildContext context) =>
+  static OverlayState? overlayOf(BuildContext context) =>
       EncapsulatedScaffoldStore.of(context).overlayKey.currentState ?? Overlay.of(context, rootOverlay: true);
 }
 
 abstract class _EncapsulatedScaffoldStore with Store {
   _EncapsulatedScaffoldStore({
     this.onPushingNotification,
-    GlobalKey<OverlayState> overlayKey,
+    GlobalKey<OverlayState>? overlayKey,
   }) : overlayKey = overlayKey ?? GlobalKey<OverlayState>() {
-    _visibleNotificationReactionDisposer = reaction<EncapsulatedNotificationItem>(
+    _visibleNotificationReactionDisposer = reaction<EncapsulatedNotificationItem?>(
       (_) => notification,
       _handleNotificationChange,
       fireImmediately: true,
@@ -43,7 +51,7 @@ abstract class _EncapsulatedScaffoldStore with Store {
   }
 
   /// Callback that is called before a notification is added to the store.
-  final EncapsulatedNotificationPushCallback onPushingNotification;
+  final EncapsulatedNotificationPushCallback? onPushingNotification;
   final GlobalKey<OverlayState> overlayKey;
 
   /// Capsules are added and popped as the navigator routes.
@@ -54,17 +62,17 @@ abstract class _EncapsulatedScaffoldStore with Store {
   final importantNotifications = ObservableList<EncapsulatedNotificationItem>();
   final sheets = ObservableList<EncapsulatedSheetItem>();
 
-  Timer _timer; // Active notification timeout timer.
-  ReactionDisposer _visibleNotificationReactionDisposer;
+  Timer? _timer; // Active notification timeout timer.
+  ReactionDisposer? _visibleNotificationReactionDisposer;
 
   @computed
-  EncapsulatedCapsuleElement get capsule => capsules.isNotEmpty ? capsules.last : null;
+  EncapsulatedCapsuleElement? get capsule => capsules.isNotEmpty ? capsules.last : null;
 
   @computed
-  EncapsulatedSheetItem get sheet => sheets.isNotEmpty ? sheets.last : null;
+  EncapsulatedSheetItem? get sheet => sheets.isNotEmpty ? sheets.last : null;
 
   @computed
-  EncapsulatedNotificationItem get notification =>
+  EncapsulatedNotificationItem? get notification =>
       importantNotifications.isNotEmpty // Prioritize important notifications.
           ? importantNotifications.last
           : notifications.isNotEmpty && sheet == null // Hide while there's a registered sheet.
@@ -74,14 +82,14 @@ abstract class _EncapsulatedScaffoldStore with Store {
   ObservableList<EncapsulatedNotificationItem> _getAppropriateNotificationList(EncapsulatedNotificationItem item) =>
       item.important ? importantNotifications : notifications;
 
-  void _handleNotificationChange(EncapsulatedNotificationItem notification) {
+  void _handleNotificationChange(EncapsulatedNotificationItem? notification) {
     // Cancel previous timeout.
     _timer?.cancel();
     _timer = null;
 
     // Start the timer for the current notifications timeout.
-    if (notification.timeout != null && !notification.important) {
-      _timer = Timer(notification.timeout * timeDilation, () {
+    if (notification?.timeout != null && !notification!.important) {
+      _timer = Timer(notification.timeout! * timeDilation, () {
         _timer = null;
         dismissNotification(notification);
       });
@@ -99,7 +107,7 @@ abstract class _EncapsulatedScaffoldStore with Store {
     } catch (_) {}
 
     final replacements = [
-      if (item.tag != null) item.tag,
+      if (item.tag != null) item.tag!,
       ..._replacements,
     ];
 

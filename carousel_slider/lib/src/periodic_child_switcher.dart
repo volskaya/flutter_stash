@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 
 class PeriodicChildSwitcher extends StatefulWidget {
   const PeriodicChildSwitcher({
-    Key key,
-    @required this.childCount,
-    @required this.childBuilder,
+    Key? key,
+    required this.childCount,
+    required this.childBuilder,
     this.shouldSkip,
     this.initialIndex,
     this.autoPlayInterval = const Duration(seconds: 10),
@@ -18,21 +18,21 @@ class PeriodicChildSwitcher extends StatefulWidget {
   }) : super(key: key);
 
   final Duration autoPlayInterval;
-  final bool Function() shouldSkip;
+  final bool Function()? shouldSkip;
   final int childCount;
-  final int initialIndex;
+  final int? initialIndex;
   final bool autoPlay;
   final IndexedWidgetBuilder childBuilder;
   final Color fillColor;
   final Axis axis;
-  final void Function(int index) onChildChanged;
+  final void Function(int index)? onChildChanged;
 
   @override
   PeriodicChildSwitcherState createState() => PeriodicChildSwitcherState();
 }
 
 class PeriodicChildSwitcherState extends State<PeriodicChildSwitcher> with WidgetsBindingObserver {
-  Timer _metronome;
+  Timer? _metronome;
   int _currentIndex = 0;
 
   int get index => _currentIndex;
@@ -42,7 +42,7 @@ class PeriodicChildSwitcherState extends State<PeriodicChildSwitcher> with Widge
 
     final shouldSkip = allowSkip ? widget.shouldSkip?.call() == true : false;
 
-    if (widget.autoPlay && mounted && ModalRoute.of(context).isCurrent && !shouldSkip) {
+    if (widget.autoPlay && mounted && ModalRoute.of(context)?.isCurrent == true && !shouldSkip) {
       final next = _currentIndex + 1 < widget.childCount ? _currentIndex + 1 : 0;
       if (_currentIndex != next) {
         setState(() => _currentIndex = next);
@@ -59,7 +59,7 @@ class PeriodicChildSwitcherState extends State<PeriodicChildSwitcher> with Widge
 
   @override
   void initState() {
-    if (widget.initialIndex != null) _currentIndex = widget.initialIndex;
+    if (widget.initialIndex != null) _currentIndex = widget.initialIndex!;
     _buildMetronome();
     super.initState();
   }
@@ -121,7 +121,5 @@ class PeriodicChildSwitcherState extends State<PeriodicChildSwitcher> with Widge
           child: child,
         );
     }
-
-    throw UnimplementedError();
   }
 }

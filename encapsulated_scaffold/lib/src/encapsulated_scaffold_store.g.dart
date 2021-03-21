@@ -9,25 +9,25 @@ part of 'encapsulated_scaffold_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$EncapsulatedScaffoldStore on _EncapsulatedScaffoldStore, Store {
-  Computed<EncapsulatedCapsuleElement> _$capsuleComputed;
+  Computed<EncapsulatedCapsuleElement?>? _$capsuleComputed;
 
   @override
-  EncapsulatedCapsuleElement get capsule => (_$capsuleComputed ??=
-          Computed<EncapsulatedCapsuleElement>(() => super.capsule,
+  EncapsulatedCapsuleElement? get capsule => (_$capsuleComputed ??=
+          Computed<EncapsulatedCapsuleElement?>(() => super.capsule,
               name: '_EncapsulatedScaffoldStore.capsule'))
       .value;
-  Computed<EncapsulatedSheetItem> _$sheetComputed;
+  Computed<EncapsulatedSheetItem?>? _$sheetComputed;
 
   @override
-  EncapsulatedSheetItem get sheet =>
-      (_$sheetComputed ??= Computed<EncapsulatedSheetItem>(() => super.sheet,
+  EncapsulatedSheetItem? get sheet =>
+      (_$sheetComputed ??= Computed<EncapsulatedSheetItem?>(() => super.sheet,
               name: '_EncapsulatedScaffoldStore.sheet'))
           .value;
-  Computed<EncapsulatedNotificationItem> _$notificationComputed;
+  Computed<EncapsulatedNotificationItem?>? _$notificationComputed;
 
   @override
-  EncapsulatedNotificationItem get notification => (_$notificationComputed ??=
-          Computed<EncapsulatedNotificationItem>(() => super.notification,
+  EncapsulatedNotificationItem? get notification => (_$notificationComputed ??=
+          Computed<EncapsulatedNotificationItem?>(() => super.notification,
               name: '_EncapsulatedScaffoldStore.notification'))
       .value;
 

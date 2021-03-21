@@ -96,9 +96,10 @@ class _ModalBottomSheetState<T> extends State<_ModalBottomSheet<T>> {
           scrollController: scrollController,
           animationCurve: widget.animationCurve,
           onClosing: widget.onClosing ?? (() => widget.route.isCurrent ? Navigator.of(context).pop() : null),
-          shouldClose: widget.shouldClose ?? (widget.route._hasScopedWillPopCallback
-              ? () async => await widget.route.willPop() != RoutePopDisposition.doNotPop
-              : null),
+          shouldClose: widget.shouldClose ??
+              (widget.route._hasScopedWillPopCallback
+                  ? () async => await widget.route.willPop() != RoutePopDisposition.doNotPop
+                  : null),
         ),
       ),
     );
@@ -148,15 +149,13 @@ class ModalBottomSheetRoute<T> extends PopupRoute<T> {
   final Future<bool> Function() shouldClose;
 
   AnimationController _animationController;
+  @override final String barrierLabel;
 
   @override
   Duration get transitionDuration => duration ?? _bottomSheetDuration;
 
   @override
   bool get barrierDismissible => isDismissible;
-
-  @override
-  final String barrierLabel;
 
   @override
   Color get barrierColor => modalBarrierColor ?? Colors.black54;

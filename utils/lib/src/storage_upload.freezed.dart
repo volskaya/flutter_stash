@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
 
 part of 'storage_upload.dart';
 
@@ -9,13 +9,15 @@ part of 'storage_upload.dart';
 
 T _$identity<T>(T value) => value;
 
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+
 /// @nodoc
 class _$StorageUploadObjectTearOff {
   const _$StorageUploadObjectTearOff();
 
-// ignore: unused_element
   _StorageUploadObject call(
-      {@required File file, @required String path, StorageMetadata metadata}) {
+      {required File file, required String path, SettableMetadata? metadata}) {
     return _StorageUploadObject(
       file: file,
       path: path,
@@ -25,16 +27,17 @@ class _$StorageUploadObjectTearOff {
 }
 
 /// @nodoc
-// ignore: unused_element
 const $StorageUploadObject = _$StorageUploadObjectTearOff();
 
 /// @nodoc
 mixin _$StorageUploadObject {
-  File get file;
-  String get path;
-  StorageMetadata get metadata;
+  File get file => throw _privateConstructorUsedError;
+  String get path => throw _privateConstructorUsedError;
+  SettableMetadata? get metadata => throw _privateConstructorUsedError;
 
-  $StorageUploadObjectCopyWith<StorageUploadObject> get copyWith;
+  @JsonKey(ignore: true)
+  $StorageUploadObjectCopyWith<StorageUploadObject> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -42,7 +45,7 @@ abstract class $StorageUploadObjectCopyWith<$Res> {
   factory $StorageUploadObjectCopyWith(
           StorageUploadObject value, $Res Function(StorageUploadObject) then) =
       _$StorageUploadObjectCopyWithImpl<$Res>;
-  $Res call({File file, String path, StorageMetadata metadata});
+  $Res call({File file, String path, SettableMetadata? metadata});
 }
 
 /// @nodoc
@@ -56,15 +59,23 @@ class _$StorageUploadObjectCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object file = freezed,
-    Object path = freezed,
-    Object metadata = freezed,
+    Object? file = freezed,
+    Object? path = freezed,
+    Object? metadata = freezed,
   }) {
     return _then(_value.copyWith(
-      file: file == freezed ? _value.file : file as File,
-      path: path == freezed ? _value.path : path as String,
-      metadata:
-          metadata == freezed ? _value.metadata : metadata as StorageMetadata,
+      file: file == freezed
+          ? _value.file
+          : file // ignore: cast_nullable_to_non_nullable
+              as File,
+      path: path == freezed
+          ? _value.path
+          : path // ignore: cast_nullable_to_non_nullable
+              as String,
+      metadata: metadata == freezed
+          ? _value.metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as SettableMetadata?,
     ));
   }
 }
@@ -76,7 +87,7 @@ abstract class _$StorageUploadObjectCopyWith<$Res>
           $Res Function(_StorageUploadObject) then) =
       __$StorageUploadObjectCopyWithImpl<$Res>;
   @override
-  $Res call({File file, String path, StorageMetadata metadata});
+  $Res call({File file, String path, SettableMetadata? metadata});
 }
 
 /// @nodoc
@@ -92,15 +103,23 @@ class __$StorageUploadObjectCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object file = freezed,
-    Object path = freezed,
-    Object metadata = freezed,
+    Object? file = freezed,
+    Object? path = freezed,
+    Object? metadata = freezed,
   }) {
     return _then(_StorageUploadObject(
-      file: file == freezed ? _value.file : file as File,
-      path: path == freezed ? _value.path : path as String,
-      metadata:
-          metadata == freezed ? _value.metadata : metadata as StorageMetadata,
+      file: file == freezed
+          ? _value.file
+          : file // ignore: cast_nullable_to_non_nullable
+              as File,
+      path: path == freezed
+          ? _value.path
+          : path // ignore: cast_nullable_to_non_nullable
+              as String,
+      metadata: metadata == freezed
+          ? _value.metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as SettableMetadata?,
     ));
   }
 }
@@ -108,16 +127,14 @@ class __$StorageUploadObjectCopyWithImpl<$Res>
 /// @nodoc
 class _$_StorageUploadObject implements _StorageUploadObject {
   const _$_StorageUploadObject(
-      {@required this.file, @required this.path, this.metadata})
-      : assert(file != null),
-        assert(path != null);
+      {required this.file, required this.path, this.metadata});
 
   @override
   final File file;
   @override
   final String path;
   @override
-  final StorageMetadata metadata;
+  final SettableMetadata? metadata;
 
   @override
   String toString() {
@@ -144,6 +161,7 @@ class _$_StorageUploadObject implements _StorageUploadObject {
       const DeepCollectionEquality().hash(path) ^
       const DeepCollectionEquality().hash(metadata);
 
+  @JsonKey(ignore: true)
   @override
   _$StorageUploadObjectCopyWith<_StorageUploadObject> get copyWith =>
       __$StorageUploadObjectCopyWithImpl<_StorageUploadObject>(
@@ -152,30 +170,31 @@ class _$_StorageUploadObject implements _StorageUploadObject {
 
 abstract class _StorageUploadObject implements StorageUploadObject {
   const factory _StorageUploadObject(
-      {@required File file,
-      @required String path,
-      StorageMetadata metadata}) = _$_StorageUploadObject;
+      {required File file,
+      required String path,
+      SettableMetadata? metadata}) = _$_StorageUploadObject;
 
   @override
-  File get file;
+  File get file => throw _privateConstructorUsedError;
   @override
-  String get path;
+  String get path => throw _privateConstructorUsedError;
   @override
-  StorageMetadata get metadata;
+  SettableMetadata? get metadata => throw _privateConstructorUsedError;
   @override
-  _$StorageUploadObjectCopyWith<_StorageUploadObject> get copyWith;
+  @JsonKey(ignore: true)
+  _$StorageUploadObjectCopyWith<_StorageUploadObject> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
 class _$StorageUploadEventTearOff {
   const _$StorageUploadEventTearOff();
 
-// ignore: unused_element
   _StorageUploadEvent call(
-      {@required StorageUploadObject object,
-      @required int number,
-      @required int totalBytes,
-      @required int bytesTransferred}) {
+      {required StorageUploadObject object,
+      required int number,
+      required int totalBytes,
+      required int bytesTransferred}) {
     return _StorageUploadEvent(
       object: object,
       number: number,
@@ -186,17 +205,18 @@ class _$StorageUploadEventTearOff {
 }
 
 /// @nodoc
-// ignore: unused_element
 const $StorageUploadEvent = _$StorageUploadEventTearOff();
 
 /// @nodoc
 mixin _$StorageUploadEvent {
-  StorageUploadObject get object;
-  int get number;
-  int get totalBytes;
-  int get bytesTransferred;
+  StorageUploadObject get object => throw _privateConstructorUsedError;
+  int get number => throw _privateConstructorUsedError;
+  int get totalBytes => throw _privateConstructorUsedError;
+  int get bytesTransferred => throw _privateConstructorUsedError;
 
-  $StorageUploadEventCopyWith<StorageUploadEvent> get copyWith;
+  @JsonKey(ignore: true)
+  $StorageUploadEventCopyWith<StorageUploadEvent> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -224,26 +244,33 @@ class _$StorageUploadEventCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object object = freezed,
-    Object number = freezed,
-    Object totalBytes = freezed,
-    Object bytesTransferred = freezed,
+    Object? object = freezed,
+    Object? number = freezed,
+    Object? totalBytes = freezed,
+    Object? bytesTransferred = freezed,
   }) {
     return _then(_value.copyWith(
-      object: object == freezed ? _value.object : object as StorageUploadObject,
-      number: number == freezed ? _value.number : number as int,
-      totalBytes: totalBytes == freezed ? _value.totalBytes : totalBytes as int,
+      object: object == freezed
+          ? _value.object
+          : object // ignore: cast_nullable_to_non_nullable
+              as StorageUploadObject,
+      number: number == freezed
+          ? _value.number
+          : number // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalBytes: totalBytes == freezed
+          ? _value.totalBytes
+          : totalBytes // ignore: cast_nullable_to_non_nullable
+              as int,
       bytesTransferred: bytesTransferred == freezed
           ? _value.bytesTransferred
-          : bytesTransferred as int,
+          : bytesTransferred // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 
   @override
   $StorageUploadObjectCopyWith<$Res> get object {
-    if (_value.object == null) {
-      return null;
-    }
     return $StorageUploadObjectCopyWith<$Res>(_value.object, (value) {
       return _then(_value.copyWith(object: value));
     });
@@ -280,33 +307,40 @@ class __$StorageUploadEventCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object object = freezed,
-    Object number = freezed,
-    Object totalBytes = freezed,
-    Object bytesTransferred = freezed,
+    Object? object = freezed,
+    Object? number = freezed,
+    Object? totalBytes = freezed,
+    Object? bytesTransferred = freezed,
   }) {
     return _then(_StorageUploadEvent(
-      object: object == freezed ? _value.object : object as StorageUploadObject,
-      number: number == freezed ? _value.number : number as int,
-      totalBytes: totalBytes == freezed ? _value.totalBytes : totalBytes as int,
+      object: object == freezed
+          ? _value.object
+          : object // ignore: cast_nullable_to_non_nullable
+              as StorageUploadObject,
+      number: number == freezed
+          ? _value.number
+          : number // ignore: cast_nullable_to_non_nullable
+              as int,
+      totalBytes: totalBytes == freezed
+          ? _value.totalBytes
+          : totalBytes // ignore: cast_nullable_to_non_nullable
+              as int,
       bytesTransferred: bytesTransferred == freezed
           ? _value.bytesTransferred
-          : bytesTransferred as int,
+          : bytesTransferred // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
 
 /// @nodoc
-class _$_StorageUploadEvent implements _StorageUploadEvent {
+class _$_StorageUploadEvent extends _StorageUploadEvent {
   _$_StorageUploadEvent(
-      {@required this.object,
-      @required this.number,
-      @required this.totalBytes,
-      @required this.bytesTransferred})
-      : assert(object != null),
-        assert(number != null),
-        assert(totalBytes != null),
-        assert(bytesTransferred != null);
+      {required this.object,
+      required this.number,
+      required this.totalBytes,
+      required this.bytesTransferred})
+      : super._();
 
   @override
   final StorageUploadObject object;
@@ -317,45 +351,9 @@ class _$_StorageUploadEvent implements _StorageUploadEvent {
   @override
   final int bytesTransferred;
 
-  bool _didprogress = false;
-  double _progress;
-
-  @override
-  double get progress {
-    if (_didprogress == false) {
-      _didprogress = true;
-      _progress = bytesTransferred / totalBytes;
-    }
-    return _progress;
-  }
-
-  bool _didmegabytesTotal = false;
-  double _megabytesTotal;
-
-  @override
-  double get megabytesTotal {
-    if (_didmegabytesTotal == false) {
-      _didmegabytesTotal = true;
-      _megabytesTotal = totalBytes / math.pow(10, 6);
-    }
-    return _megabytesTotal;
-  }
-
-  bool _didmegabytesTransferred = false;
-  double _megabytesTransferred;
-
-  @override
-  double get megabytesTransferred {
-    if (_didmegabytesTransferred == false) {
-      _didmegabytesTransferred = true;
-      _megabytesTransferred = bytesTransferred / math.pow(10, 6);
-    }
-    return _megabytesTransferred;
-  }
-
   @override
   String toString() {
-    return 'StorageUploadEvent(object: $object, number: $number, totalBytes: $totalBytes, bytesTransferred: $bytesTransferred, progress: $progress, megabytesTotal: $megabytesTotal, megabytesTransferred: $megabytesTransferred)';
+    return 'StorageUploadEvent(object: $object, number: $number, totalBytes: $totalBytes, bytesTransferred: $bytesTransferred)';
   }
 
   @override
@@ -382,26 +380,30 @@ class _$_StorageUploadEvent implements _StorageUploadEvent {
       const DeepCollectionEquality().hash(totalBytes) ^
       const DeepCollectionEquality().hash(bytesTransferred);
 
+  @JsonKey(ignore: true)
   @override
   _$StorageUploadEventCopyWith<_StorageUploadEvent> get copyWith =>
       __$StorageUploadEventCopyWithImpl<_StorageUploadEvent>(this, _$identity);
 }
 
-abstract class _StorageUploadEvent implements StorageUploadEvent {
+abstract class _StorageUploadEvent extends StorageUploadEvent {
   factory _StorageUploadEvent(
-      {@required StorageUploadObject object,
-      @required int number,
-      @required int totalBytes,
-      @required int bytesTransferred}) = _$_StorageUploadEvent;
+      {required StorageUploadObject object,
+      required int number,
+      required int totalBytes,
+      required int bytesTransferred}) = _$_StorageUploadEvent;
+  _StorageUploadEvent._() : super._();
 
   @override
-  StorageUploadObject get object;
+  StorageUploadObject get object => throw _privateConstructorUsedError;
   @override
-  int get number;
+  int get number => throw _privateConstructorUsedError;
   @override
-  int get totalBytes;
+  int get totalBytes => throw _privateConstructorUsedError;
   @override
-  int get bytesTransferred;
+  int get bytesTransferred => throw _privateConstructorUsedError;
   @override
-  _$StorageUploadEventCopyWith<_StorageUploadEvent> get copyWith;
+  @JsonKey(ignore: true)
+  _$StorageUploadEventCopyWith<_StorageUploadEvent> get copyWith =>
+      throw _privateConstructorUsedError;
 }

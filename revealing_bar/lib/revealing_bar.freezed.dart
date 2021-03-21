@@ -1,5 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
 
 part of revealing_bar;
 
@@ -9,13 +9,15 @@ part of revealing_bar;
 
 T _$identity<T>(T value) => value;
 
+final _privateConstructorUsedError = UnsupportedError(
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
+
 /// @nodoc
 class _$RevealingBarNotificationTearOff {
   const _$RevealingBarNotificationTearOff();
 
-// ignore: unused_element
   _RevealingBarNotification call(
-      {@required double maxExtent, double localOffset, double remoteOffset}) {
+      {required double maxExtent, double? localOffset, double? remoteOffset}) {
     return _RevealingBarNotification(
       maxExtent: maxExtent,
       localOffset: localOffset,
@@ -25,16 +27,17 @@ class _$RevealingBarNotificationTearOff {
 }
 
 /// @nodoc
-// ignore: unused_element
 const $RevealingBarNotification = _$RevealingBarNotificationTearOff();
 
 /// @nodoc
 mixin _$RevealingBarNotification {
-  double get maxExtent;
-  double get localOffset;
-  double get remoteOffset;
+  double get maxExtent => throw _privateConstructorUsedError;
+  double? get localOffset => throw _privateConstructorUsedError;
+  double? get remoteOffset => throw _privateConstructorUsedError;
 
-  $RevealingBarNotificationCopyWith<RevealingBarNotification> get copyWith;
+  @JsonKey(ignore: true)
+  $RevealingBarNotificationCopyWith<RevealingBarNotification> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -42,7 +45,7 @@ abstract class $RevealingBarNotificationCopyWith<$Res> {
   factory $RevealingBarNotificationCopyWith(RevealingBarNotification value,
           $Res Function(RevealingBarNotification) then) =
       _$RevealingBarNotificationCopyWithImpl<$Res>;
-  $Res call({double maxExtent, double localOffset, double remoteOffset});
+  $Res call({double maxExtent, double? localOffset, double? remoteOffset});
 }
 
 /// @nodoc
@@ -56,17 +59,23 @@ class _$RevealingBarNotificationCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object maxExtent = freezed,
-    Object localOffset = freezed,
-    Object remoteOffset = freezed,
+    Object? maxExtent = freezed,
+    Object? localOffset = freezed,
+    Object? remoteOffset = freezed,
   }) {
     return _then(_value.copyWith(
-      maxExtent: maxExtent == freezed ? _value.maxExtent : maxExtent as double,
-      localOffset:
-          localOffset == freezed ? _value.localOffset : localOffset as double,
+      maxExtent: maxExtent == freezed
+          ? _value.maxExtent
+          : maxExtent // ignore: cast_nullable_to_non_nullable
+              as double,
+      localOffset: localOffset == freezed
+          ? _value.localOffset
+          : localOffset // ignore: cast_nullable_to_non_nullable
+              as double?,
       remoteOffset: remoteOffset == freezed
           ? _value.remoteOffset
-          : remoteOffset as double,
+          : remoteOffset // ignore: cast_nullable_to_non_nullable
+              as double?,
     ));
   }
 }
@@ -78,7 +87,7 @@ abstract class _$RevealingBarNotificationCopyWith<$Res>
           $Res Function(_RevealingBarNotification) then) =
       __$RevealingBarNotificationCopyWithImpl<$Res>;
   @override
-  $Res call({double maxExtent, double localOffset, double remoteOffset});
+  $Res call({double maxExtent, double? localOffset, double? remoteOffset});
 }
 
 /// @nodoc
@@ -95,17 +104,23 @@ class __$RevealingBarNotificationCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object maxExtent = freezed,
-    Object localOffset = freezed,
-    Object remoteOffset = freezed,
+    Object? maxExtent = freezed,
+    Object? localOffset = freezed,
+    Object? remoteOffset = freezed,
   }) {
     return _then(_RevealingBarNotification(
-      maxExtent: maxExtent == freezed ? _value.maxExtent : maxExtent as double,
-      localOffset:
-          localOffset == freezed ? _value.localOffset : localOffset as double,
+      maxExtent: maxExtent == freezed
+          ? _value.maxExtent
+          : maxExtent // ignore: cast_nullable_to_non_nullable
+              as double,
+      localOffset: localOffset == freezed
+          ? _value.localOffset
+          : localOffset // ignore: cast_nullable_to_non_nullable
+              as double?,
       remoteOffset: remoteOffset == freezed
           ? _value.remoteOffset
-          : remoteOffset as double,
+          : remoteOffset // ignore: cast_nullable_to_non_nullable
+              as double?,
     ));
   }
 }
@@ -113,15 +128,14 @@ class __$RevealingBarNotificationCopyWithImpl<$Res>
 /// @nodoc
 class _$_RevealingBarNotification implements _RevealingBarNotification {
   const _$_RevealingBarNotification(
-      {@required this.maxExtent, this.localOffset, this.remoteOffset})
-      : assert(maxExtent != null);
+      {required this.maxExtent, this.localOffset, this.remoteOffset});
 
   @override
   final double maxExtent;
   @override
-  final double localOffset;
+  final double? localOffset;
   @override
-  final double remoteOffset;
+  final double? remoteOffset;
 
   @override
   String toString() {
@@ -150,6 +164,7 @@ class _$_RevealingBarNotification implements _RevealingBarNotification {
       const DeepCollectionEquality().hash(localOffset) ^
       const DeepCollectionEquality().hash(remoteOffset);
 
+  @JsonKey(ignore: true)
   @override
   _$RevealingBarNotificationCopyWith<_RevealingBarNotification> get copyWith =>
       __$RevealingBarNotificationCopyWithImpl<_RevealingBarNotification>(
@@ -158,16 +173,18 @@ class _$_RevealingBarNotification implements _RevealingBarNotification {
 
 abstract class _RevealingBarNotification implements RevealingBarNotification {
   const factory _RevealingBarNotification(
-      {@required double maxExtent,
-      double localOffset,
-      double remoteOffset}) = _$_RevealingBarNotification;
+      {required double maxExtent,
+      double? localOffset,
+      double? remoteOffset}) = _$_RevealingBarNotification;
 
   @override
-  double get maxExtent;
+  double get maxExtent => throw _privateConstructorUsedError;
   @override
-  double get localOffset;
+  double? get localOffset => throw _privateConstructorUsedError;
   @override
-  double get remoteOffset;
+  double? get remoteOffset => throw _privateConstructorUsedError;
   @override
-  _$RevealingBarNotificationCopyWith<_RevealingBarNotification> get copyWith;
+  @JsonKey(ignore: true)
+  _$RevealingBarNotificationCopyWith<_RevealingBarNotification> get copyWith =>
+      throw _privateConstructorUsedError;
 }

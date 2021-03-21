@@ -23,6 +23,3 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-dependency_overrides:
-  intl: 0.17.0

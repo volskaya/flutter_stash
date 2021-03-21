@@ -18,12 +18,12 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
     D extends FirebaseRealtimeChatParticipantImpl> extends StatefulWidget {
   /// Creates [FirebaseRealtimeChatBuilder].
   const FirebaseRealtimeChatBuilder({
-    Key key,
-    @required this.room,
-    @required this.sender,
-    @required this.builder,
-    @required this.messageBuilder,
-    @required this.participantBuilder,
+    Key? key,
+    required this.room,
+    required this.sender,
+    required this.builder,
+    required this.messageBuilder,
+    required this.participantBuilder,
     this.itemsPerPage = 20,
     this.participants,
     this.onInitState,
@@ -51,13 +51,13 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
 
   /// If the participant IDs are defined manually, there won't be any subscription observing
   /// participant IDs in the database.
-  final Set<String> participants;
+  final Set<String>? participants;
 
   /// Called when the state is initialized.
-  final VoidCallback onInitState;
+  final VoidCallback? onInitState;
 
   /// Called after the first page has paginated.
-  final FirebaseRealtimeChatEventCallback<T, D> onFirstPagePaginated;
+  final FirebaseRealtimeChatEventCallback<T, D>? onFirstPagePaginated;
 
   /// Whether to await route before updating state with first page's items.
   ///
@@ -73,12 +73,12 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
 class _FirebaseRealtimeChatBuilderState<T extends FirebaseRealtimeChatMessageImpl,
         D extends FirebaseRealtimeChatParticipantImpl> extends State<FirebaseRealtimeChatBuilder<T, D>>
     with WidgetsBindingObserver {
-  DisposableBuildContext _disposableBuildContext;
-  FirebaseRealtimeChat<T, D> _chat;
+  late final DisposableBuildContext _disposableBuildContext;
+  late final FirebaseRealtimeChat<T, D> _chat;
 
   @override
   void initState() {
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     _disposableBuildContext = DisposableBuildContext(this);
     _chat = FirebaseRealtimeChat<T, D>(
       collection: FirebaseDatabase.instance.reference().child('chats'),
@@ -105,15 +105,15 @@ class _FirebaseRealtimeChatBuilderState<T extends FirebaseRealtimeChatMessageImp
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    _disposableBuildContext?.dispose();
-    _chat?.handleAppLifecycleStatus(state);
+    _disposableBuildContext.dispose();
+    _chat.handleAppLifecycleStatus(state);
     super.didChangeAppLifecycleState(state);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _chat?.dispose();
+    WidgetsBinding.instance!.removeObserver(this);
+    _chat.dispose();
     super.dispose();
   }
 

@@ -13,35 +13,35 @@ typedef EncapsulatedSheetItemBuilder = Widget Function(BuildContext context, Voi
 /// animate with the route animation.
 ///
 /// Route animation moves forward or in reverse as the sheet is dismissed/brought back up.
-typedef EncapsulatedSheetItemContainerBuilder = Widget Function(
-    BuildContext context, Animation<double> routeAnimation, Widget sheetWidget);
+typedef EncapsulatedSheetItemContainerBuilder = Widget
+    Function(BuildContext context, Animation<double> routeAnimation, Widget sheetWidget);
 
 /// [EncapsulatedSheetItem]s aren't build the [EncapsulatedScaffoldOverlay], instead
 /// a reaction is supposed to be implemented in the apps navigator, that will build
 /// the sheet from observing [EncapsulatedScaffoldStore]. This is sort of a convenience
 /// class for my own apps.
 @freezed
-abstract class EncapsulatedSheetItem implements _$EncapsulatedSheetItem {
+class EncapsulatedSheetItem with _$EncapsulatedSheetItem {
   /// Creates [EncapsulatedSheetItem].
   factory EncapsulatedSheetItem({
     /// Tag to differentiate multiple active notifications.
-    String tag,
+    String? tag,
 
     /// Sheet body builder.
-    @required EncapsulatedSheetItemBuilder builder,
+    required EncapsulatedSheetItemBuilder builder,
 
     /// Sheet body's container builder.
-    EncapsulatedSheetItemContainerBuilder containerBuilder,
+    EncapsulatedSheetItemContainerBuilder? containerBuilder,
 
     /// Callback on dismiss.
-    VoidCallback onDismissed,
+    VoidCallback? onDismissed,
 
     /// Wether the user is allowed to manually dismiss this notification.
     @Default(true) bool dismissible,
   }) = _EncapsulatedSheetItem;
 
   EncapsulatedSheetItem._();
-  EncapsulatedScaffoldStore _store;
+  EncapsulatedScaffoldStore? _store;
 
   /// Get nearest [EncapsulatedSheetItem] through the [BuildContext].
   static EncapsulatedSheetItem of(BuildContext context) {
@@ -57,8 +57,7 @@ abstract class EncapsulatedSheetItem implements _$EncapsulatedSheetItem {
   /// Deliver this notification to the nearest [EncapsulatedNotificationOverlayController].
   void push(BuildContext context) {
     try {
-      _store = EncapsulatedScaffoldStore.of(context);
-      _store.pushSheet(this);
+      _store = EncapsulatedScaffoldStore.of(context)..pushSheet(this);
     } catch (_) {
       _store = null;
       rethrow;

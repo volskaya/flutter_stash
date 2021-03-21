@@ -4,7 +4,6 @@ import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:mobx/mobx.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +13,7 @@ import 'package:provider/provider.dart';
 class EncapsulatedNotificationOverlay extends StatefulWidget {
   /// Creates [EncapsulatedNotificationOverlay].
   const EncapsulatedNotificationOverlay({
-    Key key,
+    Key? key,
     this.body,
     this.children = const <Widget>[],
     this.onEnd,
@@ -22,13 +21,13 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
   }) : super(key: key);
 
   /// Body widget, preferably child of [MaterialApp.builder].
-  final Widget body;
+  final Widget? body;
 
   /// Children items to build in the overlay stack, above the [body] and below the notifications.
   final Iterable<Widget> children;
 
   /// Called when the notification item transition ends.
-  final VoidCallback onEnd;
+  final VoidCallback? onEnd;
 
   /// Whether to use [EncapsulatedScaffoldState.bottomInset] on the notification items.
   final bool insetNotifications;
@@ -39,7 +38,7 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
 
 /// Provider of [EncapsulatedNotificationOverlayController].
 class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotificationOverlay> {
-  EncapsulatedScaffoldStore _store;
+  late final EncapsulatedScaffoldStore _store;
 
   bool _handleBackButton(bool stopDefaultButtonEvent, RouteInfo _) {
     if (stopDefaultButtonEvent) return true;
@@ -68,7 +67,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
         fit: StackFit.expand,
         clipBehavior: Clip.none,
         children: <Widget>[
-          if (widget.body != null) widget.body,
+          if (widget.body != null) widget.body!,
           // Switcher for unimportant notifications.
           Observer(
             builder: (_, __) {
@@ -81,7 +80,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
                         tag: item,
                         child: _NotificationItem(
                           store: _store,
-                          item: item,
+                          item: item!,
                           duration: item.timeout,
                           useInset: widget.insetNotifications,
                           builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
@@ -119,7 +118,7 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
                         tag: item,
                         child: _NotificationItem(
                           store: _store,
-                          item: item,
+                          item: item!,
                           duration: item.timeout,
                           useInset: false,
                           builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
@@ -142,16 +141,16 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
 
 class _NotificationItem extends StatefulObserverWidget {
   const _NotificationItem({
-    Key key,
-    @required this.builder,
-    @required this.duration,
-    @required this.store,
-    @required this.item,
+    Key? key,
+    required this.builder,
+    required this.store,
+    required this.item,
     this.useInset = true,
+    this.duration,
   }) : super(key: key, name: 'notification_item');
 
-  final Widget Function(BuildContext context, Animation<double> animation) builder;
-  final Duration duration;
+  final Widget Function(BuildContext context, Animation<double>? animation) builder;
+  final Duration? duration;
   final EncapsulatedScaffoldStore store;
   final EncapsulatedNotificationItem item;
   final bool useInset;
@@ -161,7 +160,7 @@ class _NotificationItem extends StatefulObserverWidget {
 }
 
 class __NotificationItemState extends State<_NotificationItem> with SingleTickerProviderStateMixin<_NotificationItem> {
-  AnimationController _controller;
+  AnimationController? _controller;
 
   @override
   void initState() {
