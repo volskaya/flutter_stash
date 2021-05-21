@@ -23,7 +23,7 @@ class PredicateScrollBehavior extends MaterialScrollBehavior {
         return GlowingOverscrollIndicator(
           child: child,
           axisDirection: details.direction,
-          color: Theme.of(context).accentColor,
+          color: Theme.of(context).colorScheme.primary,
           notificationPredicate: notificationPredicate,
         );
     }
@@ -59,7 +59,7 @@ class MaterialGlowingOverscrollIndicator extends StatelessWidget {
         return GlowingOverscrollIndicator(
           child: child,
           axisDirection: direction,
-          color: theme.accentColor,
+          color: theme.colorScheme.primary,
           notificationPredicate: notificationPredicate,
         );
     }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:await_route/await_route.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -138,13 +139,13 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   /// Uses cursor only from the nearest online confirmed document.
   /// Pagination timestamps don't care about the online confirmation.
   int? get _paginationTimestamp =>
-      paginatedItems.reversed.firstWhereOrNull((item) => item.createTime != null, orElse: () => null)?.createTime;
+      paginatedItems.reversed.firstWhereOrNull((item) => item.createTime != null)?.createTime;
 
   /// Uses cursor only from the nearest online confirmed document.
   int? get _subscriptionTimestamp => pendingItems.reversed
       .followedBy(subscribedItems.reversed)
       .followedBy(paginatedItems)
-      .firstWhereOrNull((item) => item.isServerTimestamp && item.createTime != null, orElse: () => null)
+      .firstWhereOrNull((item) => item.isServerTimestamp && item.createTime != null)
       ?.createTime;
 
   /// Start calling paginators with all items on the last page.

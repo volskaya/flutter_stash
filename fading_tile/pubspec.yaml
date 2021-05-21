@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
 
   provider: ^5.0.0
-  flutter_hooks: ^0.16.0
+  flutter_hooks: ^0.17.0
 
   utils:
     path: /home/projects/packages/flutter_helpers/utils

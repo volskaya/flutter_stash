@@ -13,12 +13,12 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  mobx: ^2.0.0-nullsafety.5
-  firebase_storage: ^8.0.0
+  mobx: ^2.0.1
+  firebase_storage: ^8.1.0
   freezed_annotation: ^0.14.1
   intl: ^0.17.0
-  cloud_functions: ^1.0.0
-  cloud_firestore: ^1.0.1
+  cloud_functions: ^1.1.0
+  cloud_firestore: ^2.2.0
   quiver: ^3.0.0
   json_annotation: ^4.0.1
 
