@@ -20,7 +20,7 @@ class LoaderCoordinator {
 
   Timer? _timer;
 
-  void _maybeToggleNotifier({bool instant = false}) => WidgetsBinding.instance!.addPostFrameCallback((_) {
+  void _maybeToggleNotifier({bool instant = false}) => WidgetsBinding.instance?.addPostFrameCallback((_) {
         if (instant || _timer != null) {
           _timer?.cancel();
           _timer = null;
@@ -61,7 +61,7 @@ class LoaderCoordinator {
       _timer?.cancel();
       _timer = null;
 
-      WidgetsBinding.instance!.addPostFrameCallback(
+      WidgetsBinding.instance?.addPostFrameCallback(
         // Don't touch the notifier, if something got added again.
         (_) => _loaders.isEmpty ? notifier.value = false : null,
       );
