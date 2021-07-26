@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:collection/collection.dart';
 import 'package:await_route/await_route.dart';
+import 'package:collection/collection.dart';
 import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_realtime_chat/src/firebase_realtime_chat_impl.dart';
@@ -332,17 +332,19 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
           return;
         }
 
+        if (child.snapshot.key == null) return;
+
         _log.d('New subscribed message $child');
 
         final list = _isScrolled ? FirebaseRealtimeChatMessageList.pending : FirebaseRealtimeChatMessageList.subscribed;
         final message = messageBuilder(child.snapshot.value as Map)
-          ..reference = messageCollection.child(child.snapshot.key)
+          ..reference = messageCollection.child(child.snapshot.key!)
           ..snapshot = child.snapshot
           ..list = list
           ..updateMirror();
 
         // When the list is scrolled, new items are pushed to pending items.
-        _seenItems.add(child.snapshot.key);
+        _seenItems.add(child.snapshot.key!);
         if (_isScrolled) {
           pendingItems = pendingItems.add(message);
         } else {
