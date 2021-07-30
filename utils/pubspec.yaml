@@ -1,7 +1,7 @@
 name: utils
 version: 0.1.1
-author: Roland Volskaya
 homepage: github.com/volskaya/flutter_helpers
+publish_to: 'none'
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
 
   mobx: ^2.0.1
-  firebase_storage: ^8.1.0
+  firebase_storage: ^10.0.1
   freezed_annotation: ^0.14.1
   intl: ^0.17.0
   cloud_functions: ^3.0.0

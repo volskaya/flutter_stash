@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:await_route/await_route.dart';
 import 'package:carousel_slider/src/carousel_slider.dart';
 import 'package:carousel_slider/src/periodic_child_switcher.dart';
+import 'package:carousel_slider/src/periodic_child_switcher_builder.dart';
 import 'package:firebase_image/firebase_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,17 @@ typedef MultiPhotoCarouselChildWrap = Widget
 class _Storage extends RefreshStorageItem {
   _Storage({this.lastPage});
   int? lastPage;
+}
+
+enum MultiPhotoCarouselStyle {
+  /// The carousel builds photos in a [PageView] with [SwitchingImage] children.
+  draggable,
+
+  /// The carousel builds photos in a [FancySwitcher] with [SwitchingImage] children.
+  periodicallySwitched,
+
+  /// The carousel builds photos with a single [SwitchingImage].
+  periodicallySwitchedImage,
 }
 
 /// Copy pasted from a different project
@@ -34,7 +46,7 @@ class MultiPhotoCarousel extends StatefulWidget {
     this.precacheSurroundingPhotos = true,
     this.precacheThumbnailsInstead = false,
     this.getCacheSize,
-    this.scrollable = true,
+    this.style = MultiPhotoCarouselStyle.draggable,
     this.autoPlayAnimationDuration = const Duration(milliseconds: 600),
     this.children = const <Widget>[],
   }) : super(key: key);
@@ -52,7 +64,7 @@ class MultiPhotoCarousel extends StatefulWidget {
   final bool precacheSurroundingPhotos;
   final bool precacheThumbnailsInstead;
   final Size Function(FirebasePhotoReference photo)? getCacheSize;
-  final bool scrollable;
+  final MultiPhotoCarouselStyle style;
   final Duration autoPlayAnimationDuration;
   final List<Widget> children;
 
@@ -62,10 +74,11 @@ class MultiPhotoCarousel extends StatefulWidget {
 
 class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDependencies<MultiPhotoCarousel> {
   final _carouselKey = GlobalKey<CarouselSliderState>();
-  final _periodicChildSwicherKey = GlobalKey<PeriodicChildSwitcherState>();
+  final _periodicChildSwicherKey = GlobalKey<PeriodicChildSwitcherBuilderState>();
 
   late final RefreshStorageEntry<_Storage> _storage;
   late List<FirebasePhotoReference> _photos;
+  bool get isDraggable => widget.style == MultiPhotoCarouselStyle.draggable;
 
   Size _getCacheSize(FirebasePhotoReference photo, Size? constraints) =>
       FirebaseImage.getCacheSize(photo.size, (widget.getCacheSize?.call(photo) ?? constraints)!);
@@ -74,9 +87,7 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
       photo?.getImage(_getCacheSize(photo, constraints));
 
   int getPage() =>
-      (!widget.scrollable
-          ? _periodicChildSwicherKey.currentState?.index
-          : _carouselKey.currentState?.currentPage.round()) ??
+      (!isDraggable ? _periodicChildSwicherKey.currentState?.index : _carouselKey.currentState?.currentPage.round()) ??
       0;
 
   /// Precaches the next image.
@@ -94,7 +105,7 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
         final nextPage = (page + 1) == _photos.length ? 0 : page + 1;
         final previousPage = (page - 1) < 0 ? _photos.length - 1 : page - 1;
         final photos = [
-          if (previousPage != page && widget.scrollable) _photos[previousPage],
+          if (previousPage != page && isDraggable) _photos[previousPage],
           if (nextPage != page) _photos[nextPage],
         ];
 
@@ -146,7 +157,9 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
     super.dispose();
   }
 
-  Widget _buildPhoto(BuildContext context, int index, Size constraints) {
+  Widget _buildPhoto(BuildContext context, int index, [Size? constraints]) {
+    assert(constraints != null || widget.getCacheSize != null);
+
     final photo = _photos.length > index ? _photos[index] : null;
     final child = SwitchingFirebaseImage(
       idleChild: widget.idleChild,
@@ -157,50 +170,65 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
     return widget.wrap?.call(context, photo, child) ?? child;
   }
 
+  Widget _buildLayout(BuildContext context, [BoxConstraints? constraints]) {
+    assert(constraints != null || widget.getCacheSize != null);
+
+    final itemCount = math.max(_photos.length, 1);
+    final refresh = RefreshController.of(context)?.refresh ?? 0;
+
+    const autoPlayInterval = Duration(seconds: 20);
+    const autoPlayPauseDuration = Duration(seconds: 10);
+
+    switch (widget.style) {
+      case MultiPhotoCarouselStyle.draggable:
+        return CarouselSlider(
+          key: _carouselKey,
+          pageStorageKey: widget.bucket != null ? PageStorageKey<String>('$refresh-${widget.bucket}') : null,
+          initialPage: _storage.value?.lastPage ?? widget.initialPage,
+          height: double.infinity,
+          scrollDirection: Axis.horizontal,
+          enableInfiniteScroll: itemCount > 1,
+          autoPlayCurve: standardEasing,
+          autoPlayInterval: autoPlayInterval,
+          pauseAutoPlayOnTouch: autoPlayPauseDuration,
+          autoPlayAnimationDuration: widget.autoPlayAnimationDuration,
+          scrollPhysics: itemCount > 1 ? widget.physics : const NeverScrollableScrollPhysics(),
+          autoPlay: widget.autoPlay ? itemCount > 1 : false,
+          shouldSkip: widget.shouldSkip,
+          indicatorBuilder: widget.indicatorBuilder,
+          onPageChanged: _handlePageChange,
+          itemCount: itemCount,
+          itemBuilder: (context, i) => _buildPhoto(context, i, constraints?.biggest),
+          children: widget.children,
+        );
+      case MultiPhotoCarouselStyle.periodicallySwitched:
+        return PeriodicChildSwitcher(
+          builderKey: _periodicChildSwicherKey,
+          autoPlay: widget.autoPlay,
+          initialIndex: _storage.value?.lastPage ?? widget.initialPage,
+          childBuilder: (context, i) => _buildPhoto(context, i, constraints?.biggest),
+          fillColor: Theme.of(context).colorScheme.background,
+          childCount: _photos.length,
+          shouldSkip: widget.shouldSkip,
+          autoPlayInterval: autoPlayInterval,
+          onChildChanged: _handlePageChange,
+          axis: Axis.horizontal,
+        );
+      case MultiPhotoCarouselStyle.periodicallySwitchedImage:
+        return PeriodicChildSwitcherBuilder(
+          key: _periodicChildSwicherKey,
+          autoPlay: widget.autoPlay,
+          initialIndex: _storage.value?.lastPage ?? widget.initialPage,
+          builder: (context, i) => _buildPhoto(context, i, constraints?.biggest),
+          childCount: _photos.length,
+          shouldSkip: widget.shouldSkip,
+          autoPlayInterval: autoPlayInterval,
+          onChildChanged: _handlePageChange,
+        );
+    }
+  }
+
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-        builder: (context, constraints) {
-          final itemCount = math.max(_photos.length, 1);
-          final refresh = RefreshController.of(context)?.refresh ?? 0;
-
-          const autoPlayInterval = Duration(seconds: 20);
-          const autoPlayPauseDuration = Duration(seconds: 10);
-
-          if (!widget.scrollable) {
-            return PeriodicChildSwitcher(
-              key: _periodicChildSwicherKey,
-              autoPlay: widget.autoPlay,
-              initialIndex: _storage.value?.lastPage ?? widget.initialPage,
-              childBuilder: (context, i) => _buildPhoto(context, i, constraints.biggest),
-              fillColor: Theme.of(context).colorScheme.background,
-              childCount: _photos.length,
-              shouldSkip: widget.shouldSkip,
-              autoPlayInterval: autoPlayInterval,
-              onChildChanged: _handlePageChange,
-              axis: Axis.horizontal,
-            );
-          }
-
-          return CarouselSlider(
-            key: _carouselKey,
-            pageStorageKey: widget.bucket != null ? PageStorageKey<String>('$refresh-${widget.bucket}') : null,
-            initialPage: _storage.value?.lastPage ?? widget.initialPage,
-            height: double.infinity,
-            scrollDirection: Axis.horizontal,
-            enableInfiniteScroll: itemCount > 1,
-            autoPlayCurve: standardEasing,
-            autoPlayInterval: autoPlayInterval,
-            pauseAutoPlayOnTouch: autoPlayPauseDuration,
-            autoPlayAnimationDuration: widget.autoPlayAnimationDuration,
-            scrollPhysics: itemCount > 1 ? widget.physics : const NeverScrollableScrollPhysics(),
-            autoPlay: widget.autoPlay ? itemCount > 1 : false,
-            shouldSkip: widget.shouldSkip,
-            indicatorBuilder: widget.indicatorBuilder,
-            onPageChanged: _handlePageChange,
-            itemCount: itemCount,
-            itemBuilder: (context, i) => _buildPhoto(context, i, constraints.biggest),
-            children: widget.children,
-          );
-        },
-      );
+  Widget build(BuildContext context) =>
+      widget.getCacheSize != null ? _buildLayout(context) : LayoutBuilder(builder: _buildLayout);
 }
