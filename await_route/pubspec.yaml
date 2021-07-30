@@ -1,7 +1,6 @@
 name: await_route
 description: Helper class to await route transitions.
 version: 1.0.0
-author: Roland Volskaya
 homepage: github.com/volskaya/flutter_helpers
 
 environment:
