@@ -131,7 +131,7 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
     _photos = widget.photos?.values.toList(growable: false) ?? const <FirebasePhotoReference>[];
     _storage = RefreshStorage.write<_Storage>(
       context: context,
-      identifier: 'multi_photo_carousel_${widget.bucket}',
+      identifier: '${widget.bucket}_multi_photo_carousel',
       builder: () => _Storage(lastPage: widget.initialPage),
     );
 

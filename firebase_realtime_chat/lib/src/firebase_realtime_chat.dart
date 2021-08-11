@@ -65,7 +65,9 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     this.onFirstPagePaginated,
     this.awaitRoute = false,
     Set<String>? participants,
-  }) : _participants = participants;
+    FirebaseDatabase? firebaseDatabase,
+  })  : _participants = participants,
+        firebaseDatabase = firebaseDatabase ?? FirebaseDatabase.instance;
 
   /// Realtime database list this chat will target.
   final DatabaseReference collection;
@@ -88,6 +90,13 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
   /// the o state will be delayed. This is usually used to avoid yank mid route
   /// change animations.
   final bool awaitRoute;
+
+  /// Firebase database to use with chat. This must be provided in cases, when
+  /// the project's RTDB is not located in the default US region.
+  ///
+  /// When it's not in the default US region, the [FirebaseDatabase.instance] won't
+  /// automatically read the url from google-services file.
+  final FirebaseDatabase firebaseDatabase;
 
   /// If the participant IDs are defined manually, there won't be any subscription observing
   /// user IDs in the database.
@@ -397,7 +406,7 @@ abstract class _FirebaseRealtimeChat<T extends FirebaseRealtimeChatMessageImpl,
     // this up, if the database loses connection with the client.
     if (_onDisconnectReaction == null) {
       _log.v('Registering an `onDisconnect` reaction, to reset senders participant data');
-      _onDisconnectReaction = FirebaseDatabase.instance.reference().child('.info/connected').onValue.listen(
+      _onDisconnectReaction = firebaseDatabase.reference().child('.info/connected').onValue.listen(
         (event) async {
           if (event.snapshot.value != true) return; // Not connected.
 

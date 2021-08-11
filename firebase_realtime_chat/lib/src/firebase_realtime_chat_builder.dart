@@ -29,6 +29,7 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
     this.onInitState,
     this.onFirstPagePaginated,
     this.awaitRoute = false,
+    this.firebaseDatabase,
   }) : super(key: key);
 
   /// Chat room ID in the database.
@@ -66,6 +67,13 @@ class FirebaseRealtimeChatBuilder<T extends FirebaseRealtimeChatMessageImpl,
   /// change animations.
   final bool awaitRoute;
 
+  /// Firebase database to use with chat. This must be provided in cases, when
+  /// the project's RTDB is not located in the default US region.
+  ///
+  /// When it's not in the default US region, the [FirebaseDatabase.instance] won't
+  /// automatically read the url from google-services file.
+  final FirebaseDatabase? firebaseDatabase;
+
   @override
   _FirebaseRealtimeChatBuilderState<T, D> createState() => _FirebaseRealtimeChatBuilderState<T, D>();
 }
@@ -76,18 +84,21 @@ class _FirebaseRealtimeChatBuilderState<T extends FirebaseRealtimeChatMessageImp
   late final DisposableBuildContext _disposableBuildContext;
   late final FirebaseRealtimeChat<T, D> _chat;
 
+  FirebaseDatabase get _firebaseDatabase => widget.firebaseDatabase ?? FirebaseDatabase.instance;
+
   @override
   void initState() {
     WidgetsBinding.instance!.addObserver(this);
     _disposableBuildContext = DisposableBuildContext(this);
     _chat = FirebaseRealtimeChat<T, D>(
-      collection: FirebaseDatabase.instance.reference().child('chats'),
+      collection: _firebaseDatabase.reference().child('chats'),
       messageBuilder: widget.messageBuilder,
       participantBuilder: widget.participantBuilder,
       participants: widget.participants,
       itemsPerPage: widget.itemsPerPage,
       onFirstPagePaginated: widget.onFirstPagePaginated,
       awaitRoute: widget.awaitRoute,
+      firebaseDatabase: _firebaseDatabase,
     )
       ..initialize(
         context: _disposableBuildContext,

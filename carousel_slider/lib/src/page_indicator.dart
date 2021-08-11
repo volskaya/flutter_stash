@@ -111,7 +111,7 @@ class _BasePainter extends CustomPainter {
   final Paint _paint;
 
   double get value => animation.value % count;
-  int get index => value.floor();
+  int get index => value.toInt();
 
   @override
   void paint(Canvas canvas, Size size) {
