@@ -184,6 +184,9 @@ class RevealingBarNotifier extends StatelessWidget {
         assert(remote == null || remote > local),
         super(key: key);
 
+  /// A global toggle to disable [RevealingBarNotifier]s from sending messages.
+  @visibleForTesting static bool disable = true;
+
   /// Closest scroll controller index.
   final int local;
 
@@ -202,7 +205,7 @@ class RevealingBarNotifier extends StatelessWidget {
       child: child,
       onNotification: (notification) {
         // Ignore notifications from animating out routes.
-        if (route?.isCurrent != true) return false;
+        if (route?.isCurrent != true || disable) return false;
 
         RevealingBarNotification? update;
 
