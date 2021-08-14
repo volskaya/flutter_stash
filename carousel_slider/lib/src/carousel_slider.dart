@@ -55,9 +55,9 @@ class CarouselSlider extends StatefulWidget {
   final int? initialPage;
   final List<Widget> children;
 
-  static PageController getPageController({int initialPage = 0}) => PageController(
+  static PageController getPageController({int initialPage = 0, int base = 0}) => PageController(
         viewportFraction: 1,
-        initialPage: CarouselSlider._kRealPage + initialPage,
+        initialPage: base + initialPage,
       );
 
   @override
@@ -70,10 +70,12 @@ class CarouselSliderState extends State<CarouselSlider>
   late final PageControllerValueListenable _pageControllerValueListenable;
   Timer? _metronome; // Slide metronome.
   Timer? _timer; // Pause timer.
-  double get currentPage => (_pageController.page ?? 0.0) % CarouselSlider._kRealPage;
+  double get currentPage =>
+      (_pageController.page ?? 0.0) % (widget.enableInfiniteScroll ? CarouselSlider._kRealPage : widget.itemCount);
 
   int _getRealIndex(int index) {
-    final remainder = (index - CarouselSlider._kRealPage) % widget.itemCount;
+    final base = widget.enableInfiniteScroll ? CarouselSlider._kRealPage : 0;
+    final remainder = (index - base) % widget.itemCount;
     return remainder < 0 ? widget.itemCount + remainder : remainder;
   }
 
@@ -113,13 +115,17 @@ class CarouselSliderState extends State<CarouselSlider>
 
   void _handlePageChange(int index) => widget.onPageChanged?.call(_getRealIndex(index));
 
+  int getItemCount() => widget.enableInfiniteScroll ? CarouselSlider._kRealPage * 2 : widget.itemCount;
+  int getBase() => widget.enableInfiniteScroll ? CarouselSlider._kRealPage : 0;
+
   @override
   void initState() {
-    _pageController = widget.pageController ?? CarouselSlider.getPageController(initialPage: widget.initialPage ?? 0);
-    _pageControllerValueListenable = PageControllerValueListenable(
-      controller: _pageController,
-      base: CarouselSlider._kRealPage,
-    );
+    final initialPage = widget.initialPage ?? 0;
+    final base = getBase();
+    final maxItemCount = getItemCount();
+
+    _pageController = widget.pageController ?? CarouselSlider.getPageController(initialPage: initialPage, base: base);
+    _pageControllerValueListenable = PageControllerValueListenable(controller: _pageController, base: maxItemCount);
 
     _buildMetronome();
     WidgetsBinding.instance!.addObserver(this);
@@ -133,6 +139,12 @@ class CarouselSliderState extends State<CarouselSlider>
     _timer?.cancel();
     if (widget.pageController == null) _pageController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(CarouselSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    assert(oldWidget.enableInfiniteScroll == widget.enableInfiniteScroll);
   }
 
   bool? _toggledLifecycle;
@@ -172,20 +184,20 @@ class CarouselSliderState extends State<CarouselSlider>
       case Axis.horizontal:
         pageView = FancyView.horizontal(
           itemBuilder: (context, i) => widget.itemBuilder(context, _getRealIndex(i)),
-          itemCount: CarouselSlider._kRealPage * 2,
+          itemCount: getItemCount(),
           controller: _pageController,
           onPageChanged: _handlePageChange,
-          physics: widget.enableInfiniteScroll ? widget.scrollPhysics : const NeverScrollableScrollPhysics(),
+          physics: widget.scrollPhysics,
           fillColor: Theme.of(context).colorScheme.background,
         );
         break;
       case Axis.vertical:
         pageView = FancyView.vertical(
           itemBuilder: (context, i) => widget.itemBuilder(context, _getRealIndex(i)),
-          itemCount: CarouselSlider._kRealPage * 2,
+          itemCount: getItemCount(),
           controller: _pageController,
           onPageChanged: _handlePageChange,
-          physics: widget.enableInfiniteScroll ? widget.scrollPhysics : const NeverScrollableScrollPhysics(),
+          physics: widget.scrollPhysics,
           fillColor: Theme.of(context).colorScheme.background,
         );
         break;

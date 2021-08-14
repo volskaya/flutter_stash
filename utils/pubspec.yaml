@@ -42,6 +42,8 @@ dependency_overrides:
     path: /home/projects/forks/freezed/packages/freezed
   mobx:
     path: /home/projects/forks/mobx.dart/mobx
+  flutter_mobx:
+    path: /home/projects/forks/mobx.dart/flutter_mobx
 
 flutter:
   generate: true
