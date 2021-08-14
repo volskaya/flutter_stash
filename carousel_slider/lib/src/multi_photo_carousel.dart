@@ -49,6 +49,7 @@ class MultiPhotoCarousel extends StatefulWidget {
     this.style = MultiPhotoCarouselStyle.draggable,
     this.autoPlayAnimationDuration = const Duration(milliseconds: 600),
     this.children = const <Widget>[],
+    this.uniqueIdleChildBuilder,
   }) : super(key: key);
 
   final String? bucket;
@@ -67,6 +68,7 @@ class MultiPhotoCarousel extends StatefulWidget {
   final MultiPhotoCarouselStyle style;
   final Duration autoPlayAnimationDuration;
   final List<Widget> children;
+  final Widget Function(BuildContext context, FirebasePhotoReference photo)? uniqueIdleChildBuilder;
 
   @override
   MultiPhotoCarouselState createState() => MultiPhotoCarouselState();
@@ -162,9 +164,11 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
 
     final photo = _photos.length > index ? _photos[index] : null;
     final child = SwitchingFirebaseImage(
-      idleChild: widget.idleChild,
-      imageProvider: _getImageProvider(photo, constraints),
       scrollAware: widget.scrollAware,
+      imageProvider: _getImageProvider(photo, constraints),
+      idleChild: widget.uniqueIdleChildBuilder != null && photo != null
+          ? widget.uniqueIdleChildBuilder!(context, photo)
+          : widget.idleChild,
     );
 
     return widget.wrap?.call(context, photo, child) ?? child;

@@ -31,6 +31,7 @@ export 'src/memoizer.dart';
 export 'src/mixins.dart';
 export 'src/mutex.dart';
 export 'src/observable_keep_aliver.dart';
+export 'src/observer_hook_widget.dart';
 export 'src/overlayed_ink_well.dart';
 export 'src/page_controller_value_listenable.dart';
 export 'src/proxy_widget_builder.dart';
