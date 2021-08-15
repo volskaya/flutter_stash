@@ -30,7 +30,7 @@ class Blob extends StatefulWidget {
     this.minGrowth = BlobConfig.minGrowth,
     this.debug = false,
     this.styles,
-    this.duration = const Duration(milliseconds: BlobConfig.animDurationMs),
+    this.duration = BlobConfig.animDuration,
     this.loop = false,
     this.child,
   })  : isAnimated = true,
@@ -57,7 +57,7 @@ class Blob extends StatefulWidget {
     required this.size,
     this.debug = false,
     this.styles,
-    this.duration = const Duration(milliseconds: BlobConfig.animDurationMs),
+    this.duration = BlobConfig.animDuration,
     this.loop = false,
     this.child,
   })  : isAnimated = true,
@@ -65,13 +65,13 @@ class Blob extends StatefulWidget {
         minGrowth = null,
         super(key: key);
 
-  final double size;
+  final Size size;
+  final BlobSeed? seed;
   final bool debug;
-  final BlobStyles? styles;
+  final BlobStyle? styles;
   final Widget? child;
   final int? edgesCount;
   final int? minGrowth;
-  final List<String>? seed;
   final Duration? duration;
   final bool loop;
   final bool isAnimated;
@@ -84,26 +84,14 @@ class Blob extends StatefulWidget {
 
 class _BlobState extends State<Blob> {
   BlobData? _blobData;
-  BlobData? _fromBlobData;
   Timer? _timer;
 
-  BlobData _getRandomBlobData() => BlobGenerator(
-        edgesCount: widget.edgesCount ?? 2,
-        minGrowth: widget.minGrowth ?? 3,
-        size: Size.square(widget.size),
-        seed: _getRandomizedSeed(),
-      ).generate();
-
-  String? _getRandomizedSeed() {
-    if (!(widget.seed?.isNotEmpty == true)) return null;
-
-    Blob.count++;
-    if (widget.seed!.length == 1) return widget.seed![0];
-    return widget.seed![Blob.count % widget.seed!.length];
-  }
+  BlobData _getRandomBlobData() => BlobGenerator.generate(
+        widget.seed ?? BlobSeed.getRandomSeed(),
+        widget.size,
+      );
 
   BlobData _updateBlob([dynamic _]) {
-    if (widget.isAnimated) _fromBlobData = _blobData;
     _blobData = _getRandomBlobData();
     markNeedsBuild();
     return _blobData!;
@@ -152,7 +140,6 @@ class _BlobState extends State<Blob> {
           child: widget.child,
         )
       : AnimatedBlob(
-          fromBlobData: _fromBlobData,
           toBlobData: _blobData!,
           size: widget.size,
           styles: widget.styles,

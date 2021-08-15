@@ -13,17 +13,17 @@ class SimpleBlob extends StatelessWidget {
     this.child,
   }) : super(key: key);
 
-  final double? size;
+  final Size? size;
   final BlobData blobData;
   final bool debug;
   final Widget? child;
-  final BlobStyles? styles;
+  final BlobStyle? styles;
 
   @override
   Widget build(BuildContext context) => RepaintBoundary(
         child: CustomPaint(
           child: child,
-          size: size != null ? Size.square(size!) : Size.zero,
+          size: size ?? Size.zero,
           painter: BlobPainter(
             blobData: blobData,
             debug: debug,

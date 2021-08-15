@@ -17,23 +17,17 @@ class _$BlobDataTearOff {
   const _$BlobDataTearOff();
 
   _BlobData call(
-      {int edges = 7,
-      int growth = 4,
-      double? size,
-      BlobPoints? points,
-      String? seed,
-      Path? path,
-      String? svgPath,
-      BlobCurves? curves}) {
+      {required Size size,
+      required BlobPoints points,
+      required Path path,
+      required BlobCurves curves,
+      required BlobSeed seed}) {
     return _BlobData(
-      edges: edges,
-      growth: growth,
       size: size,
       points: points,
-      seed: seed,
       path: path,
-      svgPath: svgPath,
       curves: curves,
+      seed: seed,
     );
   }
 }
@@ -43,14 +37,11 @@ const $BlobData = _$BlobDataTearOff();
 
 /// @nodoc
 mixin _$BlobData {
-  int get edges => throw _privateConstructorUsedError;
-  int get growth => throw _privateConstructorUsedError;
-  double? get size => throw _privateConstructorUsedError;
-  BlobPoints? get points => throw _privateConstructorUsedError;
-  String? get seed => throw _privateConstructorUsedError;
-  Path? get path => throw _privateConstructorUsedError;
-  String? get svgPath => throw _privateConstructorUsedError;
-  BlobCurves? get curves => throw _privateConstructorUsedError;
+  Size get size => throw _privateConstructorUsedError;
+  BlobPoints get points => throw _privateConstructorUsedError;
+  Path get path => throw _privateConstructorUsedError;
+  BlobCurves get curves => throw _privateConstructorUsedError;
+  BlobSeed get seed => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $BlobDataCopyWith<BlobData> get copyWith =>
@@ -62,17 +53,15 @@ abstract class $BlobDataCopyWith<$Res> {
   factory $BlobDataCopyWith(BlobData value, $Res Function(BlobData) then) =
       _$BlobDataCopyWithImpl<$Res>;
   $Res call(
-      {int edges,
-      int growth,
-      double? size,
-      BlobPoints? points,
-      String? seed,
-      Path? path,
-      String? svgPath,
-      BlobCurves? curves});
+      {Size size,
+      BlobPoints points,
+      Path path,
+      BlobCurves curves,
+      BlobSeed seed});
 
-  $BlobPointsCopyWith<$Res>? get points;
-  $BlobCurvesCopyWith<$Res>? get curves;
+  $BlobPointsCopyWith<$Res> get points;
+  $BlobCurvesCopyWith<$Res> get curves;
+  $BlobSeedCopyWith<$Res> get seed;
 }
 
 /// @nodoc
@@ -85,70 +74,54 @@ class _$BlobDataCopyWithImpl<$Res> implements $BlobDataCopyWith<$Res> {
 
   @override
   $Res call({
-    Object? edges = freezed,
-    Object? growth = freezed,
     Object? size = freezed,
     Object? points = freezed,
-    Object? seed = freezed,
     Object? path = freezed,
-    Object? svgPath = freezed,
     Object? curves = freezed,
+    Object? seed = freezed,
   }) {
     return _then(_value.copyWith(
-      edges: edges == freezed
-          ? _value.edges
-          : edges // ignore: cast_nullable_to_non_nullable
-              as int,
-      growth: growth == freezed
-          ? _value.growth
-          : growth // ignore: cast_nullable_to_non_nullable
-              as int,
       size: size == freezed
           ? _value.size
           : size // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as Size,
       points: points == freezed
           ? _value.points
           : points // ignore: cast_nullable_to_non_nullable
-              as BlobPoints?,
-      seed: seed == freezed
-          ? _value.seed
-          : seed // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as BlobPoints,
       path: path == freezed
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
-              as Path?,
-      svgPath: svgPath == freezed
-          ? _value.svgPath
-          : svgPath // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as Path,
       curves: curves == freezed
           ? _value.curves
           : curves // ignore: cast_nullable_to_non_nullable
-              as BlobCurves?,
+              as BlobCurves,
+      seed: seed == freezed
+          ? _value.seed
+          : seed // ignore: cast_nullable_to_non_nullable
+              as BlobSeed,
     ));
   }
 
   @override
-  $BlobPointsCopyWith<$Res>? get points {
-    if (_value.points == null) {
-      return null;
-    }
-
-    return $BlobPointsCopyWith<$Res>(_value.points!, (value) {
+  $BlobPointsCopyWith<$Res> get points {
+    return $BlobPointsCopyWith<$Res>(_value.points, (value) {
       return _then(_value.copyWith(points: value));
     });
   }
 
   @override
-  $BlobCurvesCopyWith<$Res>? get curves {
-    if (_value.curves == null) {
-      return null;
-    }
-
-    return $BlobCurvesCopyWith<$Res>(_value.curves!, (value) {
+  $BlobCurvesCopyWith<$Res> get curves {
+    return $BlobCurvesCopyWith<$Res>(_value.curves, (value) {
       return _then(_value.copyWith(curves: value));
+    });
+  }
+
+  @override
+  $BlobSeedCopyWith<$Res> get seed {
+    return $BlobSeedCopyWith<$Res>(_value.seed, (value) {
+      return _then(_value.copyWith(seed: value));
     });
   }
 }
@@ -159,19 +132,18 @@ abstract class _$BlobDataCopyWith<$Res> implements $BlobDataCopyWith<$Res> {
       __$BlobDataCopyWithImpl<$Res>;
   @override
   $Res call(
-      {int edges,
-      int growth,
-      double? size,
-      BlobPoints? points,
-      String? seed,
-      Path? path,
-      String? svgPath,
-      BlobCurves? curves});
+      {Size size,
+      BlobPoints points,
+      Path path,
+      BlobCurves curves,
+      BlobSeed seed});
 
   @override
-  $BlobPointsCopyWith<$Res>? get points;
+  $BlobPointsCopyWith<$Res> get points;
   @override
-  $BlobCurvesCopyWith<$Res>? get curves;
+  $BlobCurvesCopyWith<$Res> get curves;
+  @override
+  $BlobSeedCopyWith<$Res> get seed;
 }
 
 /// @nodoc
@@ -185,48 +157,33 @@ class __$BlobDataCopyWithImpl<$Res> extends _$BlobDataCopyWithImpl<$Res>
 
   @override
   $Res call({
-    Object? edges = freezed,
-    Object? growth = freezed,
     Object? size = freezed,
     Object? points = freezed,
-    Object? seed = freezed,
     Object? path = freezed,
-    Object? svgPath = freezed,
     Object? curves = freezed,
+    Object? seed = freezed,
   }) {
     return _then(_BlobData(
-      edges: edges == freezed
-          ? _value.edges
-          : edges // ignore: cast_nullable_to_non_nullable
-              as int,
-      growth: growth == freezed
-          ? _value.growth
-          : growth // ignore: cast_nullable_to_non_nullable
-              as int,
       size: size == freezed
           ? _value.size
           : size // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as Size,
       points: points == freezed
           ? _value.points
           : points // ignore: cast_nullable_to_non_nullable
-              as BlobPoints?,
-      seed: seed == freezed
-          ? _value.seed
-          : seed // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as BlobPoints,
       path: path == freezed
           ? _value.path
           : path // ignore: cast_nullable_to_non_nullable
-              as Path?,
-      svgPath: svgPath == freezed
-          ? _value.svgPath
-          : svgPath // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as Path,
       curves: curves == freezed
           ? _value.curves
           : curves // ignore: cast_nullable_to_non_nullable
-              as BlobCurves?,
+              as BlobCurves,
+      seed: seed == freezed
+          ? _value.seed
+          : seed // ignore: cast_nullable_to_non_nullable
+              as BlobSeed,
     ));
   }
 }
@@ -235,75 +192,52 @@ class __$BlobDataCopyWithImpl<$Res> extends _$BlobDataCopyWithImpl<$Res>
 
 class _$_BlobData implements _BlobData {
   const _$_BlobData(
-      {this.edges = 7,
-      this.growth = 4,
-      this.size,
-      this.points,
-      this.seed,
-      this.path,
-      this.svgPath,
-      this.curves})
-      : assert(edges >= 2 && edges <= 300),
-        assert(growth >= 2 && growth <= 9);
+      {required this.size,
+      required this.points,
+      required this.path,
+      required this.curves,
+      required this.seed});
 
-  @JsonKey(defaultValue: 7)
   @override
-  final int edges;
-  @JsonKey(defaultValue: 4)
+  final Size size;
   @override
-  final int growth;
+  final BlobPoints points;
   @override
-  final double? size;
+  final Path path;
   @override
-  final BlobPoints? points;
+  final BlobCurves curves;
   @override
-  final String? seed;
-  @override
-  final Path? path;
-  @override
-  final String? svgPath;
-  @override
-  final BlobCurves? curves;
+  final BlobSeed seed;
 
   @override
   String toString() {
-    return 'BlobData(edges: $edges, growth: $growth, size: $size, points: $points, seed: $seed, path: $path, svgPath: $svgPath, curves: $curves)';
+    return 'BlobData(size: $size, points: $points, path: $path, curves: $curves, seed: $seed)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other is _BlobData &&
-            (identical(other.edges, edges) ||
-                const DeepCollectionEquality().equals(other.edges, edges)) &&
-            (identical(other.growth, growth) ||
-                const DeepCollectionEquality().equals(other.growth, growth)) &&
             (identical(other.size, size) ||
                 const DeepCollectionEquality().equals(other.size, size)) &&
             (identical(other.points, points) ||
                 const DeepCollectionEquality().equals(other.points, points)) &&
-            (identical(other.seed, seed) ||
-                const DeepCollectionEquality().equals(other.seed, seed)) &&
             (identical(other.path, path) ||
                 const DeepCollectionEquality().equals(other.path, path)) &&
-            (identical(other.svgPath, svgPath) ||
-                const DeepCollectionEquality()
-                    .equals(other.svgPath, svgPath)) &&
             (identical(other.curves, curves) ||
-                const DeepCollectionEquality().equals(other.curves, curves)));
+                const DeepCollectionEquality().equals(other.curves, curves)) &&
+            (identical(other.seed, seed) ||
+                const DeepCollectionEquality().equals(other.seed, seed)));
   }
 
   @override
   int get hashCode =>
       runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(edges) ^
-      const DeepCollectionEquality().hash(growth) ^
       const DeepCollectionEquality().hash(size) ^
       const DeepCollectionEquality().hash(points) ^
-      const DeepCollectionEquality().hash(seed) ^
       const DeepCollectionEquality().hash(path) ^
-      const DeepCollectionEquality().hash(svgPath) ^
-      const DeepCollectionEquality().hash(curves);
+      const DeepCollectionEquality().hash(curves) ^
+      const DeepCollectionEquality().hash(seed);
 
   @JsonKey(ignore: true)
   @override
@@ -313,31 +247,22 @@ class _$_BlobData implements _BlobData {
 
 abstract class _BlobData implements BlobData {
   const factory _BlobData(
-      {int edges,
-      int growth,
-      double? size,
-      BlobPoints? points,
-      String? seed,
-      Path? path,
-      String? svgPath,
-      BlobCurves? curves}) = _$_BlobData;
+      {required Size size,
+      required BlobPoints points,
+      required Path path,
+      required BlobCurves curves,
+      required BlobSeed seed}) = _$_BlobData;
 
   @override
-  int get edges => throw _privateConstructorUsedError;
+  Size get size => throw _privateConstructorUsedError;
   @override
-  int get growth => throw _privateConstructorUsedError;
+  BlobPoints get points => throw _privateConstructorUsedError;
   @override
-  double? get size => throw _privateConstructorUsedError;
+  Path get path => throw _privateConstructorUsedError;
   @override
-  BlobPoints? get points => throw _privateConstructorUsedError;
+  BlobCurves get curves => throw _privateConstructorUsedError;
   @override
-  String? get seed => throw _privateConstructorUsedError;
-  @override
-  Path? get path => throw _privateConstructorUsedError;
-  @override
-  String? get svgPath => throw _privateConstructorUsedError;
-  @override
-  BlobCurves? get curves => throw _privateConstructorUsedError;
+  BlobSeed get seed => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$BlobDataCopyWith<_BlobData> get copyWith =>
@@ -348,11 +273,12 @@ abstract class _BlobData implements BlobData {
 class _$BlobSeedTearOff {
   const _$BlobSeedTearOff();
 
-  _BlobSeed call({int edges = 7, int growth = 4, required int seed}) {
+  _BlobSeed call(int rand,
+      [int edges = BlobConfig.edgesCount, int growth = BlobConfig.minGrowth]) {
     return _BlobSeed(
-      edges: edges,
-      growth: growth,
-      seed: seed,
+      rand,
+      edges,
+      growth,
     );
   }
 }
@@ -362,9 +288,9 @@ const $BlobSeed = _$BlobSeedTearOff();
 
 /// @nodoc
 mixin _$BlobSeed {
+  int get rand => throw _privateConstructorUsedError;
   int get edges => throw _privateConstructorUsedError;
   int get growth => throw _privateConstructorUsedError;
-  int get seed => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $BlobSeedCopyWith<BlobSeed> get copyWith =>
@@ -375,7 +301,7 @@ mixin _$BlobSeed {
 abstract class $BlobSeedCopyWith<$Res> {
   factory $BlobSeedCopyWith(BlobSeed value, $Res Function(BlobSeed) then) =
       _$BlobSeedCopyWithImpl<$Res>;
-  $Res call({int edges, int growth, int seed});
+  $Res call({int rand, int edges, int growth});
 }
 
 /// @nodoc
@@ -388,11 +314,15 @@ class _$BlobSeedCopyWithImpl<$Res> implements $BlobSeedCopyWith<$Res> {
 
   @override
   $Res call({
+    Object? rand = freezed,
     Object? edges = freezed,
     Object? growth = freezed,
-    Object? seed = freezed,
   }) {
     return _then(_value.copyWith(
+      rand: rand == freezed
+          ? _value.rand
+          : rand // ignore: cast_nullable_to_non_nullable
+              as int,
       edges: edges == freezed
           ? _value.edges
           : edges // ignore: cast_nullable_to_non_nullable
@@ -400,10 +330,6 @@ class _$BlobSeedCopyWithImpl<$Res> implements $BlobSeedCopyWith<$Res> {
       growth: growth == freezed
           ? _value.growth
           : growth // ignore: cast_nullable_to_non_nullable
-              as int,
-      seed: seed == freezed
-          ? _value.seed
-          : seed // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
@@ -414,7 +340,7 @@ abstract class _$BlobSeedCopyWith<$Res> implements $BlobSeedCopyWith<$Res> {
   factory _$BlobSeedCopyWith(_BlobSeed value, $Res Function(_BlobSeed) then) =
       __$BlobSeedCopyWithImpl<$Res>;
   @override
-  $Res call({int edges, int growth, int seed});
+  $Res call({int rand, int edges, int growth});
 }
 
 /// @nodoc
@@ -428,22 +354,22 @@ class __$BlobSeedCopyWithImpl<$Res> extends _$BlobSeedCopyWithImpl<$Res>
 
   @override
   $Res call({
+    Object? rand = freezed,
     Object? edges = freezed,
     Object? growth = freezed,
-    Object? seed = freezed,
   }) {
     return _then(_BlobSeed(
-      edges: edges == freezed
+      rand == freezed
+          ? _value.rand
+          : rand // ignore: cast_nullable_to_non_nullable
+              as int,
+      edges == freezed
           ? _value.edges
           : edges // ignore: cast_nullable_to_non_nullable
               as int,
-      growth: growth == freezed
+      growth == freezed
           ? _value.growth
           : growth // ignore: cast_nullable_to_non_nullable
-              as int,
-      seed: seed == freezed
-          ? _value.seed
-          : seed // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
@@ -452,42 +378,43 @@ class __$BlobSeedCopyWithImpl<$Res> extends _$BlobSeedCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_BlobSeed implements _BlobSeed {
-  const _$_BlobSeed({this.edges = 7, this.growth = 4, required this.seed})
+  const _$_BlobSeed(this.rand,
+      [this.edges = BlobConfig.edgesCount, this.growth = BlobConfig.minGrowth])
       : assert(edges >= 2 && edges <= 300),
         assert(growth >= 2 && growth <= 9);
 
-  @JsonKey(defaultValue: 7)
+  @override
+  final int rand;
+  @JsonKey(defaultValue: BlobConfig.edgesCount)
   @override
   final int edges;
-  @JsonKey(defaultValue: 4)
+  @JsonKey(defaultValue: BlobConfig.minGrowth)
   @override
   final int growth;
-  @override
-  final int seed;
 
   @override
   String toString() {
-    return 'BlobSeed(edges: $edges, growth: $growth, seed: $seed)';
+    return 'BlobSeed(rand: $rand, edges: $edges, growth: $growth)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
         (other is _BlobSeed &&
+            (identical(other.rand, rand) ||
+                const DeepCollectionEquality().equals(other.rand, rand)) &&
             (identical(other.edges, edges) ||
                 const DeepCollectionEquality().equals(other.edges, edges)) &&
             (identical(other.growth, growth) ||
-                const DeepCollectionEquality().equals(other.growth, growth)) &&
-            (identical(other.seed, seed) ||
-                const DeepCollectionEquality().equals(other.seed, seed)));
+                const DeepCollectionEquality().equals(other.growth, growth)));
   }
 
   @override
   int get hashCode =>
       runtimeType.hashCode ^
+      const DeepCollectionEquality().hash(rand) ^
       const DeepCollectionEquality().hash(edges) ^
-      const DeepCollectionEquality().hash(growth) ^
-      const DeepCollectionEquality().hash(seed);
+      const DeepCollectionEquality().hash(growth);
 
   @JsonKey(ignore: true)
   @override
@@ -496,15 +423,14 @@ class _$_BlobSeed implements _BlobSeed {
 }
 
 abstract class _BlobSeed implements BlobSeed {
-  const factory _BlobSeed({int edges, int growth, required int seed}) =
-      _$_BlobSeed;
+  const factory _BlobSeed(int rand, [int edges, int growth]) = _$_BlobSeed;
 
+  @override
+  int get rand => throw _privateConstructorUsedError;
   @override
   int get edges => throw _privateConstructorUsedError;
   @override
   int get growth => throw _privateConstructorUsedError;
-  @override
-  int get seed => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$BlobSeedCopyWith<_BlobSeed> get copyWith =>
@@ -687,206 +613,212 @@ abstract class _BlobCurves implements BlobCurves {
 }
 
 /// @nodoc
-class _$BlobStylesTearOff {
-  const _$BlobStylesTearOff();
+class _$BlobStyleTearOff {
+  const _$BlobStyleTearOff();
 
-  _BlobStyles call(
-      {Color? color,
-      Shader? gradient,
-      int? strokeWidth,
-      BlobFillType? fillType}) {
-    return _BlobStyles(
+  _BlobStyle call(
+      {Color color = BlobConfig.color,
+      double strokeWidth = BlobConfig.strokeWidth,
+      PaintingStyle fillType = BlobConfig.fillType,
+      Shader? gradient}) {
+    return _BlobStyle(
       color: color,
-      gradient: gradient,
       strokeWidth: strokeWidth,
       fillType: fillType,
+      gradient: gradient,
     );
   }
 }
 
 /// @nodoc
-const $BlobStyles = _$BlobStylesTearOff();
+const $BlobStyle = _$BlobStyleTearOff();
 
 /// @nodoc
-mixin _$BlobStyles {
-  Color? get color => throw _privateConstructorUsedError;
+mixin _$BlobStyle {
+  Color get color => throw _privateConstructorUsedError;
+  double get strokeWidth => throw _privateConstructorUsedError;
+  PaintingStyle get fillType => throw _privateConstructorUsedError;
   Shader? get gradient => throw _privateConstructorUsedError;
-  int? get strokeWidth => throw _privateConstructorUsedError;
-  BlobFillType? get fillType => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
-  $BlobStylesCopyWith<BlobStyles> get copyWith =>
+  $BlobStyleCopyWith<BlobStyle> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $BlobStylesCopyWith<$Res> {
-  factory $BlobStylesCopyWith(
-          BlobStyles value, $Res Function(BlobStyles) then) =
-      _$BlobStylesCopyWithImpl<$Res>;
+abstract class $BlobStyleCopyWith<$Res> {
+  factory $BlobStyleCopyWith(BlobStyle value, $Res Function(BlobStyle) then) =
+      _$BlobStyleCopyWithImpl<$Res>;
   $Res call(
-      {Color? color,
-      Shader? gradient,
-      int? strokeWidth,
-      BlobFillType? fillType});
+      {Color color,
+      double strokeWidth,
+      PaintingStyle fillType,
+      Shader? gradient});
 }
 
 /// @nodoc
-class _$BlobStylesCopyWithImpl<$Res> implements $BlobStylesCopyWith<$Res> {
-  _$BlobStylesCopyWithImpl(this._value, this._then);
+class _$BlobStyleCopyWithImpl<$Res> implements $BlobStyleCopyWith<$Res> {
+  _$BlobStyleCopyWithImpl(this._value, this._then);
 
-  final BlobStyles _value;
+  final BlobStyle _value;
   // ignore: unused_field
-  final $Res Function(BlobStyles) _then;
+  final $Res Function(BlobStyle) _then;
 
   @override
   $Res call({
     Object? color = freezed,
-    Object? gradient = freezed,
     Object? strokeWidth = freezed,
     Object? fillType = freezed,
+    Object? gradient = freezed,
   }) {
     return _then(_value.copyWith(
       color: color == freezed
           ? _value.color
           : color // ignore: cast_nullable_to_non_nullable
-              as Color?,
+              as Color,
+      strokeWidth: strokeWidth == freezed
+          ? _value.strokeWidth
+          : strokeWidth // ignore: cast_nullable_to_non_nullable
+              as double,
+      fillType: fillType == freezed
+          ? _value.fillType
+          : fillType // ignore: cast_nullable_to_non_nullable
+              as PaintingStyle,
       gradient: gradient == freezed
           ? _value.gradient
           : gradient // ignore: cast_nullable_to_non_nullable
               as Shader?,
-      strokeWidth: strokeWidth == freezed
-          ? _value.strokeWidth
-          : strokeWidth // ignore: cast_nullable_to_non_nullable
-              as int?,
-      fillType: fillType == freezed
-          ? _value.fillType
-          : fillType // ignore: cast_nullable_to_non_nullable
-              as BlobFillType?,
     ));
   }
 }
 
 /// @nodoc
-abstract class _$BlobStylesCopyWith<$Res> implements $BlobStylesCopyWith<$Res> {
-  factory _$BlobStylesCopyWith(
-          _BlobStyles value, $Res Function(_BlobStyles) then) =
-      __$BlobStylesCopyWithImpl<$Res>;
+abstract class _$BlobStyleCopyWith<$Res> implements $BlobStyleCopyWith<$Res> {
+  factory _$BlobStyleCopyWith(
+          _BlobStyle value, $Res Function(_BlobStyle) then) =
+      __$BlobStyleCopyWithImpl<$Res>;
   @override
   $Res call(
-      {Color? color,
-      Shader? gradient,
-      int? strokeWidth,
-      BlobFillType? fillType});
+      {Color color,
+      double strokeWidth,
+      PaintingStyle fillType,
+      Shader? gradient});
 }
 
 /// @nodoc
-class __$BlobStylesCopyWithImpl<$Res> extends _$BlobStylesCopyWithImpl<$Res>
-    implements _$BlobStylesCopyWith<$Res> {
-  __$BlobStylesCopyWithImpl(
-      _BlobStyles _value, $Res Function(_BlobStyles) _then)
-      : super(_value, (v) => _then(v as _BlobStyles));
+class __$BlobStyleCopyWithImpl<$Res> extends _$BlobStyleCopyWithImpl<$Res>
+    implements _$BlobStyleCopyWith<$Res> {
+  __$BlobStyleCopyWithImpl(_BlobStyle _value, $Res Function(_BlobStyle) _then)
+      : super(_value, (v) => _then(v as _BlobStyle));
 
   @override
-  _BlobStyles get _value => super._value as _BlobStyles;
+  _BlobStyle get _value => super._value as _BlobStyle;
 
   @override
   $Res call({
     Object? color = freezed,
-    Object? gradient = freezed,
     Object? strokeWidth = freezed,
     Object? fillType = freezed,
+    Object? gradient = freezed,
   }) {
-    return _then(_BlobStyles(
+    return _then(_BlobStyle(
       color: color == freezed
           ? _value.color
           : color // ignore: cast_nullable_to_non_nullable
-              as Color?,
+              as Color,
+      strokeWidth: strokeWidth == freezed
+          ? _value.strokeWidth
+          : strokeWidth // ignore: cast_nullable_to_non_nullable
+              as double,
+      fillType: fillType == freezed
+          ? _value.fillType
+          : fillType // ignore: cast_nullable_to_non_nullable
+              as PaintingStyle,
       gradient: gradient == freezed
           ? _value.gradient
           : gradient // ignore: cast_nullable_to_non_nullable
               as Shader?,
-      strokeWidth: strokeWidth == freezed
-          ? _value.strokeWidth
-          : strokeWidth // ignore: cast_nullable_to_non_nullable
-              as int?,
-      fillType: fillType == freezed
-          ? _value.fillType
-          : fillType // ignore: cast_nullable_to_non_nullable
-              as BlobFillType?,
     ));
   }
 }
 
 /// @nodoc
 
-class _$_BlobStyles implements _BlobStyles {
-  const _$_BlobStyles(
-      {this.color, this.gradient, this.strokeWidth, this.fillType});
+class _$_BlobStyle extends _BlobStyle {
+  _$_BlobStyle(
+      {this.color = BlobConfig.color,
+      this.strokeWidth = BlobConfig.strokeWidth,
+      this.fillType = BlobConfig.fillType,
+      this.gradient})
+      : super._();
 
+  @JsonKey(defaultValue: BlobConfig.color)
   @override
-  final Color? color;
+  final Color color;
+  @JsonKey(defaultValue: BlobConfig.strokeWidth)
+  @override
+  final double strokeWidth;
+  @JsonKey(defaultValue: BlobConfig.fillType)
+  @override
+  final PaintingStyle fillType;
   @override
   final Shader? gradient;
-  @override
-  final int? strokeWidth;
-  @override
-  final BlobFillType? fillType;
 
   @override
   String toString() {
-    return 'BlobStyles(color: $color, gradient: $gradient, strokeWidth: $strokeWidth, fillType: $fillType)';
+    return 'BlobStyle(color: $color, strokeWidth: $strokeWidth, fillType: $fillType, gradient: $gradient)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _BlobStyles &&
+        (other is _BlobStyle &&
             (identical(other.color, color) ||
                 const DeepCollectionEquality().equals(other.color, color)) &&
-            (identical(other.gradient, gradient) ||
-                const DeepCollectionEquality()
-                    .equals(other.gradient, gradient)) &&
             (identical(other.strokeWidth, strokeWidth) ||
                 const DeepCollectionEquality()
                     .equals(other.strokeWidth, strokeWidth)) &&
             (identical(other.fillType, fillType) ||
                 const DeepCollectionEquality()
-                    .equals(other.fillType, fillType)));
+                    .equals(other.fillType, fillType)) &&
+            (identical(other.gradient, gradient) ||
+                const DeepCollectionEquality()
+                    .equals(other.gradient, gradient)));
   }
 
   @override
   int get hashCode =>
       runtimeType.hashCode ^
       const DeepCollectionEquality().hash(color) ^
-      const DeepCollectionEquality().hash(gradient) ^
       const DeepCollectionEquality().hash(strokeWidth) ^
-      const DeepCollectionEquality().hash(fillType);
+      const DeepCollectionEquality().hash(fillType) ^
+      const DeepCollectionEquality().hash(gradient);
 
   @JsonKey(ignore: true)
   @override
-  _$BlobStylesCopyWith<_BlobStyles> get copyWith =>
-      __$BlobStylesCopyWithImpl<_BlobStyles>(this, _$identity);
+  _$BlobStyleCopyWith<_BlobStyle> get copyWith =>
+      __$BlobStyleCopyWithImpl<_BlobStyle>(this, _$identity);
 }
 
-abstract class _BlobStyles implements BlobStyles {
-  const factory _BlobStyles(
-      {Color? color,
-      Shader? gradient,
-      int? strokeWidth,
-      BlobFillType? fillType}) = _$_BlobStyles;
+abstract class _BlobStyle extends BlobStyle {
+  factory _BlobStyle(
+      {Color color,
+      double strokeWidth,
+      PaintingStyle fillType,
+      Shader? gradient}) = _$_BlobStyle;
+  _BlobStyle._() : super._();
 
   @override
-  Color? get color => throw _privateConstructorUsedError;
+  Color get color => throw _privateConstructorUsedError;
+  @override
+  double get strokeWidth => throw _privateConstructorUsedError;
+  @override
+  PaintingStyle get fillType => throw _privateConstructorUsedError;
   @override
   Shader? get gradient => throw _privateConstructorUsedError;
   @override
-  int? get strokeWidth => throw _privateConstructorUsedError;
-  @override
-  BlobFillType? get fillType => throw _privateConstructorUsedError;
-  @override
   @JsonKey(ignore: true)
-  _$BlobStylesCopyWith<_BlobStyles> get copyWith =>
+  _$BlobStyleCopyWith<_BlobStyle> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -899,13 +831,13 @@ class _$BlobPointsTearOff {
       required List<Offset> destPoints,
       required Offset center,
       required double innerRad,
-      String? id}) {
+      BlobSeed? seed}) {
     return _BlobPoints(
       originPoints: originPoints,
       destPoints: destPoints,
       center: center,
       innerRad: innerRad,
-      id: id,
+      seed: seed,
     );
   }
 }
@@ -919,7 +851,7 @@ mixin _$BlobPoints {
   List<Offset> get destPoints => throw _privateConstructorUsedError;
   Offset get center => throw _privateConstructorUsedError;
   double get innerRad => throw _privateConstructorUsedError;
-  String? get id => throw _privateConstructorUsedError;
+  BlobSeed? get seed => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $BlobPointsCopyWith<BlobPoints> get copyWith =>
@@ -936,7 +868,9 @@ abstract class $BlobPointsCopyWith<$Res> {
       List<Offset> destPoints,
       Offset center,
       double innerRad,
-      String? id});
+      BlobSeed? seed});
+
+  $BlobSeedCopyWith<$Res>? get seed;
 }
 
 /// @nodoc
@@ -953,7 +887,7 @@ class _$BlobPointsCopyWithImpl<$Res> implements $BlobPointsCopyWith<$Res> {
     Object? destPoints = freezed,
     Object? center = freezed,
     Object? innerRad = freezed,
-    Object? id = freezed,
+    Object? seed = freezed,
   }) {
     return _then(_value.copyWith(
       originPoints: originPoints == freezed
@@ -972,11 +906,22 @@ class _$BlobPointsCopyWithImpl<$Res> implements $BlobPointsCopyWith<$Res> {
           ? _value.innerRad
           : innerRad // ignore: cast_nullable_to_non_nullable
               as double,
-      id: id == freezed
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String?,
+      seed: seed == freezed
+          ? _value.seed
+          : seed // ignore: cast_nullable_to_non_nullable
+              as BlobSeed?,
     ));
+  }
+
+  @override
+  $BlobSeedCopyWith<$Res>? get seed {
+    if (_value.seed == null) {
+      return null;
+    }
+
+    return $BlobSeedCopyWith<$Res>(_value.seed!, (value) {
+      return _then(_value.copyWith(seed: value));
+    });
   }
 }
 
@@ -991,7 +936,10 @@ abstract class _$BlobPointsCopyWith<$Res> implements $BlobPointsCopyWith<$Res> {
       List<Offset> destPoints,
       Offset center,
       double innerRad,
-      String? id});
+      BlobSeed? seed});
+
+  @override
+  $BlobSeedCopyWith<$Res>? get seed;
 }
 
 /// @nodoc
@@ -1010,7 +958,7 @@ class __$BlobPointsCopyWithImpl<$Res> extends _$BlobPointsCopyWithImpl<$Res>
     Object? destPoints = freezed,
     Object? center = freezed,
     Object? innerRad = freezed,
-    Object? id = freezed,
+    Object? seed = freezed,
   }) {
     return _then(_BlobPoints(
       originPoints: originPoints == freezed
@@ -1029,10 +977,10 @@ class __$BlobPointsCopyWithImpl<$Res> extends _$BlobPointsCopyWithImpl<$Res>
           ? _value.innerRad
           : innerRad // ignore: cast_nullable_to_non_nullable
               as double,
-      id: id == freezed
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String?,
+      seed: seed == freezed
+          ? _value.seed
+          : seed // ignore: cast_nullable_to_non_nullable
+              as BlobSeed?,
     ));
   }
 }
@@ -1045,7 +993,7 @@ class _$_BlobPoints implements _BlobPoints {
       required this.destPoints,
       required this.center,
       required this.innerRad,
-      this.id});
+      this.seed});
 
   @override
   final List<Offset> originPoints;
@@ -1056,11 +1004,11 @@ class _$_BlobPoints implements _BlobPoints {
   @override
   final double innerRad;
   @override
-  final String? id;
+  final BlobSeed? seed;
 
   @override
   String toString() {
-    return 'BlobPoints(originPoints: $originPoints, destPoints: $destPoints, center: $center, innerRad: $innerRad, id: $id)';
+    return 'BlobPoints(originPoints: $originPoints, destPoints: $destPoints, center: $center, innerRad: $innerRad, seed: $seed)';
   }
 
   @override
@@ -1078,8 +1026,8 @@ class _$_BlobPoints implements _BlobPoints {
             (identical(other.innerRad, innerRad) ||
                 const DeepCollectionEquality()
                     .equals(other.innerRad, innerRad)) &&
-            (identical(other.id, id) ||
-                const DeepCollectionEquality().equals(other.id, id)));
+            (identical(other.seed, seed) ||
+                const DeepCollectionEquality().equals(other.seed, seed)));
   }
 
   @override
@@ -1089,7 +1037,7 @@ class _$_BlobPoints implements _BlobPoints {
       const DeepCollectionEquality().hash(destPoints) ^
       const DeepCollectionEquality().hash(center) ^
       const DeepCollectionEquality().hash(innerRad) ^
-      const DeepCollectionEquality().hash(id);
+      const DeepCollectionEquality().hash(seed);
 
   @JsonKey(ignore: true)
   @override
@@ -1103,7 +1051,7 @@ abstract class _BlobPoints implements BlobPoints {
       required List<Offset> destPoints,
       required Offset center,
       required double innerRad,
-      String? id}) = _$_BlobPoints;
+      BlobSeed? seed}) = _$_BlobPoints;
 
   @override
   List<Offset> get originPoints => throw _privateConstructorUsedError;
@@ -1114,9 +1062,274 @@ abstract class _BlobPoints implements BlobPoints {
   @override
   double get innerRad => throw _privateConstructorUsedError;
   @override
-  String? get id => throw _privateConstructorUsedError;
+  BlobSeed? get seed => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$BlobPointsCopyWith<_BlobPoints> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+class _$BlobPaintDataTearOff {
+  const _$BlobPaintDataTearOff();
+
+  _BlobPaintData call(
+      {required Size size,
+      required BlobSeed seed,
+      Alignment alignment = Alignment.center,
+      Offset translation = Offset.zero,
+      BlobStyle? style}) {
+    return _BlobPaintData(
+      size: size,
+      seed: seed,
+      alignment: alignment,
+      translation: translation,
+      style: style,
+    );
+  }
+}
+
+/// @nodoc
+const $BlobPaintData = _$BlobPaintDataTearOff();
+
+/// @nodoc
+mixin _$BlobPaintData {
+  Size get size => throw _privateConstructorUsedError;
+  BlobSeed get seed => throw _privateConstructorUsedError;
+  Alignment get alignment =>
+      throw _privateConstructorUsedError; // Alignment of the painted blob rect on the canvas.
+  Offset get translation =>
+      throw _privateConstructorUsedError; // Shift of the path after the blob is aligned on the canvas.
+  BlobStyle? get style => throw _privateConstructorUsedError;
+
+  @JsonKey(ignore: true)
+  $BlobPaintDataCopyWith<BlobPaintData> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $BlobPaintDataCopyWith<$Res> {
+  factory $BlobPaintDataCopyWith(
+          BlobPaintData value, $Res Function(BlobPaintData) then) =
+      _$BlobPaintDataCopyWithImpl<$Res>;
+  $Res call(
+      {Size size,
+      BlobSeed seed,
+      Alignment alignment,
+      Offset translation,
+      BlobStyle? style});
+
+  $BlobSeedCopyWith<$Res> get seed;
+  $BlobStyleCopyWith<$Res>? get style;
+}
+
+/// @nodoc
+class _$BlobPaintDataCopyWithImpl<$Res>
+    implements $BlobPaintDataCopyWith<$Res> {
+  _$BlobPaintDataCopyWithImpl(this._value, this._then);
+
+  final BlobPaintData _value;
+  // ignore: unused_field
+  final $Res Function(BlobPaintData) _then;
+
+  @override
+  $Res call({
+    Object? size = freezed,
+    Object? seed = freezed,
+    Object? alignment = freezed,
+    Object? translation = freezed,
+    Object? style = freezed,
+  }) {
+    return _then(_value.copyWith(
+      size: size == freezed
+          ? _value.size
+          : size // ignore: cast_nullable_to_non_nullable
+              as Size,
+      seed: seed == freezed
+          ? _value.seed
+          : seed // ignore: cast_nullable_to_non_nullable
+              as BlobSeed,
+      alignment: alignment == freezed
+          ? _value.alignment
+          : alignment // ignore: cast_nullable_to_non_nullable
+              as Alignment,
+      translation: translation == freezed
+          ? _value.translation
+          : translation // ignore: cast_nullable_to_non_nullable
+              as Offset,
+      style: style == freezed
+          ? _value.style
+          : style // ignore: cast_nullable_to_non_nullable
+              as BlobStyle?,
+    ));
+  }
+
+  @override
+  $BlobSeedCopyWith<$Res> get seed {
+    return $BlobSeedCopyWith<$Res>(_value.seed, (value) {
+      return _then(_value.copyWith(seed: value));
+    });
+  }
+
+  @override
+  $BlobStyleCopyWith<$Res>? get style {
+    if (_value.style == null) {
+      return null;
+    }
+
+    return $BlobStyleCopyWith<$Res>(_value.style!, (value) {
+      return _then(_value.copyWith(style: value));
+    });
+  }
+}
+
+/// @nodoc
+abstract class _$BlobPaintDataCopyWith<$Res>
+    implements $BlobPaintDataCopyWith<$Res> {
+  factory _$BlobPaintDataCopyWith(
+          _BlobPaintData value, $Res Function(_BlobPaintData) then) =
+      __$BlobPaintDataCopyWithImpl<$Res>;
+  @override
+  $Res call(
+      {Size size,
+      BlobSeed seed,
+      Alignment alignment,
+      Offset translation,
+      BlobStyle? style});
+
+  @override
+  $BlobSeedCopyWith<$Res> get seed;
+  @override
+  $BlobStyleCopyWith<$Res>? get style;
+}
+
+/// @nodoc
+class __$BlobPaintDataCopyWithImpl<$Res>
+    extends _$BlobPaintDataCopyWithImpl<$Res>
+    implements _$BlobPaintDataCopyWith<$Res> {
+  __$BlobPaintDataCopyWithImpl(
+      _BlobPaintData _value, $Res Function(_BlobPaintData) _then)
+      : super(_value, (v) => _then(v as _BlobPaintData));
+
+  @override
+  _BlobPaintData get _value => super._value as _BlobPaintData;
+
+  @override
+  $Res call({
+    Object? size = freezed,
+    Object? seed = freezed,
+    Object? alignment = freezed,
+    Object? translation = freezed,
+    Object? style = freezed,
+  }) {
+    return _then(_BlobPaintData(
+      size: size == freezed
+          ? _value.size
+          : size // ignore: cast_nullable_to_non_nullable
+              as Size,
+      seed: seed == freezed
+          ? _value.seed
+          : seed // ignore: cast_nullable_to_non_nullable
+              as BlobSeed,
+      alignment: alignment == freezed
+          ? _value.alignment
+          : alignment // ignore: cast_nullable_to_non_nullable
+              as Alignment,
+      translation: translation == freezed
+          ? _value.translation
+          : translation // ignore: cast_nullable_to_non_nullable
+              as Offset,
+      style: style == freezed
+          ? _value.style
+          : style // ignore: cast_nullable_to_non_nullable
+              as BlobStyle?,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$_BlobPaintData extends _BlobPaintData {
+  _$_BlobPaintData(
+      {required this.size,
+      required this.seed,
+      this.alignment = Alignment.center,
+      this.translation = Offset.zero,
+      this.style})
+      : super._();
+
+  @override
+  final Size size;
+  @override
+  final BlobSeed seed;
+  @JsonKey(defaultValue: Alignment.center)
+  @override
+  final Alignment alignment;
+  @JsonKey(defaultValue: Offset.zero)
+  @override // Alignment of the painted blob rect on the canvas.
+  final Offset translation;
+  @override // Shift of the path after the blob is aligned on the canvas.
+  final BlobStyle? style;
+
+  @override
+  String toString() {
+    return 'BlobPaintData(size: $size, seed: $seed, alignment: $alignment, translation: $translation, style: $style)';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other is _BlobPaintData &&
+            (identical(other.size, size) ||
+                const DeepCollectionEquality().equals(other.size, size)) &&
+            (identical(other.seed, seed) ||
+                const DeepCollectionEquality().equals(other.seed, seed)) &&
+            (identical(other.alignment, alignment) ||
+                const DeepCollectionEquality()
+                    .equals(other.alignment, alignment)) &&
+            (identical(other.translation, translation) ||
+                const DeepCollectionEquality()
+                    .equals(other.translation, translation)) &&
+            (identical(other.style, style) ||
+                const DeepCollectionEquality().equals(other.style, style)));
+  }
+
+  @override
+  int get hashCode =>
+      runtimeType.hashCode ^
+      const DeepCollectionEquality().hash(size) ^
+      const DeepCollectionEquality().hash(seed) ^
+      const DeepCollectionEquality().hash(alignment) ^
+      const DeepCollectionEquality().hash(translation) ^
+      const DeepCollectionEquality().hash(style);
+
+  @JsonKey(ignore: true)
+  @override
+  _$BlobPaintDataCopyWith<_BlobPaintData> get copyWith =>
+      __$BlobPaintDataCopyWithImpl<_BlobPaintData>(this, _$identity);
+}
+
+abstract class _BlobPaintData extends BlobPaintData {
+  factory _BlobPaintData(
+      {required Size size,
+      required BlobSeed seed,
+      Alignment alignment,
+      Offset translation,
+      BlobStyle? style}) = _$_BlobPaintData;
+  _BlobPaintData._() : super._();
+
+  @override
+  Size get size => throw _privateConstructorUsedError;
+  @override
+  BlobSeed get seed => throw _privateConstructorUsedError;
+  @override
+  Alignment get alignment => throw _privateConstructorUsedError;
+  @override // Alignment of the painted blob rect on the canvas.
+  Offset get translation => throw _privateConstructorUsedError;
+  @override // Shift of the path after the blob is aligned on the canvas.
+  BlobStyle? get style => throw _privateConstructorUsedError;
+  @override
+  @JsonKey(ignore: true)
+  _$BlobPaintDataCopyWith<_BlobPaintData> get copyWith =>
       throw _privateConstructorUsedError;
 }

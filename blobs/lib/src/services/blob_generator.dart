@@ -2,78 +2,48 @@ import 'dart:math';
 
 import 'package:blobs/src/models.dart';
 import 'package:blobs/src/painter/tools.dart';
-import 'package:blobs/src/services/blob_error_handler.dart';
 import 'package:flutter/material.dart';
 
 class BlobGenerator {
-  BlobGenerator({
-    required this.size,
-    this.edgesCount = 7,
-    this.minGrowth = 4,
-    this.seed,
-  })  : assert(edgesCount >= 2 && edgesCount <= 300),
-        assert(minGrowth >= 2 && minGrowth <= 9);
-
-  final Size size;
-
-  int edgesCount;
-  int minGrowth;
-  String svgPath = '';
-  String? seed;
-  List<List<Offset>> dots = [];
-
-  BlobData generate() {
-    if (seed != null) {
-      var datum = seed!.split('-');
-      if (datum.length != 3) throw InvalidSeedException(seed);
-      edgesCount = int.parse(datum[0]);
-      minGrowth = int.parse(datum[1]);
-      seed = datum[2];
-    }
-
-    if (edgesCount <= 2) throw InvalidEdgesCountException();
-
-    var points = _createPoints(seed != null ? int.parse(seed!) : null);
+  static BlobData generate(BlobSeed seed, Size size) {
+    final points = _createPoints(seed, size);
     final curves = _createCurves(points.destPoints);
     final path = connectPoints(curves);
 
     return BlobData(
-      edges: edgesCount,
-      growth: minGrowth,
-      seed: points.id,
+      seed: seed,
       path: path,
       points: points,
-      size: size.width,
-      svgPath: svgPath,
+      size: size,
       curves: curves,
     );
   }
 
-  BlobData generateFromPoints(List<Offset> destPoints) {
-    BlobCurves curves = _createCurves(destPoints);
-    Path path = connectPoints(curves);
-    BlobPoints points = _createPointsFromDest(destPoints);
+  static BlobData generateFromPoints(List<Offset> destPoints, Size size, int edgesCount, int minGrowth) {
+    final curves = _createCurves(destPoints);
+    final path = connectPoints(curves);
+    final points = _createPointsFromDest(destPoints, size, edgesCount, minGrowth);
 
     return BlobData(
-      seed: '',
+      seed: BlobSeed(0, edgesCount, minGrowth),
       path: path,
       points: points,
-      size: 0,
-      svgPath: null,
+      size: Size.zero,
       curves: curves,
     );
   }
 
-  double _toRad(double deg) => deg * (pi / 180.0);
+  static double _toRad(double deg) => deg * (pi / 180.0);
 
-  List<double> _divide(int count) {
+  static List<double> _divide(int count) {
     final deg = 360.0 / count;
     return List<double>.generate(count, (i) => i * deg);
   }
 
   // https://stackoverflow.com/a/29450606/3096740
-  double Function() _randomDoubleGenerator(int seedValue) {
-    var mask = 0xffffffff;
+  static double Function() _randomDoubleGenerator(int seedValue) {
+    const mask = 0xffffffff;
+
     int mw = (123456789 + seedValue) & mask;
     int mz = (987654321 - seedValue) & mask;
 
@@ -86,7 +56,7 @@ class BlobGenerator {
     };
   }
 
-  double _magicPoint(double value, double min, double max) {
+  static double _magicPoint(double value, double min, double max) {
     double radius = min + (value * (max - min));
     if (radius > max) {
       radius = radius - min;
@@ -96,28 +66,18 @@ class BlobGenerator {
     return radius;
   }
 
-  Offset _point(Offset origin, double radius, double degree) {
+  static Offset _point(Offset origin, double radius, double degree) {
     final x = origin.dx + (radius * cos(_toRad(degree)));
     final y = origin.dy + (radius * sin(_toRad(degree)));
     return Offset(x.round().toDouble(), y.round().toDouble());
   }
 
-  BlobPoints _createPoints(int? seedValue) {
+  static BlobPoints _createPoints(BlobSeed seed, Size size) {
     final outerRad = size.width / 2.0;
-    final innerRad = minGrowth * (outerRad / 10.0);
+    final innerRad = seed.growth * (outerRad / 10.0);
     final center = Offset(size.width / 2.0, size.height / 2.0);
-    final slices = _divide(edgesCount);
-
-    int? randomInt;
-    if (seed != null) {
-      seedValue = int.parse(seed!);
-    } else {
-      final maxRandomValue = ([99, 999, 9999, 99999, 999999]..shuffle()).first;
-      randomInt = Random().nextInt(maxRandomValue);
-      seedValue = randomInt;
-    }
-
-    var randVal = _randomDoubleGenerator(seedValue);
+    final slices = _divide(seed.edges);
+    final randVal = _randomDoubleGenerator(seed.rand);
     final originPoints = List<Offset>.filled(slices.length, Offset.zero);
     final destPoints = List<Offset>.filled(slices.length, Offset.zero);
 
@@ -135,12 +95,12 @@ class BlobGenerator {
       originPoints: originPoints,
       destPoints: destPoints,
       center: center,
-      id: randomInt == null ? null : '$edgesCount-$minGrowth-$seed',
+      seed: seed,
       innerRad: innerRad.toDouble(),
     );
   }
 
-  BlobPoints _createPointsFromDest(List<Offset> destPoints) {
+  static BlobPoints _createPointsFromDest(List<Offset> destPoints, Size size, int minGrowth, int edgesCount) {
     final outerRad = size.width / 2.0;
     final innerRad = minGrowth * (outerRad / 10.0);
     final center = Offset(size.width / 2.0, size.height / 2.0);
@@ -151,33 +111,28 @@ class BlobGenerator {
       originPoints: originPoints,
       destPoints: destPoints,
       center: center,
-      id: null,
+      seed: null,
       innerRad: innerRad.toDouble(),
     );
   }
 
-  BlobCurves _createCurves(List<Offset> points) {
+  static BlobCurves _createCurves(List<Offset> points) {
     assert(points.length >= 2);
 
     final curves = List<List<double>>.filled(points.length, const <double>[]);
     final breakpoints = List<Offset>.filled(points.length + 1, Offset.zero);
 
     Offset mid = (points[0] + points[1]) / 2.0;
-
     breakpoints[0] = mid;
-    svgPath += 'M${mid.dx},${mid.dy}';
 
     for (var i = 0; i < points.length; i++) {
-      var p1 = points[(i + 1) % points.length];
-      var p2 = points[(i + 2) % points.length];
-      mid = (p1 + p2) / 2;
-      svgPath += 'Q${p1.dx},${p1.dy},${mid.dx},${mid.dy}';
+      final p1 = points[(i + 1) % points.length];
+      final p2 = points[(i + 2) % points.length];
 
+      mid = (p1 + p2) / 2;
       breakpoints[i + 1] = mid;
       curves[i] = [p1.dx, p1.dy, mid.dx, mid.dy];
     }
-
-    svgPath += 'Z';
 
     return BlobCurves(
       start: mid,

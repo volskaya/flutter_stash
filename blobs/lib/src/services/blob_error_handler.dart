@@ -1,10 +1,12 @@
-class InvalidSeedException implements Exception {
-  const InvalidSeedException(this.id);
+import 'package:blobs/src/models.dart';
 
-  final String? id;
+class InvalidSeedException implements Exception {
+  const InvalidSeedException(this.seed);
+
+  final BlobSeed seed;
 
   @override
-  String toString() => "Invalid ID - $id";
+  String toString() => "Invalid ID - $seed";
 }
 
 class InvalidEdgesCountException implements Exception {

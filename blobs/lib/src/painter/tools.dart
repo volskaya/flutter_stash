@@ -1,4 +1,3 @@
-import 'package:blobs/src/config.dart';
 import 'package:blobs/src/models.dart';
 import 'package:flutter/material.dart';
 
@@ -19,12 +18,12 @@ void circle(Canvas canvas, Size size, double radius) {
 }
 
 void label(Canvas canvas, String text, Offset offset) {
-  final textStyle = TextStyle(color: Colors.black, fontSize: 16.0);
+  const textStyle = TextStyle(color: Colors.black, fontSize: 16.0);
   final textSpan = TextSpan(text: text, style: textStyle);
   final textPainter = TextPainter(text: textSpan, textDirection: TextDirection.ltr);
 
   textPainter.layout(minWidth: 0.0, maxWidth: 100.0);
-  textPainter.paint(canvas, offset + Offset(0.0, -20.0));
+  textPainter.paint(canvas, offset + const Offset(0.0, -20.0));
 }
 
 void line(Canvas canvas, Offset start, Offset end) {
@@ -51,23 +50,6 @@ void point(Canvas canvas, Offset center) {
   canvas.drawPath(path, paint);
 }
 
-Paint createPaint(BlobStyles? styles) {
-  Map<BlobFillType, PaintingStyle> fillType = {
-    BlobFillType.fill: PaintingStyle.fill,
-    BlobFillType.stroke: PaintingStyle.stroke
-  };
-
-  styles ??= const BlobStyles();
-
-  var paint = Paint();
-  paint.color = styles.color ?? BlobConfig.color;
-  paint.shader = styles.gradient;
-  paint.strokeWidth = (styles.strokeWidth ?? BlobConfig.strokeWidth).toDouble();
-  paint.style = fillType[styles.fillType ?? BlobConfig.fillType]!;
-
-  return paint;
-}
-
 Path connectPoints(BlobCurves curves) {
   final path = Path()..moveTo(curves.start.dx, curves.start.dy);
   for (final curve in curves.curves) {
@@ -77,4 +59,4 @@ Path connectPoints(BlobCurves curves) {
   return path..close();
 }
 
-void drawBlob(Canvas canvas, Path path, BlobStyles? styles) => canvas.drawPath(path, createPaint(styles));
+void drawBlob(Canvas canvas, Path path, BlobStyle? style) => canvas.drawPath(path, (style ?? BlobStyle()).paint);
