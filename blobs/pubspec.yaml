@@ -1,0 +1,25 @@
+name: blobs
+description: Create beautiful blobs - fixed/random blob generation, animations, svgs and more
+version: 2.0.0
+homepage: https://github.com/lokesh-coder/flutter_blobs
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=0.2.5 <2.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  freezed_annotation: ^0.14.1
+
+dev_dependencies:
+  build_runner:
+  flutter_lints: ^1.0.4
+  freezed: ^0.14.1+1
+
+dependency_overrides:
+  freezed_annotation:
+    path: /home/projects/forks/freezed/packages/freezed_annotation
+  freezed:
+    path: /home/projects/forks/freezed/packages/freezed
