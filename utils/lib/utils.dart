@@ -13,6 +13,7 @@ import 'package:flutter/widgets.dart';
 
 import 'src/mixins.dart';
 
+export 'src/animated_observer_widget.dart';
 export 'src/converters.dart';
 export 'src/corrected_media_query.dart';
 export 'src/custom_ink_splash.dart';
