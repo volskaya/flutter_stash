@@ -25,7 +25,7 @@ abstract class AnimatedObserverWidget extends StatefulObserverWidget {
 
   /// Subclasses typically do not override this method.
   @override
-  State<AnimatedWidget> createState() => _AnimatedState();
+  State<AnimatedObserverWidget> createState() => _AnimatedState();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -34,7 +34,7 @@ abstract class AnimatedObserverWidget extends StatefulObserverWidget {
   }
 }
 
-class _AnimatedState extends State<AnimatedWidget> {
+class _AnimatedState extends State<AnimatedObserverWidget> {
   @override
   void initState() {
     super.initState();
@@ -42,7 +42,7 @@ class _AnimatedState extends State<AnimatedWidget> {
   }
 
   @override
-  void didUpdateWidget(AnimatedWidget oldWidget) {
+  void didUpdateWidget(AnimatedObserverWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.listenable != oldWidget.listenable) {
       oldWidget.listenable.removeListener(markNeedsBuild);

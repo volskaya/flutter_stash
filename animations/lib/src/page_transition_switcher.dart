@@ -266,11 +266,16 @@ class PageTransitionSwitcher extends StatefulWidget {
   ///
   /// See [PageTransitionSwitcherTransitionBuilder] for more information on the function
   /// signature.
-  static Widget defaultLayoutBuilder(List<Widget> entries, [AlignmentGeometry alignment = Alignment.center]) {
+  static Widget defaultLayoutBuilder(
+    List<Widget> entries, [
+    AlignmentGeometry alignment = Alignment.center,
+    StackSizeTarget sizeTarget = StackSizeTarget.expand,
+  ]) {
     return Stack(
       children: entries,
       alignment: alignment,
       clipBehavior: Clip.none,
+      sizeTarget: sizeTarget,
     );
   }
 
