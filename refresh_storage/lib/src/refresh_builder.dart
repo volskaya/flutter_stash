@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:refresh_storage/src/refresh_counter_pod.dart';
 import 'package:refresh_storage/src/refresh_indicator.dart' as my;
-import 'package:refresh_storage/src/refresh_storage.dart';
-import 'package:refresh_storage/src/refresh_storage_entry.dart';
 
 /// Child builder of [RefreshBuilder].
-typedef RefreshChildBuilder = Widget Function(BuildContext context, String bucket, int refresh);
-
-/// Page storage of [RefreshController].
-class RefreshControllerStorage extends RefreshStorageItem {
-  /// Which refresh is the [RefreshController] set at.
-  int refreshes = 0;
-}
+typedef RefreshChildBuilder = Widget Function(BuildContext context, String? bucket, int refresh);
 
 /// [Notification] that's dispatched when the [RefreshBuilder] refreshes.
 class RefreshControllerNotication extends Notification {
@@ -27,7 +20,7 @@ class RefreshControllerNotication extends Notification {
 ///
 /// Wrap this around scrollables, to add a pull to refresh behavior to the
 /// scroll view.
-class RefreshBuilder extends StatefulWidget {
+class RefreshBuilder extends ConsumerWidget {
   /// Creates the [RefreshBuilder] without the support for [NestedScrollView].
   const RefreshBuilder({
     Key? key,
@@ -64,91 +57,37 @@ class RefreshBuilder extends StatefulWidget {
   final OverscrollIndicatorNotificationPredicate overscrollPredicate;
 
   @override
-  RefreshController createState() => RefreshController();
+  Widget build(BuildContext context, WidgetRef ref) => my.RefreshIndicator(
+        offset: enforceSafeArea ? Offset(0, MediaQuery.of(context).padding.top) : Offset.zero,
+        notificationPredicate: notificationPredicate,
+        overscrollPredicate: overscrollPredicate,
+        child: _Builder(bucket: bucket, builder: builder),
+        onRefresh: () async {
+          final newRefreshes = ref.read(RefreshCounterPod.provider.notifier).refresh();
+          RefreshControllerNotication(newRefreshes).dispatch(context);
+        },
+      );
 }
 
-/// Provider of [RefreshController] and state of [RefreshBuilder].
-class RefreshController extends State<RefreshBuilder> {
-  /// [RefreshContrtoller] appends this to bucket strings to avoid collisions.
-  static const storageIdentifierPostfix = '_refresh_builder';
+class _Builder extends ConsumerWidget {
+  const _Builder({
+    Key? key,
+    required this.bucket,
+    required this.builder,
+  }) : super(key: key);
 
-  /// Get a reference to above [RefrshController].
-  /// Returns null, if there are none.
-  static RefreshController? of(BuildContext context) {
-    try {
-      return Provider.of<RefreshController>(context, listen: false);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  late RefreshStorageEntry<RefreshControllerStorage> _storage;
-  int _bucketChanges = 0; // Incremented every time the widget's bucket changes.
-
-  /// Number of times this container has been refreshed.
-  int get refreshes => (_storage.value?.refreshes ?? 0) + _bucketChanges;
-
-  /// Refresh the controller.
-  void refresh() {
-    if (_storage.value != null) setState(() => _storage.value!.refreshes += 1);
-    RefreshControllerNotication(refreshes).dispatch(context);
-  }
-
-  Future _futureRefresh() async => refresh();
+  final String bucket;
+  final RefreshChildBuilder builder;
 
   @override
-  void initState() {
-    _storage = RefreshStorage.write(
-      context: context,
-      identifier: widget.bucket + RefreshController.storageIdentifierPostfix,
-      refreshes: 0, // Never refresh this storage.
-      builder: () => RefreshControllerStorage(),
-    );
-    super.initState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final refreshes = ref.watch(RefreshCounterPod.provider); // Keep the state live.
+    // print('Refreshes in the actual builder: $refreshes');
+
+    // ref.listen(RefreshCounterPod.provider, (_) {
+    //   print('Refreshes in the listener: $refreshes');
+    // });
+
+    return builder(context, bucket, ref.watch(RefreshCounterPod.provider));
   }
-
-  @override
-  void didUpdateWidget(covariant RefreshBuilder oldWidget) {
-    if (oldWidget.bucket != widget.bucket) {
-      _storage.dispose();
-      _bucketChanges += 1;
-      _storage = RefreshStorage.write(
-        context: context,
-        identifier: widget.bucket + RefreshController.storageIdentifierPostfix,
-        refreshes: 0, // Never refresh this storage.
-        builder: () => RefreshControllerStorage(),
-      );
-
-      // Get the storage early, in case the state is unmounted, and
-      // destroy the old refresh storage item.
-      final storage = RefreshStorage.of(context);
-      WidgetsBinding.instance!.addPostFrameCallback(
-        (_) => RefreshStorage.destroy(
-          context: context,
-          identifier: oldWidget.bucket + RefreshController.storageIdentifierPostfix,
-          storage: storage,
-        ),
-      );
-    }
-
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void dispose() {
-    _storage.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => my.RefreshIndicator(
-        onRefresh: _futureRefresh,
-        offset: widget.enforceSafeArea ? Offset(0, MediaQuery.of(context).padding.top) : Offset.zero,
-        notificationPredicate: widget.notificationPredicate,
-        overscrollPredicate: widget.overscrollPredicate,
-        child: Provider.value(
-          value: this,
-          child: widget.builder(context, widget.bucket, refreshes),
-        ),
-      );
 }

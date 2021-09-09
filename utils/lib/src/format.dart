@@ -204,7 +204,8 @@ class Format {
   static String trimRedundantLines(String str) => str.replaceAll(_redundantNewLineRegExp, '\n');
 
   static String createTime(DateTime? time, [DateFormat? format, UtilsLocalizations? strings]) {
-    final duration = time != null ? DateTime.now().difference(time) : Duration.zero;
+    if (time == null) return strings?.justNow ?? 'Just now';
+    final duration = DateTime.now().difference(time);
     if (duration < Duration.zero) {
       return strings?.justNow ?? 'Just now';
     } else if (duration > const Duration(days: 1)) {

@@ -2,7 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:animations/src/custom_widgets.dart';
+import 'package:animations/src/animations.dart';
+import 'package:animations/src/inherited_animation/inherited_animation.dart';
+import 'package:animations/src/inherited_opacity/inherited_opacity.dart';
+import 'package:animations/src/inherited_opacity/inherited_opacity_builder.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
@@ -97,7 +100,7 @@ class SharedAxisPageTransitionsBuilder extends PageTransitionsBuilder {
 
   /// The color to use for the background color during the transition.
   ///
-  /// This defaults to the [Theme]'s [ThemeData.canvasColor].
+  /// This defaults to the [Theme]'s [ThemeData.colorScheme.background].
   final Color? fillColor;
 
   @override
@@ -114,6 +117,8 @@ class SharedAxisPageTransitionsBuilder extends PageTransitionsBuilder {
       transitionType: transitionType,
       fillColor: fillColor,
       child: child,
+      inherit: true,
+      paintInheritedAnimations: true,
     );
   }
 }
@@ -207,7 +212,10 @@ class SharedAxisTransition extends StatelessWidget {
     this.onEnd,
     this.onStatusChanged,
     this.sliver = false,
-  }) : super(key: key);
+    this.inherit = false,
+    this.paintInheritedAnimations = false,
+  })  : assert(!paintInheritedAnimations || inherit),
+        super(key: key);
 
   /// Callback to be called when the animation ends.
   final VoidCallback? onEnd;
@@ -254,9 +262,15 @@ class SharedAxisTransition extends StatelessWidget {
   /// Whether to use sliver variants of animation widgets.
   final bool sliver;
 
+  /// Whether to inherit and defer the animations to [InheritedAnimationCoordinator].
+  final bool inherit;
+
+  /// Whether to paint any deferred animations before the child.
+  final bool paintInheritedAnimations;
+
   @override
   Widget build(BuildContext context) {
-    final Color color = fillColor ?? Theme.of(context).canvasColor;
+    final Color fillColor = this.fillColor ?? Theme.of(context).colorScheme.background;
     return dual_transition_builder.DualTransitionBuilder(
       animation: animation,
       onEnd: onEnd,
@@ -266,14 +280,16 @@ class SharedAxisTransition extends StatelessWidget {
         transitionType: transitionType,
         child: child,
         sliver: sliver,
+        inherit: inherit,
       ),
       reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => _ExitTransition(
         animation: animation,
         transitionType: transitionType,
         reverse: true,
-        fillColor: color,
+        fillColor: fillColor,
         child: child,
         sliver: sliver,
+        inherit: inherit,
       ),
       child: dual_transition_builder.DualTransitionBuilder(
         animation: ReverseAnimation(secondaryAnimation),
@@ -283,15 +299,24 @@ class SharedAxisTransition extends StatelessWidget {
           reverse: true,
           child: child,
           sliver: sliver,
+          inherit: inherit,
         ),
         reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => _ExitTransition(
           animation: animation,
           transitionType: transitionType,
-          fillColor: color,
+          fillColor: fillColor,
           child: child,
           sliver: sliver,
+          inherit: inherit,
         ),
-        child: child,
+        child: paintInheritedAnimations
+            ? InheritedAnimation(
+                fillColor: fillColor,
+                child: child,
+                opacity: true,
+                translation: true,
+              )
+            : child,
       ),
     );
   }
@@ -304,6 +329,7 @@ class _EnterTransition extends StatelessWidget {
     required this.child,
     this.reverse = false,
     this.sliver = false,
+    this.inherit = false,
   });
 
   final Animation<double> animation;
@@ -311,6 +337,7 @@ class _EnterTransition extends StatelessWidget {
   final Widget child;
   final bool reverse;
   final bool sliver;
+  final bool inherit;
 
   static final Animatable<double> _fadeInTransition = CurveTween(
     curve: decelerateEasing,
@@ -335,19 +362,15 @@ class _EnterTransition extends StatelessWidget {
           end: Offset.zero,
         ).chain(CurveTween(curve: standardEasing));
 
-        return CustomWidgets.fade(
+        return Animations.fade(
           opacity: _fadeInTransition.animate(animation),
           sliver: sliver,
-          child: AnimatedBuilder(
-            animation: animation,
-            builder: (BuildContext context, Widget? child) {
-              return CustomWidgets.translate(
-                offset: slideInTransition.evaluate(animation),
-                child: child!,
-                sliver: sliver,
-              );
-            },
+          inherit: inherit,
+          child: Animations.translate(
+            offset: slideInTransition.animate(animation),
             child: child,
+            sliver: sliver,
+            inherit: inherit,
           ),
         );
       case SharedAxisTransitionType.vertical:
@@ -356,29 +379,27 @@ class _EnterTransition extends StatelessWidget {
           end: Offset.zero,
         ).chain(CurveTween(curve: standardEasing));
 
-        return CustomWidgets.fade(
+        return Animations.fade(
           opacity: _fadeInTransition.animate(animation),
           sliver: sliver,
-          child: AnimatedBuilder(
-            animation: animation,
-            builder: (BuildContext context, Widget? child) {
-              return CustomWidgets.translate(
-                offset: slideInTransition.evaluate(animation),
-                child: child!,
-                sliver: sliver,
-              );
-            },
+          inherit: inherit,
+          child: Animations.translate(
+            offset: slideInTransition.animate(animation),
             child: child,
+            sliver: sliver,
+            inherit: inherit,
           ),
         );
       case SharedAxisTransitionType.scaled:
-        return CustomWidgets.fade(
+        return Animations.fade(
           opacity: _fadeInTransition.animate(animation),
           sliver: sliver,
-          child: CustomWidgets.scale(
+          inherit: inherit,
+          child: Animations.scale(
             scale: (!reverse ? _scaleUpTransition : _scaleDownTransition).animate(animation),
             child: child,
             sliver: sliver,
+            inherit: inherit,
           ),
         );
     }
@@ -393,6 +414,7 @@ class _ExitTransition extends StatelessWidget {
     required this.child,
     this.reverse = false,
     this.sliver = false,
+    this.inherit = false,
   });
 
   final Animation<double> animation;
@@ -401,6 +423,7 @@ class _ExitTransition extends StatelessWidget {
   final Color fillColor;
   final Widget child;
   final bool sliver;
+  final bool inherit;
 
   static final Animatable<double> _fadeOutTransition = _FlippedCurveTween(
     curve: accelerateEasing,
@@ -425,26 +448,22 @@ class _ExitTransition extends StatelessWidget {
           end: Offset(!reverse ? -30.0 : 30.0, 0.0),
         ).chain(CurveTween(curve: standardEasing));
 
-        Widget _widget = AnimatedBuilder(
-          animation: animation,
-          builder: (BuildContext context, Widget? child) {
-            return CustomWidgets.translate(
-              offset: slideOutTransition.evaluate(animation),
-              child: child!,
-              sliver: sliver,
-            );
-          },
+        Widget _widget = Animations.translate(
+          offset: slideOutTransition.animate(animation),
           child: child,
+          sliver: sliver,
+          inherit: inherit,
         );
 
-        if (fillColor != Colors.transparent) {
-          _widget = ColoredBox(color: fillColor, child: _widget);
+        if (!inherit && fillColor != Colors.transparent) {
+          _widget = ColoredBox(color: fillColor, child: child);
         }
 
-        return CustomWidgets.fade(
+        return Animations.fade(
           opacity: _fadeOutTransition.animate(animation),
           child: _widget,
           sliver: sliver,
+          inherit: inherit,
         );
       case SharedAxisTransitionType.vertical:
         final Animatable<Offset> slideOutTransition = Tween<Offset>(
@@ -452,42 +471,40 @@ class _ExitTransition extends StatelessWidget {
           end: Offset(0.0, !reverse ? -30.0 : 30.0),
         ).chain(CurveTween(curve: standardEasing));
 
-        Widget _widget = AnimatedBuilder(
-          animation: animation,
-          builder: (BuildContext context, Widget? child) {
-            return CustomWidgets.translate(
-              offset: slideOutTransition.evaluate(animation),
-              child: child!,
-              sliver: sliver,
-            );
-          },
+        Widget _widget = Animations.translate(
+          offset: slideOutTransition.animate(animation),
           child: child,
+          sliver: sliver,
+          inherit: inherit,
         );
 
         if (fillColor != Colors.transparent) {
-          _widget = ColoredBox(color: fillColor, child: _widget);
+          _widget = ColoredBox(color: fillColor, child: child);
         }
 
-        return CustomWidgets.fade(
+        return Animations.fade(
           opacity: _fadeOutTransition.animate(animation),
           child: _widget,
           sliver: sliver,
+          inherit: inherit,
         );
       case SharedAxisTransitionType.scaled:
-        Widget _widget = CustomWidgets.scale(
+        Widget _widget = Animations.scale(
           scale: (!reverse ? _scaleUpTransition : _scaleDownTransition).animate(animation),
           child: child,
           sliver: sliver,
+          inherit: inherit,
         );
 
-        if (fillColor != Colors.transparent) {
+        if (!inherit && fillColor != Colors.transparent) {
           _widget = ColoredBox(color: fillColor, child: _widget);
         }
 
-        return CustomWidgets.fade(
+        return Animations.fade(
           opacity: _fadeOutTransition.animate(animation),
           child: _widget,
           sliver: sliver,
+          inherit: inherit,
         );
     }
   }

@@ -1,379 +1,41 @@
-// ignore_for_file:sort_unnamed_constructors_first
+import 'dart:ui';
 
-import 'dart:async';
-import 'dart:collection';
-import 'dart:math' as math;
-
-import 'package:await_route/await_route.dart';
+import 'package:animations/animations.dart';
+import 'package:fading_tile/src/fading_tile_controller.dart';
+import 'package:fading_tile/src/fading_tile_mixin.dart';
 import 'package:fading_tile/src/size_expand_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:log/log.dart';
-import 'package:provider/provider.dart';
-import 'package:refresh_storage/refresh_storage.dart';
-import 'package:utils/utils.dart';
 
-enum _FadingTileType { fade, size }
-
-class _FadingTileControllerStorage extends RefreshStorageItem {
-  final finished = <int>{};
-  int maxIndex = -1;
-}
-
-/// Holds and schedules [AnimationController]s of [FadingTile]s.
-class FadingTileController extends StatefulWidget {
-  const FadingTileController._({
-    Key? key,
-    required this.type,
-    required this.child,
-    this.bucket,
-    this.pageSize = 20,
-    this.staggerDuration = const Duration(milliseconds: 20),
-    this.awaitRoute = false,
-    this.startFrom = 0,
-    this.poolControllers = false,
-    this.initialOffset,
-    this.expectedItemCount,
-    this.lastMountedItem,
-    this.optimizeOutFades = true,
-    this.duration = const Duration(milliseconds: 300),
-  }) : super(key: key);
-
-  /// Creates [FadingTileController] with no sizing animation.
-  const FadingTileController({
-    Key? key,
-    required this.child,
-    this.bucket,
-    this.pageSize = 20,
-    this.staggerDuration = const Duration(milliseconds: 20),
-    this.awaitRoute = false,
-    this.startFrom = 0,
-    this.poolControllers = false,
-    this.initialOffset,
-    this.expectedItemCount,
-    this.lastMountedItem,
-    this.optimizeOutFades = true,
-    this.duration = const Duration(milliseconds: 300),
-  })  : type = _FadingTileType.fade,
-        super(key: key);
-
-  /// Creates [FadingTileController] with sizing animation.
-  const FadingTileController.size({
-    Key? key,
-    required this.child,
-    this.bucket,
-    this.pageSize = 20,
-    this.staggerDuration = const Duration(milliseconds: 20),
-    this.awaitRoute = false,
-    this.startFrom = 0,
-    this.poolControllers = false,
-    this.initialOffset,
-    this.expectedItemCount,
-    this.lastMountedItem,
-    this.optimizeOutFades = true,
-    this.duration = const Duration(milliseconds: 300),
-  })  : type = _FadingTileType.size,
-        super(key: key);
-
-  /// Animation type of the fade.
-  final _FadingTileType type;
-
-  /// Page storage bucket identifier.
-  final String? bucket;
-
-  /// Child widget that builds the descendant [FadeTile]s.
-  final Widget child;
-
-  /// Page size of the collection thats being paginated.
-  final int pageSize;
-
-  /// Optional expected item count to better allow the [FadingTileController]
-  /// to optimize offscreen items.
-  final int? expectedItemCount;
-
-  /// Getter function of the last mounted item index, within the list, to better
-  /// optimize out the tiles that don't need fade anymore.
-  final int Function()? lastMountedItem;
-
-  /// Delay between every next fade in animation. If set to null,
-  /// every next fade will start after the previous one finishes.
-  final Duration staggerDuration;
-
-  /// [FadeTiles]s with their index lower than [startFrom] will be ignored.
-  final int startFrom;
-
-  /// When the controller is initialized, overrides the currently accounted
-  /// highest child index, so all children with the index lower than the
-  /// [initialOffset] don't get faded.
-  final int Function()? initialOffset;
-
-  /// Whether to only start animating after the route has finished animating.
-  final bool awaitRoute;
-
-  /// Pooling controllers will await 1 frame, to allow multiple controllers
-  /// to build, before seeking the earliest stopped controller and animating
-  /// from that.
-  final bool poolControllers;
-
-  /// Whether to attept to optimize out fades of off-screen widgets.
-  final bool optimizeOutFades;
-
-  /// Animation duration of each fading tile.
-  final Duration duration;
-
-  /// Get a [FadingTileController] from the context.
-  static _FadingTileControllerState of(BuildContext context) =>
-      Provider.of<_FadingTileControllerState>(context, listen: false);
-
-  FadingTileController copyWith({
-    required Widget child,
-  }) =>
-      FadingTileController._(
-        key: key,
-        type: type,
-        awaitRoute: awaitRoute,
-        pageSize: pageSize,
-        staggerDuration: staggerDuration,
-        startFrom: startFrom,
-        child: child,
-        bucket: bucket,
-      );
-
-  @override
-  _FadingTileControllerState createState() => _FadingTileControllerState();
-}
-
-class _FadingTileControllerState extends State<FadingTileController>
-    with TickerProviderStateMixin<FadingTileController> {
-  static final _log = Log.named('FadingTileController');
-  final _controllers = HashMap<int, AnimationController?>();
-  final _indexes = <int>[];
-
-  // int get _lowestIndex => _indexes.isNotEmpty ? _indexes.first : 0;
-  int get _highestIndex => _indexes.isNotEmpty ? _indexes.last : 0;
-
-  /// While the animation is in progress, the `_handleAnimationStatus` takes care
-  /// of animating controllers.
-  bool _animationInProgress = false;
-  int _highestRequestedIndex = -1;
-  late final RefreshStorageEntry<_FadingTileControllerStorage> _storage;
-
-  /// If [considerInitial], this will be the first controller, that starts animating.
-  /// Rest of the controllers should either be null or sometimes dismissed.
-  ///
-  /// If a list receives a lot of items at once, multiple controllers could be created,
-  /// but never scheduled, since the index has skipped them. If that happens, use [widget.poolControllers].
-  ///
-  /// Pooling controllers will await 1 frame, allowing them to finish building, then
-  /// seek to the index of the earliest dismissed controller and begin animating from that.
-  Future _scheduleController(int index, {bool considerInitial = false}) async {
-    var targetIndex = index;
-
-    if (considerInitial) {
-      if (widget.poolControllers) {
-        // First await a frame to let the controllers build.
-        await Utils.awaitPostframe();
-        if (!mounted) return;
-
-        // Seek to the earliest dismissed controller.
-        for (var i = targetIndex - 1; i >= 0; i -= 1) {
-          if (_controllers[i] == null) break;
-          if (_controllers[i]?.isDismissed == true) targetIndex = i;
-        }
-
-        if (index != targetIndex) _log.v('Scheduling index $targetIndex in place of $index instead');
-      }
-
-      if (widget.awaitRoute && mounted) await AwaitRoute.of(context);
-    }
-
-    assert((() {
-      for (var i = targetIndex - 1; i >= 0; i -= 1) if (_controllers[i]?.isDismissed == true) return false;
-      return true;
-    })(), 'Frozen controllers found before index: $targetIndex');
-
-    if (!considerInitial && widget.staggerDuration > Duration.zero) {
-      await Future<void>.delayed(widget.staggerDuration * timeDilation); // Stagger the animation.
-    } else if (widget.optimizeOutFades &&
-        !considerInitial &&
-        targetIndex >= _highestRequestedIndex &&
-        _controllers[targetIndex]?.hasListeners == false) {
-      await Utils.awaitPostframe(); // A widget might not have mounted yet and never could attach a listener.
-    }
-
-    // After the post frame, check if the same optimize conditional is still truthy.
-    if (widget.optimizeOutFades &&
-        !considerInitial &&
-        targetIndex >= _highestRequestedIndex &&
-        _controllers[targetIndex]?.hasListeners == false) {
-      final optimizationSize = math.max(
-        widget.expectedItemCount ?? 0,
-        targetIndex + widget.pageSize,
-      );
-
-      // If this controller has no listeners yet, assume the tile has not mounted yet.
-      // If that's the case, optimize out every created controller past this index.
-      for (var i = targetIndex; i < optimizationSize - 1; i += 1) {
-        if (_controllers[i] == null) break;
-        _log.d('Optimized out fade controller of $i / ${_controllers.length - 1}');
-        _controllers[i]!.dispose();
-        _controllers[i] = null;
-      }
-
-      _highestRequestedIndex = optimizationSize - 1;
-      _animationInProgress = false;
-      if (_storage.value != null) _storage.value!.maxIndex = math.max(_highestRequestedIndex, _storage.value!.maxIndex);
-    } else {
-      if (!mounted) return;
-      if (_controllers[targetIndex] != null) {
-        _controllers[targetIndex]!.forward();
-      } else if (targetIndex >= (_storage.value?.maxIndex ?? 0)) {
-        _animationInProgress = false;
-      }
-    }
-  }
-
-  void _handleAnimationStatus(int index, AnimationStatus status) {
-    switch (status) {
-      case AnimationStatus.dismissed:
-      case AnimationStatus.reverse:
-        break; // Ignore.
-      case AnimationStatus.forward:
-        if (widget.staggerDuration > Duration.zero) _scheduleController(index + 1);
-        _animationInProgress = true;
-        break;
-      case AnimationStatus.completed:
-        if (widget.staggerDuration == Duration.zero) _scheduleController(index + 1);
-        if (_storage.value != null) _storage.value!.maxIndex = math.max(index, _storage.value!.maxIndex);
-        _controllers.remove(index)?.dispose();
-        break;
-    }
-  }
-
-  void _registerIndex(int index) {
-    if (_indexes.isEmpty) {
-      _indexes.add(index);
-    } else {
-      if (index < _indexes.first) {
-        _indexes.insert(0, index);
-      } else if (index > _indexes.last) {
-        _indexes.add(index);
-      } else {
-        _log.w('Failed to find a side for index: $index in $_indexes');
-        // This can happen on orientation change.
-        _indexes
-          ..add(index)
-          ..sort();
-      }
-    }
-  }
-
-  void _unregisterIndex(int index) {
-    _indexes.remove(index);
-  }
-
-  /// If the animation has finished, the controller is disposed and this function
-  /// returns null.
-  AnimationController? getController(int index) {
-    if (index < widget.startFrom) return null;
-    if (index <= (_storage.value?.maxIndex ?? 0)) return null;
-
-    _highestRequestedIndex = index;
-
-    // Prepare a controller for the current index and for the rest of the page.
-    if (index % widget.pageSize == widget.startFrom % widget.pageSize) {
-      for (var i = index; i < index + widget.pageSize; i++) {
-        if (_controllers.containsKey(i)) continue;
-        _controllers[i] = AnimationController(vsync: this, duration: widget.duration)
-          ..addStatusListener((status) => _handleAnimationStatus(i, status));
-      }
-
-      // This begins the stagger.
-      if (!_animationInProgress) {
-        _animationInProgress = true;
-        _scheduleController(index, considerInitial: true);
-      }
-    }
-
-    return _controllers[index];
-  }
-
-  @override
-  void didUpdateWidget(covariant FadingTileController oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    assert(oldWidget.type == widget.type);
-
-    if (widget.optimizeOutFades && (oldWidget.expectedItemCount ?? 0) < (widget.expectedItemCount ?? 0)) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
-        if (_highestIndex < widget.expectedItemCount! && !_animationInProgress) {
-          for (var i = _highestRequestedIndex + 1; i < widget.expectedItemCount!; i += 1) {
-            if (_controllers[i] == null) break;
-            _log.d('Optimized out fade controller of $i / ${widget.expectedItemCount! - 1}');
-            _controllers[i]!.dispose();
-            _controllers[i] = null;
-          }
-
-          if (_storage.value != null)
-            _storage.value!.maxIndex = math.max(widget.expectedItemCount! - 1, _storage.value!.maxIndex);
-          _highestRequestedIndex = widget.expectedItemCount! - 1;
-        }
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    final identifier = 'fading_tile_controller_${widget.bucket}';
-    _storage = widget.bucket != null
-        ? RefreshStorage.write(
-            identifier: identifier,
-            context: context,
-            builder: () => _FadingTileControllerStorage(),
-          )
-        : RefreshStorageEntry(identifier, _FadingTileControllerStorage());
-
-    final initialOffset = widget.initialOffset?.call();
-    if (initialOffset != null) _storage.value!.maxIndex = initialOffset;
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    for (final controller in _controllers.values.where((val) => val != null)) controller!.dispose();
-    _storage.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => Provider<_FadingTileControllerState>.value(
-        value: this,
-        child: widget.child,
-      );
-}
+enum FadingTileType { fade, slideLeft, slideRight, slideBottom, slideTop }
 
 /// Fades in and staggers list tiles.
 ///
 /// Must be a descendant of [FadingTileController].
-class FadingTile extends HookWidget {
+class FadingTile extends StatefulWidget with FadingTileWidget {
   /// Creates [FadingTile] without size animation.
-  const FadingTile({
+  FadingTile({
     Key? key,
+    FadingTileType? type,
     required this.child,
     required this.index,
     this.paginatorIndex,
     this.fade = true,
     this.paginator,
-  })  : type = _FadingTileType.fade,
-        alignment = null,
+  })  : alignment = null,
         axis = null,
         clipBehavior = Clip.antiAlias,
         optimizeOutChild = false,
+        type = type ?? defaultType,
+        sizeDuration = defaultSizeDuration,
+        _size = false,
         super(key: key);
 
   /// Creates [FadingTile] with size animation.
-  const FadingTile.size({
+  FadingTile.size({
     Key? key,
+    FadingTileType? type,
+    Duration? sizeDuration,
     required this.child,
     required this.index,
     this.paginatorIndex,
@@ -383,20 +45,29 @@ class FadingTile extends HookWidget {
     this.optimizeOutChild = false,
     this.fade = true,
     this.paginator,
-  })  : type = _FadingTileType.size,
+  })  : type = type ?? defaultType,
+        sizeDuration = sizeDuration ?? defaultSizeDuration,
+        _size = true,
         super(key: key);
+
+  static FadingTileType defaultType = FadingTileType.slideRight;
+  static Duration defaultDuration = const Duration(milliseconds: 500);
+  static Duration defaultSizeDuration = const Duration(milliseconds: 250);
+  static Duration defaultStaggerDuration = const Duration(milliseconds: 20);
+
+  final bool _size;
 
   /// Child widget to fade in.
   final Widget child;
 
   /// Index of the child in the list.
-  final int index;
+  @override final int index;
 
   /// Index of the child in the list.
   final int? paginatorIndex;
 
   /// Fade in animation type.
-  final _FadingTileType type;
+  final FadingTileType type;
 
   /// Alignment of the child in the size animation.
   final Alignment? alignment;
@@ -414,45 +85,106 @@ class FadingTile extends HookWidget {
   /// Whether to use the fade animation.
   final bool fade;
 
+  /// Intended duration of the size animation. If this is lower than the fade animation,
+  /// size will be animated with an [Interval].
+  final Duration sizeDuration;
+
   /// Callback to call when the element for this widget is mounted.
   final VoidCallback? Function(int index)? paginator;
 
   @override
+  VoidCallback? getPaginator(int index) => paginator?.call(index);
+
+  @override
+  State<FadingTile> createState() => _FadingTileState();
+}
+
+class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<FadingTile> {
+  static final _slideFromLeftTween = Tween<double>(begin: -1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOutExpo));
+  static final _slideFromRightTween = Tween<double>(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOutExpo));
+  static final _slideFromBottomTween = Tween<double>(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOutExpo));
+
+  @override
   Widget build(BuildContext context) {
-    // Memoize controller once per tile build.
-    final animation = useMemoized(() => FadingTileController.of(context).getController(index));
-
-    useEffect(() {
-      try {
-        paginator?.call(paginatorIndex ?? index)?.call();
-      } catch (_) {}
-
-      final controller = FadingTileController.of(context).._registerIndex(index);
-      return () => controller._unregisterIndex(index);
-    }, [index]);
-
     // Controller is usually not returned anymore, when the tile has faded out and it has disposed.
     // To ease off GC, don't wrap the child in animations.
-    if (animation == null) return this.child;
+    if (fadeAnimationController == null || !widget.fade) return widget.child;
 
-    final child = RepaintBoundary(child: this.child);
     Widget tile;
 
-    switch (type) {
-      case _FadingTileType.fade:
-        tile = fade ? _FadeTroughTransitionZoomedFadeIn(animation: animation, child: child) : child;
-        break;
-      case _FadingTileType.size:
-        tile = _SizeInTransition(
-          animation: animation,
-          child: child,
-          alignment: alignment!,
-          axis: axis!,
-          clip: clipBehavior != Clip.none,
-          optimizeOutChild: optimizeOutChild,
-          fade: fade,
+    switch (widget.type) {
+      case FadingTileType.fade:
+        tile = _FadeTroughTransitionZoomedFadeIn(
+          animation: fadeAnimationController!,
+          child: widget.child,
         );
         break;
+      case FadingTileType.slideLeft:
+        final animation = _slideFromLeftTween.animate(fadeAnimationController!);
+        tile = AnimatedBuilder(
+          animation: animation,
+          builder: (_, __) => FractionalTranslation(
+            translation: Offset(animation.value, 0.0),
+            child: widget.child,
+          ),
+        );
+        break;
+      case FadingTileType.slideRight:
+        final animation = _slideFromRightTween.animate(fadeAnimationController!);
+        tile = AnimatedBuilder(
+          animation: animation,
+          builder: (_, __) => FractionalTranslation(
+            translation: Offset(animation.value, 0.0),
+            child: widget.child,
+          ),
+        );
+        break;
+      case FadingTileType.slideBottom:
+        final mediaQuery = MediaQuery.of(context);
+        final animation = _slideFromBottomTween.animate(fadeAnimationController!);
+        tile = AnimatedBuilder(
+          animation: animation,
+          builder: (_, __) => Transform.translate(
+            offset: Offset(0.0, mediaQuery.size.height * animation.value),
+            child: widget.child,
+          ),
+        );
+        break;
+      case FadingTileType.slideTop:
+        final mediaQuery = MediaQuery.of(context);
+        final animation = _slideFromBottomTween.animate(fadeAnimationController!);
+        tile = AnimatedBuilder(
+          animation: animation,
+          builder: (_, __) => Transform.translate(
+            offset: Offset(0.0, -(mediaQuery.size.height * animation.value)),
+            child: widget.child,
+          ),
+        );
+        break;
+    }
+
+    if (widget._size) {
+      final CurveTween tween;
+
+      // Clamp the size animation's interval if its duration is smaller than the fade animation's duration.
+      if (fadeAnimationController!.duration != null && widget.sizeDuration < fadeAnimationController!.duration!) {
+        final end = widget.sizeDuration.inMicroseconds / fadeAnimationController!.duration!.inMicroseconds;
+        final interval = Interval(0.0, end, curve: decelerateEasing);
+
+        tween = CurveTween(curve: interval);
+      } else {
+        tween = CurveTween(curve: decelerateEasing);
+      }
+
+      tile = _SizeInTransition(
+        animation: fadeAnimationController!.drive(tween),
+        child: tile,
+        alignment: widget.alignment!,
+        axis: widget.axis!,
+        clip: widget.clipBehavior != Clip.none,
+        optimizeOutChild: widget.optimizeOutChild,
+        fade: widget.fade,
+      );
     }
 
     return tile;
@@ -483,9 +215,9 @@ class _FadeTroughTransitionZoomedFadeIn extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => FadeTransition(
+  Widget build(BuildContext context) => Animations.fade(
         opacity: _fadeInOpacity.animate(animation),
-        child: ScaleTransition(
+        child: Animations.scale(
           scale: _scaleIn.animate(animation),
           child: child,
         ),
@@ -511,28 +243,17 @@ class _SizeInTransition extends StatelessWidget {
   final bool optimizeOutChild;
   final bool fade;
 
-  static final _tween = CurveTween(curve: decelerateEasing);
-
   @override
   Widget build(BuildContext context) => SizeExpandTransition(
-        animation: animation.drive(_tween),
+        animation: animation,
         alignment: alignment,
         axis: axis,
         clip: clip,
         child: !optimizeOutChild
-            ? fade
-                ? _FadeTroughTransitionZoomedFadeIn(animation: animation, child: child)
-                : child
+            ? child
             : AnimatedBuilder(
                 animation: animation,
-                builder: (_, __) => animation.isDismissed
-                    ? const SizedBox()
-                    : fade
-                        ? _FadeTroughTransitionZoomedFadeIn(
-                            animation: animation,
-                            child: child,
-                          )
-                        : child,
+                builder: (_, __) => animation.isDismissed ? const SizedBox() : child,
               ),
       );
 }

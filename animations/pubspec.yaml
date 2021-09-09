@@ -10,8 +10,24 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  freezed_annotation: ^0.14.1
+  provider: ^5.0.0
+  flutter_riverpod: ^1.0.0-dev.7
+
   sliver_transform:
     path: /home/projects/packages/flutter_helpers/sliver_transform
+  utils:
+    path: /home/projects/packages/flutter_helpers/utils
 
 dev_dependencies:
+  flutter_lints:
+  build_runner:
   vector_math: ^2.1.0
+  freezed: ^0.14.1+1
+
+dependency_overrides:
+  freezed_annotation:
+    path: /home/projects/forks/freezed/packages/freezed_annotation
+  freezed:
+    path: /home/projects/forks/freezed/packages/freezed

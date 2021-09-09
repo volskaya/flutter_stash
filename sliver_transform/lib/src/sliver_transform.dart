@@ -7,8 +7,10 @@ class SliverTransform extends SingleChildRenderObjectWidget {
     required this.transform,
     this.origin,
     this.alignment,
+    bool? toggled,
     Widget? sliver,
   })  : assert(transform != null),
+        toggled = toggled ?? true,
         super(key: key, child: sliver);
 
   SliverTransform.rotate({
@@ -16,17 +18,21 @@ class SliverTransform extends SingleChildRenderObjectWidget {
     required double angle,
     this.origin,
     this.alignment = Alignment.center,
+    bool? toggled,
     Widget? sliver,
   })  : transform = Matrix4.rotationZ(angle),
+        toggled = toggled ?? angle != 0.0,
         super(key: key, child: sliver);
 
   SliverTransform.translate({
     Key? key,
     required Offset offset,
+    bool? toggled,
     Widget? sliver,
   })  : transform = Matrix4.translationValues(offset.dx, offset.dy, 0.0),
         origin = null,
         alignment = null,
+        toggled = toggled ?? offset != Offset.zero,
         super(key: key, child: sliver);
 
   SliverTransform.scale({
@@ -34,13 +40,16 @@ class SliverTransform extends SingleChildRenderObjectWidget {
     required double scale,
     this.origin,
     this.alignment = Alignment.center,
+    bool? toggled,
     Widget? sliver,
   })  : transform = Matrix4.diagonal3Values(scale, scale, 1.0),
+        toggled = toggled ?? scale != 1.0,
         super(key: key, child: sliver);
 
   final Matrix4 transform;
   final Offset? origin;
   final AlignmentGeometry? alignment;
+  final bool toggled;
 
   @override
   RenderSliverTransform createRenderObject(BuildContext context) {
@@ -48,6 +57,7 @@ class SliverTransform extends SingleChildRenderObjectWidget {
       transform: transform,
       origin: origin,
       alignment: alignment,
+      toggled: toggled,
       textDirection: Directionality.maybeOf(context),
     );
   }
@@ -58,6 +68,7 @@ class SliverTransform extends SingleChildRenderObjectWidget {
       ..transform = transform
       ..origin = origin
       ..alignment = alignment
+      ..toggled = toggled
       ..textDirection = Directionality.maybeOf(context);
   }
 }

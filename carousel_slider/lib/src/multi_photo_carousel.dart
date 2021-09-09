@@ -178,7 +178,6 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
     assert(constraints != null || widget.getCacheSize != null);
 
     final itemCount = math.max(_photos.length, 1);
-    final refresh = RefreshController.of(context)?.refresh ?? 0;
 
     const autoPlayInterval = Duration(seconds: 20);
     const autoPlayPauseDuration = Duration(seconds: 10);
@@ -187,7 +186,6 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
       case MultiPhotoCarouselStyle.draggable:
         return CarouselSlider(
           key: _carouselKey,
-          pageStorageKey: widget.bucket != null ? PageStorageKey<String>('$refresh-${widget.bucket}') : null,
           initialPage: _storage.value?.lastPage ?? widget.initialPage,
           height: double.infinity,
           scrollDirection: Axis.horizontal,

@@ -12,7 +12,6 @@ class CarouselSlider extends StatefulWidget {
     Key? key,
     required this.itemBuilder,
     required this.itemCount,
-    this.pageStorageKey,
     this.pageController,
     this.height,
     this.aspectRatio,
@@ -34,7 +33,6 @@ class CarouselSlider extends StatefulWidget {
 
   static const int _kRealPage = 10000;
 
-  final PageStorageKey? pageStorageKey;
   final bool Function()? shouldSkip;
   final IndexedWidgetBuilder itemBuilder;
   final int itemCount;

@@ -370,8 +370,9 @@ class _ModalBottomSheetBox extends BoxyDelegate {
     final t = 1.0 - ((content.rect.top - topInset) / kToolbarHeight).clamp(0.0, 1.0);
 
     if (t > 0) {
-      final topBarWidget = SizedBox.fromSize(
-        size: Size.fromHeight(topInset),
+      final topBarWidget = SizedBox(
+        height: topInset,
+        width: double.infinity,
         child: ColoredBox(color: statusBarColor.withOpacity(t)),
       );
 
@@ -389,48 +390,6 @@ class _ModalBottomSheetBox extends BoxyDelegate {
   bool shouldRelayout(_ModalBottomSheetBox oldDelegate) =>
       oldDelegate.topInset != topInset || oldDelegate.value != value;
 }
-
-// class _ModalBottomSheetLayout extends SingleChildLayoutDelegate {
-//   _ModalBottomSheetLayout(this.progress, this.expand);
-
-//   final double progress;
-//   final bool expand;
-
-//   @override
-//   BoxConstraints getConstraintsForChild(BoxConstraints constraints) => BoxConstraints(
-//         minWidth: constraints.maxWidth,
-//         maxWidth: constraints.maxWidth,
-//         minHeight: expand ? constraints.maxHeight : 0,
-//         maxHeight: expand ? constraints.maxHeight : constraints.minHeight,
-//       );
-
-//   @override
-//   Offset getPositionForChild(Size size, Size childSize) => Offset(0.0, size.height - childSize.height * progress);
-
-//   @override
-//   bool shouldRelayout(_ModalBottomSheetLayout oldDelegate) => progress != oldDelegate.progress;
-// }
-
-// class _CustomBottomSheetLayout extends SingleChildLayoutDelegate {
-//   _CustomBottomSheetLayout(this.progress);
-
-//   final double progress;
-//   double childHeight;
-
-//   @override
-//   BoxConstraints getConstraintsForChild(BoxConstraints constraints) => BoxConstraints(
-//         minWidth: constraints.maxWidth,
-//         maxWidth: constraints.maxWidth,
-//         minHeight: constraints.minHeight,
-//         maxHeight: constraints.maxHeight + progress * 8, // FIXME: Why 8?
-//       );
-
-//   @override
-//   Offset getPositionForChild(Size size, Size childSize) => Offset(0.0, size.height - childSize.height);
-
-//   @override
-//   bool shouldRelayout(_CustomBottomSheetLayout oldDelegate) => false;
-// }
 
 // Checks the device input type as per the OS installed in it
 // Mobile platforms will be default to `touch` while desktop will do to `mouse`

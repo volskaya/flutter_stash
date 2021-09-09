@@ -1,5 +1,6 @@
 import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:refresh_storage/src/refresh_builder.dart';
 
 /// Wrapper around [RefreshBuilder] & provider of [RefreshController], which holds
@@ -18,7 +19,8 @@ class RefreshContainer extends StatelessWidget {
     this.duration = const Duration(milliseconds: 300),
     this.notificationPredicate = defaultScrollNotificationPredicate,
     this.overscrollPredicate = defaultOverscrollIndicatorNotificationPredicate,
-    this.controllerKey,
+    this.dependents = const <Override>[],
+    this.inheritSwitcherAnimations = false,
   }) : super(key: key);
 
   /// Transform the refresh indicator under the top safe area.
@@ -26,7 +28,6 @@ class RefreshContainer extends StatelessWidget {
 
   /// Child should contain a scrollable, which will controll the scroll
   /// indicator in [RefreshContainer].
-  // final Widget child;
   final Widget child;
 
   /// Page storage identifier, where this widget will preserve its refresh
@@ -46,9 +47,6 @@ class RefreshContainer extends StatelessWidget {
   /// else for more complicated layouts.
   final ScrollNotificationPredicate notificationPredicate;
 
-  /// Passes this key to the [RefreshBuilder], that this [RefreshContainer] wraps.
-  final GlobalKey<RefreshController>? controllerKey;
-
   /// A check that specifies whether a [OverscrollNotification] should be
   /// handled by this widget.
   ///
@@ -56,19 +54,35 @@ class RefreshContainer extends StatelessWidget {
   /// else for more complicated layouts.
   final OverscrollIndicatorNotificationPredicate overscrollPredicate;
 
-  Widget _buildSwitcher(BuildContext context, String bucket, int refresh) => FancySwitcher.vertical(
+  /// Dependent providers that should be scoped by the nested [ProviderScope].
+  final List<Override> dependents;
+
+  /// Controls nested [FancySwitcher.inherit].
+  final bool inheritSwitcherAnimations;
+
+  Widget _buildSwitcher(
+    BuildContext context,
+    String? bucket,
+    int refresh,
+  ) =>
+      FancySwitcher.vertical(
         fillColor: fillColor,
         duration: duration,
+        inherit: inheritSwitcherAnimations,
         child: FancySwitcherTag(
           tag: '${bucket}_$refresh',
           index: -refresh, // Have the switcher animate in reverse.
-          child: child,
+          child: dependents.isNotEmpty
+              ? ProviderScope(
+                  overrides: dependents,
+                  child: child,
+                )
+              : child,
         ),
       );
 
   @override
   Widget build(BuildContext context) => RefreshBuilder(
-        key: controllerKey,
         enforceSafeArea: enforceSafeArea,
         bucket: bucket,
         notificationPredicate: notificationPredicate,

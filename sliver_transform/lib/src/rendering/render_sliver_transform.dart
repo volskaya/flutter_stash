@@ -10,12 +10,14 @@ class RenderSliverTransform extends RenderProxySliver {
     Offset? origin,
     AlignmentGeometry? alignment,
     TextDirection? textDirection,
+    bool toggled = true,
     this.transformHitTests = false, // NOTE: Not implemented.
     RenderSliver? child,
   })  : assert(transform != null),
         super(child) {
     this.transform = transform;
     this.alignment = alignment;
+    this.toggled = toggled;
     this.textDirection = textDirection;
     this.origin = origin;
   }
@@ -63,6 +65,16 @@ class RenderSliverTransform extends RenderProxySliver {
   set textDirection(TextDirection? value) {
     if (_textDirection == value) return;
     _textDirection = value;
+    markNeedsPaint();
+    markNeedsSemanticsUpdate();
+  }
+
+  bool get toggled => _toggled;
+  bool _toggled = true;
+  set toggled(bool value) {
+    if (_toggled == value)
+      return;
+    _toggled = value;
     markNeedsPaint();
     markNeedsSemanticsUpdate();
   }
@@ -148,19 +160,24 @@ class RenderSliverTransform extends RenderProxySliver {
   @override
   void paint(PaintingContext context, Offset offset) {
     if (child != null) {
-      final Matrix4 transform = _effectiveTransform!;
-      final Offset? childOffset = MatrixUtils.getAsTranslation(transform);
-      if (childOffset == null) {
-        layer = context.pushTransform(
-          needsCompositing,
-          offset,
-          transform,
-          super.paint,
-          oldLayer: layer as TransformLayer?,
-        );
+      if (toggled) {
+        final Matrix4 transform = _effectiveTransform!;
+        final Offset? childOffset = MatrixUtils.getAsTranslation(transform);
+        if (childOffset == null) {
+          layer = context.pushTransform(
+            needsCompositing,
+            offset,
+            transform,
+            super.paint,
+            oldLayer: layer as TransformLayer?,
+          );
+        } else {
+          layer = null;
+          super.paint(context, offset + childOffset);
+        }
       } else {
-        super.paint(context, offset + childOffset);
         layer = null;
+        super.paint(context, offset);
       }
     }
   }

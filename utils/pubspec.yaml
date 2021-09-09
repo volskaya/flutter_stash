@@ -22,6 +22,8 @@ dependencies:
   quiver: ^3.0.0
   json_annotation: ^4.1.0
   flutter_hooks: ^0.18.0
+  flutter_riverpod: ^1.0.0-dev.7
+  provider: ^5.0.0
 
   loader_coordinator:
     path: /home/projects/packages/flutter_helpers/loader_coordinator

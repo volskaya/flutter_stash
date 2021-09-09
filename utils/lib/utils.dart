@@ -13,6 +13,8 @@ import 'package:flutter/widgets.dart';
 
 import 'src/mixins.dart';
 
+export 'src/animated_change_widget.dart';
+export 'src/animated_listenable_widget.dart';
 export 'src/animated_observer_widget.dart';
 export 'src/converters.dart';
 export 'src/corrected_media_query.dart';

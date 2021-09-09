@@ -19,17 +19,20 @@ class CorrectedMediaQuery extends StatelessWidget {
     this.onBuild,
   }) : super(key: key);
 
-  // NOTE: Match with the same `keyboardHeightRatioHeuristic` in the Flutter engine.
+  /// Constant form the same `keyboardHeightRatioHeuristic` in the Flutter engine.
   static const keyboardHeightRatioHeuristic = 0.18;
 
   final Widget child;
   final ValueChanged<MediaQueryData>? onBuild;
 
+  static bool isKeyboardHeightAboveRatioHeuristic(MediaQueryData mediaQuery) =>
+      mediaQuery.viewInsets.bottom > (mediaQuery.size.height * keyboardHeightRatioHeuristic);
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData mediaQuery = MediaQuery.of(context);
 
-    if (mediaQuery.viewInsets.bottom < mediaQuery.size.height * keyboardHeightRatioHeuristic) {
+    if (!isKeyboardHeightAboveRatioHeuristic(mediaQuery)) {
       mediaQuery = mediaQuery.copyWith(
         padding: mediaQuery.padding + EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),
         viewPadding: mediaQuery.viewPadding + EdgeInsets.only(bottom: mediaQuery.viewInsets.bottom),

@@ -1,47 +1,64 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-
 /// An async memoizer that returns the value synchronously, if the future has finished.
 class Memoizer<T> {
   /// Instantiate the [Memoizer] asynchronously.
-  Memoizer(Future<T> Function() future) {
+  Memoizer({
+    required Future<T> Function() future,
+  }) : _completer = Completer<T?>() {
     _resolveFuture(future);
   }
 
   /// Instantiate the [Memoizer] synchronously.
-  Memoizer.of(this.value) : _hasResolved = true;
+  Memoizer.of(this.value)
+      : _hasResolved = true,
+        _completer = null;
 
   Future _resolveFuture(Future<T> Function() future) async {
     assert(!_invalidated);
 
+    assert((() {
+      Future.delayed(const Duration(seconds: 60), () {
+        if (!_completer!.isCompleted) throw '$hashCode completer is not complete after 60 seconds';
+      });
+      return true;
+    })());
+
     try {
       final resolvedItem = await future();
-      if (_invalidated) return;
+      if (_invalidated) {
+        assert(_completer?.isCompleted == true);
+        return;
+      }
       value = resolvedItem;
-      _completer.complete(resolvedItem);
+      _completer!.complete(resolvedItem);
     } catch (e) {
-      _completer.completeError(e);
+      _completer!.completeError(e);
     }
 
     _hasResolved = true;
   }
 
-  final Completer<T?> _completer = Completer<T?>();
+  final Completer<T?>? _completer;
   bool _hasResolved = false;
   bool _invalidated = false;
+
+  /// Resolved value, if any.
   T? value;
 
-  bool get isCompleted => _completer.isCompleted || value != null;
+  /// Whether the memoizer has resolved its future.
+  bool get isCompleted => _completer?.isCompleted == true || value != null;
 
-  /// If the value is ready, it is returned with a [SynchronousFuture].
+  /// Gets the future from the [Completer] or value, if the [Completer] has resolved already.
   Future<T?> get future {
     assert(!_invalidated);
-    return _hasResolved ? SynchronousFuture<T?>(value) : _completer.future;
+    return _hasResolved ? Future<T?>.value(value) : _completer!.future;
   }
 
+  /// Unreferences the value and resolves the future with null, if it's not resolved yet.
   void invalidate() {
     _invalidated = true;
-    if (!_completer.isCompleted) _completer.complete();
+    if (_completer?.isCompleted == false) _completer!.complete(value);
+    value = null;
   }
 }

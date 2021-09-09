@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:animations/src/custom_widgets.dart';
+import 'package:animations/src/animations.dart';
+import 'package:animations/src/inherited_animation/inherited_animation.dart';
 import 'package:flutter/material.dart';
 
 // TODO(shihaohong): Remove DualTransitionBuilder once flutter/flutter's `stable`
@@ -69,7 +70,7 @@ class FadeThroughPageTransitionsBuilder extends PageTransitionsBuilder {
 
   /// The color to use for the background color during the transition.
   ///
-  /// This defaults to the [Theme]'s [ThemeData.canvasColor].
+  /// This defaults to the [Theme]'s [ThemeData.colorScheme.background].
   final Color? fillColor;
 
   @override
@@ -85,6 +86,8 @@ class FadeThroughPageTransitionsBuilder extends PageTransitionsBuilder {
       secondaryAnimation: secondaryAnimation,
       fillColor: fillColor,
       child: child,
+      inherit: true,
+      paintInheritedAnimations: true,
     );
   }
 }
@@ -167,6 +170,7 @@ class FadeThroughTransition extends StatelessWidget {
   /// The [animation] and [secondaryAnimation] argument are required and must
   /// not be null.
   const FadeThroughTransition({
+    Key? key,
     required this.animation,
     required this.secondaryAnimation,
     required this.child,
@@ -174,7 +178,10 @@ class FadeThroughTransition extends StatelessWidget {
     this.onEnd,
     this.onStatusChanged,
     this.sliver = false,
-  });
+    this.inherit = false,
+    this.paintInheritedAnimations = false,
+  })  : assert(!paintInheritedAnimations || inherit),
+        super(key: key);
 
   /// Callback to be called when the animation ends.
   final VoidCallback? onEnd;
@@ -213,20 +220,35 @@ class FadeThroughTransition extends StatelessWidget {
   /// Whether to use sliver variants of animation widgets.
   final bool sliver;
 
+  /// Whether to defer the animations to [InheritedAnimationCoordinator].
+  final bool inherit;
+
+  /// Whether to paint any deferred animations before the child.
+  final bool paintInheritedAnimations;
+
   @override
   Widget build(BuildContext context) {
+    final Color fillColor = this.fillColor ?? Theme.of(context).colorScheme.background;
+
+    Widget child = paintInheritedAnimations
+        ? InheritedAnimation(
+            fillColor: fillColor,
+            child: this.child,
+            opacity: true,
+            scale: true,
+          )
+        : this.child;
+
     Widget _widget = _ZoomedFadeInFadeOut(
       animation: ReverseAnimation(secondaryAnimation),
       child: child,
       onEnd: onEnd,
       sliver: sliver,
+      inherit: inherit,
     );
 
-    if (fillColor != Colors.transparent) {
-      _widget = ColoredBox(
-        color: fillColor ?? Theme.of(context).canvasColor,
-        child: _widget,
-      );
+    if (!inherit && fillColor != Colors.transparent) {
+      _widget = ColoredBox(color: fillColor, child: _widget);
     }
 
     return _ZoomedFadeInFadeOut(
@@ -234,6 +256,7 @@ class FadeThroughTransition extends StatelessWidget {
       child: _widget,
       onEnd: onEnd,
       sliver: sliver,
+      inherit: inherit,
     );
   }
 }
@@ -246,6 +269,7 @@ class _ZoomedFadeInFadeOut extends StatelessWidget {
     this.onEnd,
     this.onStatusChanged,
     this.sliver = false,
+    this.inherit = false,
   }) : super(key: key);
 
   final Animation<double> animation;
@@ -253,6 +277,7 @@ class _ZoomedFadeInFadeOut extends StatelessWidget {
   final VoidCallback? onEnd;
   final ValueChanged<AnimationStatus>? onStatusChanged;
   final bool sliver;
+  final bool inherit;
 
   @override
   Widget build(BuildContext context) => dual_transition_builder.DualTransitionBuilder(
@@ -263,11 +288,13 @@ class _ZoomedFadeInFadeOut extends StatelessWidget {
           animation: animation,
           child: child,
           sliver: sliver,
+          inherit: inherit,
         ),
         reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => _FadeOut(
           child: child,
           animation: animation,
           sliver: sliver,
+          inherit: inherit,
         ),
         child: child,
       );
@@ -278,11 +305,13 @@ class _ZoomedFadeIn extends StatelessWidget {
     required this.child,
     required this.animation,
     this.sliver = false,
+    this.inherit = false,
   });
 
   final Widget child;
   final Animation<double> animation;
   final bool sliver;
+  final bool inherit;
 
   static final CurveTween _inCurve = CurveTween(
     curve: const Cubic(0.0, 0.0, 0.2, 1.0),
@@ -313,13 +342,15 @@ class _ZoomedFadeIn extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => CustomWidgets.fade(
+  Widget build(BuildContext context) => Animations.fade(
         opacity: _fadeInOpacity.animate(animation),
         sliver: sliver,
-        child: CustomWidgets.scale(
+        inherit: inherit,
+        child: Animations.scale(
           scale: _scaleIn.animate(animation),
           child: child,
           sliver: sliver,
+          inherit: inherit,
         ),
       );
 }
@@ -329,11 +360,13 @@ class _FadeOut extends StatelessWidget {
     required this.child,
     required this.animation,
     this.sliver = false,
+    this.inherit = false,
   });
 
   final Widget child;
   final Animation<double> animation;
   final bool sliver;
+  final bool inherit;
 
   static final CurveTween _outCurve = CurveTween(
     curve: const Cubic(0.4, 0.0, 1.0, 1.0),
@@ -352,9 +385,10 @@ class _FadeOut extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) => CustomWidgets.fade(
+  Widget build(BuildContext context) => Animations.fade(
         opacity: _fadeOutOpacity.animate(animation),
         child: child,
         sliver: sliver,
+        inherit: inherit,
       );
 }

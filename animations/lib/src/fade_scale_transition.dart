@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:animations/src/custom_widgets.dart';
+import 'package:animations/src/animations.dart';
+import 'package:animations/src/inherited_animation/inherited_animation.dart';
 import 'package:flutter/material.dart' hide decelerateEasing; // ignore: undefined_hidden_name
 // TODO(goderbauer): Remove implementation import when material properly exports the file.
 import 'package:flutter/src/material/curves.dart'; // ignore: implementation_imports
@@ -94,6 +95,8 @@ class FadeScaleTransitionConfiguration extends ModalConfiguration {
     return FadeScaleTransition(
       animation: animation,
       child: child,
+      inherit: true,
+      paintInheritedAnimations: true,
     );
   }
 }
@@ -125,7 +128,10 @@ class FadeScaleTransition extends StatelessWidget {
     required this.animation,
     required this.child,
     this.sliver = false,
-  }) : super(key: key);
+    this.inherit = false,
+    this.paintInheritedAnimations = false,
+  })  : assert(!paintInheritedAnimations || inherit),
+        super(key: key);
 
   /// The animation that drives the [child]'s entrance and exit.
   ///
@@ -144,35 +150,43 @@ class FadeScaleTransition extends StatelessWidget {
   /// Whether to use sliver variants of animation widgets.
   final bool sliver;
 
-  static final Animatable<double> _fadeInTransition = CurveTween(
-    curve: const Interval(0.0, 0.3),
-  );
-  static final Animatable<double> _scaleInTransition = Tween<double>(
-    begin: 0.80,
-    end: 1.00,
-  ).chain(CurveTween(curve: decelerateEasing));
-  static final Animatable<double> _fadeOutTransition = Tween<double>(
-    begin: 1.0,
-    end: 0.0,
-  );
+  /// Whether to defer the animations to [InheritedAnimationCoordinator].
+  final bool inherit;
+
+  /// Whether to paint any deferred animations before the child.
+  final bool paintInheritedAnimations;
+
+  static final Animatable<double> _fadeInTransition = CurveTween(curve: const Interval(0.0, 0.3));
+  static final Animatable<double> _scaleInTransition =
+      Tween<double>(begin: 0.8, end: 1.0).chain(CurveTween(curve: decelerateEasing));
+  static final Animatable<double> _fadeOutTransition = Tween<double>(begin: 1.0, end: 0.0);
 
   @override
   Widget build(BuildContext context) => dual_transition_builder.DualTransitionBuilder(
         animation: animation,
-        forwardBuilder: (BuildContext context, Animation<double> animation, Widget child) => CustomWidgets.fade(
+        forwardBuilder: (BuildContext context, Animation<double> animation, Widget child) => Animations.fade(
           opacity: _fadeInTransition.animate(animation),
           sliver: sliver,
-          child: CustomWidgets.scale(
+          inherit: inherit,
+          child: Animations.scale(
             scale: _scaleInTransition.animate(animation),
             child: child,
             sliver: sliver,
+            inherit: inherit,
           ),
         ),
-        reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => CustomWidgets.fade(
+        reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => Animations.fade(
           opacity: _fadeOutTransition.animate(animation),
           child: child,
           sliver: sliver,
+          inherit: inherit,
         ),
-        child: child,
+        child: paintInheritedAnimations
+            ? InheritedAnimation(
+                child: child,
+                opacity: true,
+                scale: true,
+              )
+            : child,
       );
 }

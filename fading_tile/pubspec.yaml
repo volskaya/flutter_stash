@@ -1,6 +1,5 @@
 name: fading_tile
 version: 1.1.0
-author: Roland Volskaya
 homepage: github.com/volskaya
 publish_to: none
 
@@ -21,6 +20,8 @@ dependencies:
     path: /home/projects/packages/flutter_helpers/log
   refresh_storage:
     path: /home/projects/packages/flutter_helpers/refresh_storage
+  animations:
+    path: /home/projects/packages/flutter_helpers/animations
 
 dev_dependencies:
   flutter_test:
