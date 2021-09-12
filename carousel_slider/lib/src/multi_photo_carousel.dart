@@ -50,6 +50,9 @@ class MultiPhotoCarousel extends StatefulWidget {
     this.autoPlayAnimationDuration = const Duration(milliseconds: 600),
     this.children = const <Widget>[],
     this.uniqueIdleChildBuilder,
+    this.inherit = false,
+    this.paintInheritedAnimations = false,
+    this.wrapInheritBoundary = false,
   }) : super(key: key);
 
   final String? bucket;
@@ -69,6 +72,9 @@ class MultiPhotoCarousel extends StatefulWidget {
   final Duration autoPlayAnimationDuration;
   final List<Widget> children;
   final Widget Function(BuildContext context, FirebasePhotoReference photo)? uniqueIdleChildBuilder;
+  final bool inherit;
+  final bool paintInheritedAnimations;
+  final bool wrapInheritBoundary;
 
   @override
   MultiPhotoCarouselState createState() => MultiPhotoCarouselState();
@@ -166,6 +172,8 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
     final child = SwitchingFirebaseImage(
       scrollAware: widget.scrollAware,
       imageProvider: _getImageProvider(photo, constraints),
+      inherit: widget.inherit,
+      paintInheritedAnimations: widget.paintInheritedAnimations,
       idleChild: widget.uniqueIdleChildBuilder != null && photo != null
           ? widget.uniqueIdleChildBuilder!(context, photo)
           : widget.idleChild,
@@ -202,6 +210,9 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
           itemCount: itemCount,
           itemBuilder: (context, i) => _buildPhoto(context, i, constraints?.biggest),
           children: widget.children,
+          inherit: widget.inherit,
+          paintInheritedAnimations: widget.paintInheritedAnimations,
+          wrapInheritBoundary: widget.wrapInheritBoundary,
         );
       case MultiPhotoCarouselStyle.periodicallySwitched:
         return PeriodicChildSwitcher(
@@ -215,6 +226,9 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
           autoPlayInterval: autoPlayInterval,
           onChildChanged: _handlePageChange,
           axis: Axis.horizontal,
+          inherit: widget.inherit,
+          paintInheritedAnimations: widget.paintInheritedAnimations,
+          wrapInheritBoundary: widget.wrapInheritBoundary,
         );
       case MultiPhotoCarouselStyle.periodicallySwitchedImage:
         return PeriodicChildSwitcherBuilder(

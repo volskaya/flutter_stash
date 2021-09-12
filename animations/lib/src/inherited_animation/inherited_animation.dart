@@ -1,150 +1,164 @@
-import 'package:animations/src/inherited_animation/inherited_animation_coordinator.dart';
-import 'package:animations/src/inherited_animation/inherited_animation_listenable.dart';
-import 'package:animations/src/inherited_animation/inherited_animation_mixin.dart';
+import 'dart:math' as math;
+
+import 'package:animations/src/inherited_animation/inherited_animation_variants.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:provider/provider.dart';
-import 'package:utils/utils.dart';
 
-class InheritedAnimation extends StatefulWidget {
-  const InheritedAnimation({
-    Key? key,
-    required this.child,
-    this.fillColor = Colors.transparent,
-    this.opacity = false,
-    this.scale = false,
-    this.rotation = false,
-    this.translation = false,
-    this.debug = false,
-    this.addRepaintBoundaries = true,
-    this.consume = true,
-  })  : assert(rotation == false, 'Rotation is not implemented yet'),
-        super(key: key);
+part 'inherited_animation.freezed.dart';
 
-  final Widget child;
-  final bool opacity;
-  final bool scale;
-  final bool rotation;
-  final bool translation;
-  final Color fillColor;
-  final bool debug;
-  final bool addRepaintBoundaries;
-
-  /// Will prevent the used animations from being passed down the widget tree.
-  final bool consume;
-
-  static InheritedAnimationListenable? of(BuildContext context, {bool listen = true}) =>
-      InheritedAnimationListenable.of(context, listen: listen);
-
-  @override
-  State<InheritedAnimation> createState() => _InheritedAnimationState();
+@freezed
+class InheritedAnimationValue with _$InheritedAnimationValue {
+  const factory InheritedAnimationValue({
+    @Default(1.0) double opacity,
+    @Default(1.0) double scale,
+    @Default(Offset.zero) Offset translation,
+  }) = _InheritedAnimationValue;
 }
 
-class _InheritedAnimationState extends State<InheritedAnimation> with InheritedAnimationMixin {
+class InheritedAnimation extends Listenable
+    with AnimationLazyListenerMixin, AnimationLocalListenersMixin, AnimationLocalStatusListenersMixin {
+  InheritedAnimation({
+    this.parent,
+    this.opacityAnimation,
+    this.scaleAnimation,
+    this.translationAnimation,
+    this.inheritOpacity = true,
+    this.inheritScale = true,
+    this.inheritTranslation = true,
+  });
+
+  static InheritedAnimation? of(BuildContext context, {bool listen = true}) {
+    try {
+      return Provider.of<InheritedAnimation?>(context, listen: listen);
+    } catch (_) {}
+  }
+
+  final InheritedAnimation? parent;
+  final Animation<double>? opacityAnimation;
+  final Animation<double>? scaleAnimation;
+  final Animation<Offset>? translationAnimation;
+  final bool inheritOpacity;
+  final bool inheritScale;
+  final bool inheritTranslation;
+
+  double get _parentOpacityValue => inheritOpacity ? parent?.opacity ?? 1.0 : 1.0;
+  double get _parentScaleValue => inheritScale ? parent?.scale ?? 1.0 : 1.0;
+  Offset get _parentTranslationValue => inheritTranslation ? parent?.translation ?? Offset.zero : Offset.zero;
+
+  double get _opacityValue => opacityAnimation?.value ?? 1.0;
+  double get _scaleValue => scaleAnimation?.value ?? 1.0;
+  Offset get _translationValue => translationAnimation?.value ?? Offset.zero;
+
+  double get opacity => math.min(_parentOpacityValue, _opacityValue);
+  double get scale => math.min(_parentScaleValue, _scaleValue);
+  Offset get translation => _parentTranslationValue + _translationValue;
+
+  AnimationStatus get opacityStatus =>
+      (inheritOpacity ? _reuseAnimationStatus(parent?.opacityStatus) : null) ??
+      opacityAnimation?.status ??
+      AnimationStatus.completed;
+
+  AnimationStatus get scaleStatus =>
+      (inheritScale ? _reuseAnimationStatus(parent?.scaleStatus) : null) ??
+      scaleAnimation?.status ??
+      AnimationStatus.completed;
+
+  AnimationStatus get translationStatus =>
+      (inheritTranslation ? _reuseAnimationStatus(parent?.translationStatus) : null) ??
+      translationAnimation?.status ??
+      AnimationStatus.completed;
+
+  static AnimationStatus? _reuseAnimationStatus(AnimationStatus? status) =>
+      _shouldUseAnimationSatus(status) ? status : null;
+
+  static bool _shouldUseAnimationSatus(AnimationStatus? status) =>
+      status == AnimationStatus.forward || status == AnimationStatus.reverse;
+
   @override
-  void markNeedsBuild() {
-    super.markNeedsBuild();
-    if (widget.debug) {
-      print(inheritedAnimation!.freeze()); // ignore: avoid_print
+  void didStartListening() {
+    bool hasInheritance = false;
+
+    if (inheritOpacity) {
+      hasInheritance = true;
+      opacityAnimation?.addListener(_maybeNotifyListeners);
+      opacityAnimation?.addStatusListener(_maybeNotifyStatusListeners);
+    }
+    if (inheritScale) {
+      hasInheritance = true;
+      scaleAnimation?.addListener(_maybeNotifyListeners);
+      scaleAnimation?.addStatusListener(_maybeNotifyStatusListeners);
+    }
+    if (inheritTranslation) {
+      hasInheritance = true;
+      translationAnimation?.addListener(_maybeNotifyListeners);
+      translationAnimation?.addStatusListener(_maybeNotifyStatusListeners);
+    }
+
+    if (hasInheritance) {
+      parent?.addListener(_maybeNotifyListeners);
+      parent?.addStatusListener(_maybeNotifyStatusListeners);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    Widget child = widget.child;
+  void didStopListening() {
+    bool hasInheritance = false;
 
-    if (widget.consume) {
-      child = Provider<InheritedAnimationListenable?>.value(
-        updateShouldNotify: InheritedAnimationCoordinator.handleUpdateShouldNotify,
-        child: child,
-        value: inheritedAnimation!.copyWith(
-          opacity: !widget.opacity,
-          scale: !widget.scale,
-          rotation: !widget.rotation,
-          translation: !widget.translation,
-        ),
-      );
+    if (inheritOpacity) {
+      hasInheritance = true;
+      opacityAnimation?.removeListener(_maybeNotifyListeners);
+      opacityAnimation?.removeStatusListener(_maybeNotifyStatusListeners);
+    }
+    if (inheritScale) {
+      hasInheritance = true;
+      scaleAnimation?.removeListener(_maybeNotifyListeners);
+      scaleAnimation?.removeStatusListener(_maybeNotifyStatusListeners);
+    }
+    if (inheritTranslation) {
+      hasInheritance = true;
+      translationAnimation?.removeListener(_maybeNotifyListeners);
+      translationAnimation?.removeStatusListener(_maybeNotifyStatusListeners);
     }
 
-    if (widget.fillColor != Colors.transparent) {
-      child = ColoredBox(child: child, color: widget.fillColor);
+    if (hasInheritance) {
+      parent?.addListener(_maybeNotifyListeners);
+      parent?.addStatusListener(_maybeNotifyStatusListeners);
     }
-
-    if (widget.addRepaintBoundaries) {
-      child = RepaintBoundary(child: child);
-    }
-
-    if (widget.translation || widget.scale || widget.rotation) {
-      // FIXME: Avoid rebuilds if this animates the same values.
-      child = AnimatedBuilder(
-        animation: inheritedAnimation!,
-        child: child,
-        builder: (_, _child) {
-          Widget child = _child!;
-
-          if (widget.translation) {
-            child = Transform.translate(
-              offset: inheritedAnimation!.translation,
-              child: child,
-            );
-          }
-
-          if (widget.scale) {
-            child = Transform.scale(
-              scale: inheritedAnimation!.scale,
-              child: child,
-            );
-          }
-
-          return child;
-
-          // FIXME: Use 1 [Transform] widget.
-
-          // final toggled = inheritedAnimation!.scale != 1.0 ||
-          //     inheritedAnimation!.translation != Offset.zero ||
-          //     inheritedAnimation!.rotation != 0.0;
-
-          // final matrix = Matrix4.identity()
-          //   ..scale(inheritedAnimation!.scale)
-          //   ..translate(inheritedAnimation!.translation.dx, inheritedAnimation!.translation.dy);
-
-          // return Transform(
-          //   toggled: toggled,
-          //   transform: matrix,
-          //   child: child,
-          //   origin: Offset.zero,
-          // );
-        },
-      );
-    }
-
-    if (widget.opacity) {
-      child = _OpacityTransition(
-        animation: inheritedAnimation!,
-        child: child,
-      );
-    }
-
-    return child;
   }
-}
 
-class _OpacityTransition extends AnimatedListenableWidget<InheritedAnimationListenable, double> {
-  const _OpacityTransition({
-    Key? key,
-    required this.animation,
-    required this.child,
-  }) : super(key: key, listenable: animation);
+  // InheritedAnimationValue? _lastValue;
+  void _maybeNotifyListeners() {
+    notifyListeners();
+  }
 
-  final InheritedAnimationListenable animation;
-  final Widget child;
+  // AnimationStatus? _lastStatus;
+  void _maybeNotifyStatusListeners(AnimationStatus _) {
+    notifyStatusListeners(AnimationStatus.completed);
+  }
 
-  @override
-  double getValue(InheritedAnimationListenable listenable) => listenable.opacity;
-
-  @override
-  Widget build(BuildContext context, double opacity) => Opacity(
-        opacity: animation.opacity,
-        child: child,
+  InheritedAnimationValue freeze() => InheritedAnimationValue(
+        opacity: opacity,
+        scale: scale,
+        translation: translation,
       );
+
+  InheritedAnimation copyWith({
+    bool opacity = true,
+    bool scale = true,
+    bool translation = true,
+  }) =>
+      InheritedAnimation(
+        opacityAnimation: opacity ? opacityAnimation : null,
+        scaleAnimation: scale ? scaleAnimation : null,
+        translationAnimation: translation ? translationAnimation : null,
+        inheritOpacity: opacity,
+        inheritScale: scale,
+        inheritTranslation: translation,
+      );
+
+  InheritedOpacityAnimation selectOpacityVariant() => InheritedOpacityAnimation(this);
+  InheritedScaleAnimation selectScaleVariant() => InheritedScaleAnimation(this);
+  InheritedTranslationAnimation selectTranslationVariant() => InheritedTranslationAnimation(this);
 }

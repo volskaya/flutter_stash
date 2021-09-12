@@ -29,6 +29,9 @@ class CarouselSlider extends StatefulWidget {
     this.indicatorBuilder,
     this.initialPage,
     this.children = const <Widget>[],
+    this.inherit = false,
+    this.paintInheritedAnimations = false,
+    this.wrapInheritBoundary = false,
   }) : super(key: key);
 
   static const int _kRealPage = 10000;
@@ -52,6 +55,9 @@ class CarouselSlider extends StatefulWidget {
   final IndicatorBuilder? indicatorBuilder;
   final int? initialPage;
   final List<Widget> children;
+  final bool inherit;
+  final bool paintInheritedAnimations;
+  final bool wrapInheritBoundary;
 
   static PageController getPageController({int initialPage = 0, int base = 0}) => PageController(
         viewportFraction: 1,
@@ -187,6 +193,9 @@ class CarouselSliderState extends State<CarouselSlider>
           onPageChanged: _handlePageChange,
           physics: widget.scrollPhysics,
           fillColor: Theme.of(context).colorScheme.background,
+          inherit: widget.inherit,
+          paintInheritedAnimations: widget.paintInheritedAnimations,
+          wrapInheritBoundary: widget.wrapInheritBoundary,
         );
         break;
       case Axis.vertical:
@@ -197,6 +206,9 @@ class CarouselSliderState extends State<CarouselSlider>
           onPageChanged: _handlePageChange,
           physics: widget.scrollPhysics,
           fillColor: Theme.of(context).colorScheme.background,
+          inherit: widget.inherit,
+          paintInheritedAnimations: widget.paintInheritedAnimations,
+          wrapInheritBoundary: widget.wrapInheritBoundary,
         );
         break;
     }

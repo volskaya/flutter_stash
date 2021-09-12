@@ -217,7 +217,7 @@ packages:
       path: "/home/projects/packages/flutter_helpers/delayed_progress_indicator"
       relative: false
     source: path
-    version: "0.0.1"
+    version: "1.0.0"
   fancy_switcher:
     dependency: "direct main"
     description:

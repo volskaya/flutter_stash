@@ -8,9 +8,9 @@ import 'package:modal_bottom_sheet/src/bottom_sheet.dart';
 /// Extracted from Scaffold and used in modal bottom sheet.
 class ScrollToTopStatusBarHandler extends StatefulWidget {
   const ScrollToTopStatusBarHandler({
-    Key key,
-    @required this.child,
-    @required this.scrollController,
+    Key? key,
+    required this.child,
+    required this.scrollController,
   }) : super(key: key);
 
   final Widget child;
@@ -22,7 +22,7 @@ class ScrollToTopStatusBarHandler extends StatefulWidget {
 
 class _ScrollToTopStatusBarState extends State<ScrollToTopStatusBarHandler> {
   void _handleStatusBarTap(BuildContext context) {
-    if (widget.scrollController?.hasClients == true) {
+    if (widget.scrollController.hasClients == true) {
       widget.scrollController.animateTo(0.0, duration: kMediumMotionDuration, curve: standardEasing);
     }
   }
@@ -34,9 +34,9 @@ class _ScrollToTopStatusBarState extends State<ScrollToTopStatusBarHandler> {
         children: [
           widget.child,
           Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
+            top: 0.0,
+            left: 0.0,
+            right: 0.0,
             height: MediaQuery.of(context).padding.top,
             child: Builder(
               builder: (context) => GestureDetector(

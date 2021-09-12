@@ -15,6 +15,9 @@ class PeriodicChildSwitcher extends StatelessWidget {
     this.axis = Axis.horizontal,
     this.onChildChanged,
     this.builderKey,
+    this.inherit = false,
+    this.paintInheritedAnimations = false,
+    this.wrapInheritBoundary = false,
   }) : super(key: key);
 
   final Duration autoPlayInterval;
@@ -27,6 +30,9 @@ class PeriodicChildSwitcher extends StatelessWidget {
   final Axis axis;
   final void Function(int index)? onChildChanged;
   final Key? builderKey;
+  final bool inherit;
+  final bool paintInheritedAnimations;
+  final bool wrapInheritBoundary;
 
   @override
   Widget build(BuildContext context) => PeriodicChildSwitcherBuilder(
@@ -44,9 +50,21 @@ class PeriodicChildSwitcher extends StatelessWidget {
 
           switch (axis) {
             case Axis.horizontal:
-              return FancySwitcher.horizontal(fillColor: fillColor, child: child);
+              return FancySwitcher.horizontal(
+                fillColor: fillColor,
+                child: child,
+                inherit: inherit,
+                paintInheritedAnimations: paintInheritedAnimations,
+                wrapInheritBoundary: wrapInheritBoundary,
+              );
             case Axis.vertical:
-              return FancySwitcher.vertical(fillColor: fillColor, child: child);
+              return FancySwitcher.vertical(
+                fillColor: fillColor,
+                child: child,
+                inherit: inherit,
+                paintInheritedAnimations: paintInheritedAnimations,
+                wrapInheritBoundary: wrapInheritBoundary,
+              );
           }
         },
       );

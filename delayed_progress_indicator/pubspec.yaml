@@ -1,8 +1,8 @@
 name: delayed_progress_indicator
 description: A new Flutter package project.
-version: 0.0.1
-author: Roland Volskaya
+version: 1.0.0
 homepage: github.com/volskaya/flutter_helpers
+publish_to: none
 
 environment:
   sdk: ">=2.12.0-0 <3.0.0"
@@ -11,6 +11,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  animations:
+    path: /home/projects/packages/flutter_helpers/animations
 
 dev_dependencies:
   flutter_test:

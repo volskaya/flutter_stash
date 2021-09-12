@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:animations/src/animations.dart';
-import 'package:animations/src/inherited_animation/inherited_animation.dart';
+import 'package:animations/src/inherited_animation/inherited_animation_wrap.dart';
 import 'package:flutter/material.dart';
 
 // TODO(shihaohong): Remove DualTransitionBuilder once flutter/flutter's `stable`
@@ -231,7 +231,7 @@ class FadeThroughTransition extends StatelessWidget {
     final Color fillColor = this.fillColor ?? Theme.of(context).colorScheme.background;
 
     Widget child = paintInheritedAnimations
-        ? InheritedAnimation(
+        ? InheritedAnimationWrap(
             fillColor: fillColor,
             child: this.child,
             opacity: true,

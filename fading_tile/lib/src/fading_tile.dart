@@ -7,7 +7,14 @@ import 'package:fading_tile/src/size_expand_transition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-enum FadingTileType { fade, slideLeft, slideRight, slideBottom, slideTop }
+enum FadingTileType {
+  fade,
+  slideLeft,
+  slideRight,
+  slideBottom,
+  slideTop,
+  scaleUp,
+}
 
 /// Fades in and staggers list tiles.
 ///
@@ -50,7 +57,7 @@ class FadingTile extends StatefulWidget with FadingTileWidget {
         _size = true,
         super(key: key);
 
-  static FadingTileType defaultType = FadingTileType.slideRight;
+  static FadingTileType defaultType = FadingTileType.scaleUp;
   static Duration defaultDuration = const Duration(milliseconds: 500);
   static Duration defaultSizeDuration = const Duration(milliseconds: 250);
   static Duration defaultStaggerDuration = const Duration(milliseconds: 20);
@@ -100,9 +107,11 @@ class FadingTile extends StatefulWidget with FadingTileWidget {
 }
 
 class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<FadingTile> {
-  static final _slideFromLeftTween = Tween<double>(begin: -1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOutExpo));
-  static final _slideFromRightTween = Tween<double>(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOutExpo));
-  static final _slideFromBottomTween = Tween<double>(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOutExpo));
+  static final _curve = CurveTween(curve: Curves.easeOutExpo);
+  static final _slideFromLeftTween = Tween<double>(begin: -1.0, end: 0.0).chain(_curve);
+  static final _slideFromRightTween = Tween<double>(begin: 1.0, end: 0.0).chain(_curve);
+  static final _slideFromBottomTween = Tween<double>(begin: 1.0, end: 0.0).chain(_curve);
+  static final _scaleInTween = Tween<double>(begin: 0.0, end: 1.0).chain(_curve);
 
   @override
   Widget build(BuildContext context) {
@@ -157,6 +166,16 @@ class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<Fadin
           animation: animation,
           builder: (_, __) => Transform.translate(
             offset: Offset(0.0, -(mediaQuery.size.height * animation.value)),
+            child: widget.child,
+          ),
+        );
+        break;
+      case FadingTileType.scaleUp:
+        final animation = _scaleInTween.animate(fadeAnimationController!);
+        tile = AnimatedBuilder(
+          animation: animation,
+          builder: (_, __) => Transform.scale(
+            scale: animation.value,
             child: widget.child,
           ),
         );

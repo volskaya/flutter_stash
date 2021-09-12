@@ -3,9 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:animations/src/animations.dart';
-import 'package:animations/src/inherited_animation/inherited_animation.dart';
-import 'package:animations/src/inherited_opacity/inherited_opacity.dart';
-import 'package:animations/src/inherited_opacity/inherited_opacity_builder.dart';
+import 'package:animations/src/inherited_animation/inherited_animation_wrap.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
@@ -310,7 +308,7 @@ class SharedAxisTransition extends StatelessWidget {
           inherit: inherit,
         ),
         child: paintInheritedAnimations
-            ? InheritedAnimation(
+            ? InheritedAnimationWrap(
                 fillColor: fillColor,
                 child: child,
                 opacity: true,

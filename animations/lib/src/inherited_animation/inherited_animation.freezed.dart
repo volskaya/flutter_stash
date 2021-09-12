@@ -1,7 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
-part of 'inherited_animation_listenable.dart';
+part of 'inherited_animation.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -19,12 +19,10 @@ class _$InheritedAnimationValueTearOff {
   _InheritedAnimationValue call(
       {double opacity = 1.0,
       double scale = 1.0,
-      double rotation = 0.0,
       Offset translation = Offset.zero}) {
     return _InheritedAnimationValue(
       opacity: opacity,
       scale: scale,
-      rotation: rotation,
       translation: translation,
     );
   }
@@ -37,7 +35,6 @@ const $InheritedAnimationValue = _$InheritedAnimationValueTearOff();
 mixin _$InheritedAnimationValue {
   double get opacity => throw _privateConstructorUsedError;
   double get scale => throw _privateConstructorUsedError;
-  double get rotation => throw _privateConstructorUsedError;
   Offset get translation => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -50,8 +47,7 @@ abstract class $InheritedAnimationValueCopyWith<$Res> {
   factory $InheritedAnimationValueCopyWith(InheritedAnimationValue value,
           $Res Function(InheritedAnimationValue) then) =
       _$InheritedAnimationValueCopyWithImpl<$Res>;
-  $Res call(
-      {double opacity, double scale, double rotation, Offset translation});
+  $Res call({double opacity, double scale, Offset translation});
 }
 
 /// @nodoc
@@ -67,7 +63,6 @@ class _$InheritedAnimationValueCopyWithImpl<$Res>
   $Res call({
     Object? opacity = freezed,
     Object? scale = freezed,
-    Object? rotation = freezed,
     Object? translation = freezed,
   }) {
     return _then(_value.copyWith(
@@ -78,10 +73,6 @@ class _$InheritedAnimationValueCopyWithImpl<$Res>
       scale: scale == freezed
           ? _value.scale
           : scale // ignore: cast_nullable_to_non_nullable
-              as double,
-      rotation: rotation == freezed
-          ? _value.rotation
-          : rotation // ignore: cast_nullable_to_non_nullable
               as double,
       translation: translation == freezed
           ? _value.translation
@@ -98,8 +89,7 @@ abstract class _$InheritedAnimationValueCopyWith<$Res>
           $Res Function(_InheritedAnimationValue) then) =
       __$InheritedAnimationValueCopyWithImpl<$Res>;
   @override
-  $Res call(
-      {double opacity, double scale, double rotation, Offset translation});
+  $Res call({double opacity, double scale, Offset translation});
 }
 
 /// @nodoc
@@ -118,7 +108,6 @@ class __$InheritedAnimationValueCopyWithImpl<$Res>
   $Res call({
     Object? opacity = freezed,
     Object? scale = freezed,
-    Object? rotation = freezed,
     Object? translation = freezed,
   }) {
     return _then(_InheritedAnimationValue(
@@ -129,10 +118,6 @@ class __$InheritedAnimationValueCopyWithImpl<$Res>
       scale: scale == freezed
           ? _value.scale
           : scale // ignore: cast_nullable_to_non_nullable
-              as double,
-      rotation: rotation == freezed
-          ? _value.rotation
-          : rotation // ignore: cast_nullable_to_non_nullable
               as double,
       translation: translation == freezed
           ? _value.translation
@@ -148,10 +133,7 @@ class _$_InheritedAnimationValue
     with DiagnosticableTreeMixin
     implements _InheritedAnimationValue {
   const _$_InheritedAnimationValue(
-      {this.opacity = 1.0,
-      this.scale = 1.0,
-      this.rotation = 0.0,
-      this.translation = Offset.zero});
+      {this.opacity = 1.0, this.scale = 1.0, this.translation = Offset.zero});
 
   @JsonKey(defaultValue: 1.0)
   @override
@@ -159,16 +141,13 @@ class _$_InheritedAnimationValue
   @JsonKey(defaultValue: 1.0)
   @override
   final double scale;
-  @JsonKey(defaultValue: 0.0)
-  @override
-  final double rotation;
   @JsonKey(defaultValue: Offset.zero)
   @override
   final Offset translation;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'InheritedAnimationValue(opacity: $opacity, scale: $scale, rotation: $rotation, translation: $translation)';
+    return 'InheritedAnimationValue(opacity: $opacity, scale: $scale, translation: $translation)';
   }
 
   @override
@@ -178,7 +157,6 @@ class _$_InheritedAnimationValue
       ..add(DiagnosticsProperty('type', 'InheritedAnimationValue'))
       ..add(DiagnosticsProperty('opacity', opacity))
       ..add(DiagnosticsProperty('scale', scale))
-      ..add(DiagnosticsProperty('rotation', rotation))
       ..add(DiagnosticsProperty('translation', translation));
   }
 
@@ -191,9 +169,6 @@ class _$_InheritedAnimationValue
                     .equals(other.opacity, opacity)) &&
             (identical(other.scale, scale) ||
                 const DeepCollectionEquality().equals(other.scale, scale)) &&
-            (identical(other.rotation, rotation) ||
-                const DeepCollectionEquality()
-                    .equals(other.rotation, rotation)) &&
             (identical(other.translation, translation) ||
                 const DeepCollectionEquality()
                     .equals(other.translation, translation)));
@@ -204,7 +179,6 @@ class _$_InheritedAnimationValue
       runtimeType.hashCode ^
       const DeepCollectionEquality().hash(opacity) ^
       const DeepCollectionEquality().hash(scale) ^
-      const DeepCollectionEquality().hash(rotation) ^
       const DeepCollectionEquality().hash(translation);
 
   @JsonKey(ignore: true)
@@ -218,15 +192,12 @@ abstract class _InheritedAnimationValue implements InheritedAnimationValue {
   const factory _InheritedAnimationValue(
       {double opacity,
       double scale,
-      double rotation,
       Offset translation}) = _$_InheritedAnimationValue;
 
   @override
   double get opacity => throw _privateConstructorUsedError;
   @override
   double get scale => throw _privateConstructorUsedError;
-  @override
-  double get rotation => throw _privateConstructorUsedError;
   @override
   Offset get translation => throw _privateConstructorUsedError;
   @override

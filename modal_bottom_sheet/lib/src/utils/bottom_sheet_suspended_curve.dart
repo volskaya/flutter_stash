@@ -30,8 +30,7 @@ class BottomSheetSuspendedCurve extends ParametricCurve<double> {
   const BottomSheetSuspendedCurve(
     this.startingPoint, {
     this.curve = Curves.easeOutCubic,
-  })  : assert(startingPoint != null),
-        assert(curve != null);
+  });
 
   /// The progress value at which [curve] should begin.
   ///
@@ -54,9 +53,9 @@ class BottomSheetSuspendedCurve extends ParametricCurve<double> {
       return t;
     }
 
-    final curveProgress = (t - startingPoint) / (1 - startingPoint);
+    final curveProgress = (t - startingPoint) / (1.0 - startingPoint);
     final transformed = curve.transform(curveProgress);
-    return lerpDouble(startingPoint, 1, transformed);
+    return lerpDouble(startingPoint, 1.0, transformed)!;
   }
 
   @override

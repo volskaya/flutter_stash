@@ -3,14 +3,14 @@ import 'package:modal_bottom_sheet/src/bottom_sheet.dart';
 import 'package:modal_bottom_sheet/src/bottom_sheet_route.dart';
 
 class ModalBottomSheetPage extends Page {
-  ModalBottomSheetPage({
-    LocalKey key,
-    @required this.containerBuilder,
-    @required this.builder,
+  const ModalBottomSheetPage({
+    LocalKey? key,
+    required this.containerBuilder,
+    required this.builder,
     this.expanded = false,
   }) : super(key: key);
 
-  final WidgetWithChildBuilder containerBuilder;
+  final ModalBottomSheetContainerBuilder containerBuilder;
   final WidgetBuilder builder;
   final bool expanded;
 

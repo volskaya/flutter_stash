@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:animations/src/animations.dart';
-import 'package:animations/src/inherited_animation/inherited_animation.dart';
+import 'package:animations/src/inherited_animation/inherited_animation_wrap.dart';
 import 'package:flutter/material.dart' hide decelerateEasing; // ignore: undefined_hidden_name
 // TODO(goderbauer): Remove implementation import when material properly exports the file.
 import 'package:flutter/src/material/curves.dart'; // ignore: implementation_imports
@@ -182,7 +182,7 @@ class FadeScaleTransition extends StatelessWidget {
           inherit: inherit,
         ),
         child: paintInheritedAnimations
-            ? InheritedAnimation(
+            ? InheritedAnimationWrap(
                 child: child,
                 opacity: true,
                 scale: true,

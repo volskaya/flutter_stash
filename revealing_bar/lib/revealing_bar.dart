@@ -185,7 +185,7 @@ class RevealingBarNotifier extends StatelessWidget {
         super(key: key);
 
   /// A global toggle to disable [RevealingBarNotifier]s from sending messages.
-  @visibleForTesting static bool disable = true;
+  @visibleForTesting static bool disable = false;
 
   /// Closest scroll controller index.
   final int local;

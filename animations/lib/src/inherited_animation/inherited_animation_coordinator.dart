@@ -1,4 +1,4 @@
-import 'package:animations/src/inherited_animation/inherited_animation_listenable.dart';
+import 'package:animations/src/inherited_animation/inherited_animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
@@ -6,33 +6,28 @@ import 'package:provider/provider.dart';
 class InheritedAnimationCoordinator extends StatefulWidget {
   const InheritedAnimationCoordinator({
     Key? key,
-    this.child,
+    required this.child,
     this.opacity,
     this.scale,
-    this.rotation,
     this.translation,
     this.inheritParent = true,
   }) : super(key: key);
 
   final Animation<double>? opacity;
   final Animation<double>? scale;
-  final Animation<double>? rotation;
   final Animation<Offset>? translation;
-  final Widget? child;
+  final Widget child;
   final bool inheritParent;
 
-  static InheritedAnimationListenable? of(BuildContext context, {bool listen = true}) =>
-      InheritedAnimationListenable.of(context, listen: listen);
+  static InheritedAnimation? of(BuildContext context, {bool listen = true}) =>
+      InheritedAnimation.of(context, listen: listen);
 
-  static bool handleUpdateShouldNotify(
-    InheritedAnimationListenable? a,
-    InheritedAnimationListenable? b,
-  ) =>
-      false;
-
-  static Widget boundary({Key? key, required Widget child}) => Provider<InheritedAnimationListenable?>.value(
-        value: null,
-        updateShouldNotify: (_, __) => false,
+  static bool _handleUpdateShouldNotify(InheritedAnimation? a, InheritedAnimation? b) => false;
+  static Widget boundary({Key? key, required Widget child}) => provider(key: key, child: child, value: null);
+  static Widget provider({Key? key, required Widget child, required InheritedAnimation? value}) =>
+      Provider<InheritedAnimation?>.value(
+        value: value,
+        updateShouldNotify: _handleUpdateShouldNotify,
         child: child,
       );
 
@@ -41,15 +36,14 @@ class InheritedAnimationCoordinator extends StatefulWidget {
 }
 
 class _InheritedAnimationCoordinatorState extends State<InheritedAnimationCoordinator> {
-  InheritedAnimationListenable? _parent;
-  InheritedAnimationListenable? _effectiveAnimation;
+  InheritedAnimation? _parent;
+  InheritedAnimation? _effectiveAnimation;
 
   void _handleAnimationChange() {
-    _effectiveAnimation = InheritedAnimationListenable(
+    _effectiveAnimation = InheritedAnimation(
       parent: _parent,
       opacityAnimation: widget.opacity,
       scaleAnimation: widget.scale,
-      rotationAnimation: widget.rotation,
       translationAnimation: widget.translation,
     );
 
@@ -59,7 +53,7 @@ class _InheritedAnimationCoordinatorState extends State<InheritedAnimationCoordi
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _parent = widget.inheritParent ? InheritedAnimationListenable.of(context) : null;
+    _parent = widget.inheritParent ? InheritedAnimation.of(context) : null;
     if (_effectiveAnimation == null || _parent != _effectiveAnimation!.parent) {
       _handleAnimationChange();
     }
@@ -69,7 +63,6 @@ class _InheritedAnimationCoordinatorState extends State<InheritedAnimationCoordi
   void didUpdateWidget(InheritedAnimationCoordinator oldWidget) {
     final hasChanged = oldWidget.opacity != widget.opacity ||
         oldWidget.scale != widget.scale ||
-        oldWidget.rotation != widget.rotation ||
         oldWidget.translation != widget.translation;
 
     if (hasChanged) _handleAnimationChange();
@@ -77,9 +70,8 @@ class _InheritedAnimationCoordinatorState extends State<InheritedAnimationCoordi
   }
 
   @override
-  Widget build(BuildContext context) => Provider<InheritedAnimationListenable?>.value(
+  Widget build(BuildContext context) => InheritedAnimationCoordinator.provider(
         value: _effectiveAnimation!,
-        updateShouldNotify: InheritedAnimationCoordinator.handleUpdateShouldNotify,
         child: widget.child,
       );
 }
