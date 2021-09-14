@@ -1,2 +1,0 @@
-/// @nodoc
-abstract class FirebaseRealtimeChatMessageImpl {}

@@ -104,18 +104,19 @@ abstract class Utils {
   }) =>
       [
         if (top)
-          (insets.top > 0
+          (insets.top > 0.0
               ? SliverSafeArea(bottom: false, sliver: SliverPadding(padding: EdgeInsets.only(top: insets.top)))
               : const SliverSafeArea(bottom: false, sliver: SliverPadding(padding: EdgeInsets.zero))),
         ...children,
         if (bottom)
-          (insets.bottom > 0
+          (insets.bottom > 0.0
               ? SliverSafeArea(top: false, sliver: SliverPadding(padding: EdgeInsets.only(bottom: insets.bottom)))
               : const SliverSafeArea(top: false, sliver: SliverPadding(padding: EdgeInsets.zero))),
       ];
 
   /// The app has 2 navigators. Make sure [WillPopScope] doesn't
   /// stand in the root navigator's way.
+  @Deprecated('')
   static Future<bool> protectRootNavigator(BuildContext context, FutureOr<bool> Function() callback) async {
     final rootNavigator = Navigator.of(context, rootNavigator: true);
 

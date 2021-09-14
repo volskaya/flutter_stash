@@ -1,4 +1,4 @@
-export 'src/bottom_sheet.dart';
+export 'src/bottom_sheet.dart' hide kMediumMotionDuration;
 export 'src/bottom_sheet_page.dart';
 export 'src/bottom_sheet_route.dart';
 export 'src/bottom_sheets/material_bottom_sheet.dart';

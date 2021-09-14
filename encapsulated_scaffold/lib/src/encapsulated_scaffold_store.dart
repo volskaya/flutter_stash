@@ -65,14 +65,9 @@ abstract class _EncapsulatedScaffoldStore with Store {
   Timer? _timer; // Active notification timeout timer.
   ReactionDisposer? _visibleNotificationReactionDisposer;
 
-  @computed
-  EncapsulatedCapsuleElement? get capsule => capsules.isNotEmpty ? capsules.last : null;
-
-  @computed
-  EncapsulatedSheetItem? get sheet => sheets.isNotEmpty ? sheets.last : null;
-
-  @computed
-  EncapsulatedNotificationItem? get notification =>
+  @c EncapsulatedCapsuleElement? get capsule => capsules.isNotEmpty ? capsules.last : null;
+  @c EncapsulatedSheetItem? get sheet => sheets.isNotEmpty ? sheets.last : null;
+  @c EncapsulatedNotificationItem? get notification =>
       importantNotifications.isNotEmpty // Prioritize important notifications.
           ? importantNotifications.last
           : notifications.isNotEmpty && sheet == null // Hide while there's a registered sheet.
@@ -102,21 +97,30 @@ abstract class _EncapsulatedScaffoldStore with Store {
   ///
   @action
   void pushNotification(EncapsulatedNotificationItem item, [Set<String> _replacements = const <String>{}]) {
+    assert(item.store == null);
+
     try {
       onPushingNotification?.call(item);
     } catch (_) {}
 
-    final replacements = [
-      if (item.tag != null) item.tag!,
-      ..._replacements,
-    ];
+    try {
+      item.store = this as EncapsulatedScaffoldStore;
 
-    if (replacements.isNotEmpty) {
-      notifications.removeWhere((item) => replacements.contains(item.tag));
-      importantNotifications.removeWhere((item) => replacements.contains(item.tag));
+      final replacements = [
+        if (item.tag != null) item.tag!,
+        ..._replacements,
+      ];
+
+      if (replacements.isNotEmpty) {
+        notifications.removeWhere((item) => replacements.contains(item.tag));
+        importantNotifications.removeWhere((item) => replacements.contains(item.tag));
+      }
+
+      _getAppropriateNotificationList(item).add(item);
+    } catch (_) {
+      item.store = null;
+      rethrow;
     }
-
-    _getAppropriateNotificationList(item).add(item);
   }
 
   /// Remove an [EncapsulatedNotificationItem] from the overlay.
@@ -128,8 +132,16 @@ abstract class _EncapsulatedScaffoldStore with Store {
 
   @action
   void pushSheet(EncapsulatedSheetItem item) {
+    assert(item.store == null);
     assert(sheets.where((sheet) => sheet.tag != item.tag).isEmpty);
-    sheets.add(item);
+
+    try {
+      item.store = this as EncapsulatedScaffoldStore;
+      sheets.add(item);
+    } catch (_) {
+      item.store = null;
+      rethrow;
+    }
   }
 
   @action

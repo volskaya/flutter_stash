@@ -211,10 +211,10 @@ class Format {
     } else if (duration > const Duration(days: 1)) {
       if (strings == null) {
         final formatter = format ?? _defaultCreateTimeFormat;
-        return formatter.format(time!);
+        return formatter.format(time);
       }
 
-      return strings.createDate(time!, time);
+      return strings.createDate(time, time);
     } else {
       return strings?.durationAgo(duration) ?? '${Format.duration(duration, strings)} ago';
     }

@@ -128,12 +128,10 @@ class InheritedAnimation extends Listenable
     }
   }
 
-  // InheritedAnimationValue? _lastValue;
   void _maybeNotifyListeners() {
     notifyListeners();
   }
 
-  // AnimationStatus? _lastStatus;
   void _maybeNotifyStatusListeners(AnimationStatus _) {
     notifyStatusListeners(AnimationStatus.completed);
   }

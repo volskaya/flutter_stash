@@ -63,16 +63,16 @@ class _InheritedAnimationWidgetState extends State<InheritedAnimationWidget>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.enableRebuilds != widget.enableRebuilds) {
       if (widget.enableRebuilds) {
-        inheritedAnimation?.addListener(markNeedsBuild);
+        inheritedAnimation?.addListener(_maybeMarkNeedsBuild);
       } else {
-        inheritedAnimation?.removeListener(markNeedsBuild);
+        inheritedAnimation?.removeListener(_maybeMarkNeedsBuild);
       }
     }
   }
 
   @override
   void dispose() {
-    if (widget.enableRebuilds) inheritedAnimation?.removeListener(markNeedsBuild);
+    if (widget.enableRebuilds) inheritedAnimation?.removeListener(_maybeMarkNeedsBuild);
     super.dispose();
   }
 

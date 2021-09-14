@@ -6,29 +6,29 @@ import 'package:sembast/sembast.dart';
 import 'package:sembast_sqflite/sembast_sqflite.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 
-class _FirebaseRealtimeChatMirrorStorageRef {
-  _FirebaseRealtimeChatMirrorStorageRef({
+class _RealtimeChatMirrorStorageRef {
+  _RealtimeChatMirrorStorageRef({
     required this.collection,
     required this.record,
   }) : store = stringMapStoreFactory.store(collection);
 
-  factory _FirebaseRealtimeChatMirrorStorageRef.fromPath(String path) {
+  factory _RealtimeChatMirrorStorageRef.fromPath(String path) {
     final pathArray = path.split('/').toList(growable: false);
     assert(pathArray.length > 2, 'This path does not have a collection');
     assert(pathArray.length.isEven, 'Path must point to a document');
 
-    return _FirebaseRealtimeChatMirrorStorageRef(
+    return _RealtimeChatMirrorStorageRef(
       collection: pathArray.take(pathArray.length - 1).join('/'),
       record: pathArray.last,
     );
   }
 
-  factory _FirebaseRealtimeChatMirrorStorageRef.fromCollection(String path) {
+  factory _RealtimeChatMirrorStorageRef.fromCollection(String path) {
     final pathArray = path.split('/').toList(growable: false);
     assert(pathArray.length > 1, 'This path does not have a collection');
     assert(pathArray.length.isOdd, 'Path is not a collection');
 
-    return _FirebaseRealtimeChatMirrorStorageRef(collection: path, record: null);
+    return _RealtimeChatMirrorStorageRef(collection: path, record: null);
   }
 
   String collection;
@@ -37,12 +37,12 @@ class _FirebaseRealtimeChatMirrorStorageRef {
 }
 
 /// Offline persistent cache of [FirebaseRealtimeChat] messages.
-class FirebaseRealtimeChatMirrorStorage {
-  FirebaseRealtimeChatMirrorStorage._(this.key);
+class RealtimeChatMirrorStorage {
+  RealtimeChatMirrorStorage._(this.key);
 
-  static final _log = Log.named('FirebaseRealtimeChatMirrorStorage');
+  static final _log = Log.named('RealtimeChatMirrorStorage');
 
-  /// The key with what this [FirebaseRealtimeChatMirrorStorage] was stored in the [instances].
+  /// The key with what this [RealtimeChatMirrorStorage] was stored in the [instances].
   final String key;
 
   late final Database _database;
@@ -52,7 +52,7 @@ class FirebaseRealtimeChatMirrorStorage {
   bool get initialized => _initialized;
 
   /// Instances keyed by chat reference's path and the client count.
-  static final instances = <String, MapEntry<int, FirebaseRealtimeChatMirrorStorage>>{};
+  static final instances = <String, MapEntry<int, RealtimeChatMirrorStorage>>{};
 
   /// Initialize storage database.
   Future init([String? key]) async {
@@ -73,8 +73,8 @@ class FirebaseRealtimeChatMirrorStorage {
   }
 
   /// Initialize a mirror storage for the key, usually chat reference's path.
-  static Future<FirebaseRealtimeChatMirrorStorage> initialize(DatabaseReference reference) async {
-    final storage = FirebaseRealtimeChatMirrorStorage._(reference.path);
+  static Future<RealtimeChatMirrorStorage> initialize(DatabaseReference reference) async {
+    final storage = RealtimeChatMirrorStorage._(reference.path);
     instances[reference.path] ??= MapEntry((instances[reference.path]?.key ?? 0) + 1, storage);
 
     // When a new instance is created, open the database.
@@ -111,26 +111,26 @@ class FirebaseRealtimeChatMirrorStorage {
 
   /// Put a file in the storage.
   Future put(String path, Map json) async {
-    final ref = _FirebaseRealtimeChatMirrorStorageRef.fromPath(path);
+    final ref = _RealtimeChatMirrorStorageRef.fromPath(path);
     if (ref.record != null) await ref.store.record(ref.record!).put(_database, json, merge: true);
   }
 
   /// Delete the record at the path.
   Future delete(String path) async {
-    final ref = _FirebaseRealtimeChatMirrorStorageRef.fromPath(path);
+    final ref = _RealtimeChatMirrorStorageRef.fromPath(path);
     if (ref.record != null) await ref.store.record(ref.record!).delete(_database);
   }
 
   /// Get a document from the storage.
   Future<Map<String, dynamic>?> get(String path) async {
-    final ref = _FirebaseRealtimeChatMirrorStorageRef.fromPath(path);
+    final ref = _RealtimeChatMirrorStorageRef.fromPath(path);
     final dynamic record = ref.record != null ? await ref.store.record(ref.record!).get(_database) : null;
     return record == null ? null : record as Map<String, dynamic>;
   }
 
   /// Query a document in the storage.
   Future<List<RecordSnapshot<String, dynamic>>> find(String collection, [Finder? finder]) async {
-    final ref = _FirebaseRealtimeChatMirrorStorageRef.fromCollection(collection);
+    final ref = _RealtimeChatMirrorStorageRef.fromCollection(collection);
     return ref.store.find(_database, finder: finder);
   }
 }

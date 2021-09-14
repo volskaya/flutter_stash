@@ -19,7 +19,7 @@ class Memoizer<T> {
 
     assert((() {
       Future.delayed(const Duration(seconds: 60), () {
-        if (!_completer!.isCompleted) throw '$hashCode completer is not complete after 60 seconds';
+        if (_completer?.isCompleted == false) throw '$hashCode completer is not complete after 60 seconds';
       });
       return true;
     })());
@@ -31,15 +31,16 @@ class Memoizer<T> {
         return;
       }
       value = resolvedItem;
-      _completer!.complete(resolvedItem);
+      _completer?.complete(resolvedItem);
     } catch (e) {
-      _completer!.completeError(e);
+      _completer?.completeError(e);
     }
 
+    _completer = null; // There's no need to hold on to the completer anymore.
     _hasResolved = true;
   }
 
-  final Completer<T?>? _completer;
+  Completer<T?>? _completer;
   bool _hasResolved = false;
   bool _invalidated = false;
 
@@ -52,13 +53,15 @@ class Memoizer<T> {
   /// Gets the future from the [Completer] or value, if the [Completer] has resolved already.
   Future<T?> get future {
     assert(!_invalidated);
-    return _hasResolved ? Future<T?>.value(value) : _completer!.future;
+    assert(_hasResolved || _completer != null);
+    return _hasResolved || _completer == null ? Future<T?>.value(value) : _completer!.future;
   }
 
   /// Unreferences the value and resolves the future with null, if it's not resolved yet.
   void invalidate() {
     _invalidated = true;
     if (_completer?.isCompleted == false) _completer!.complete(value);
+    _completer = null;
     value = null;
   }
 }

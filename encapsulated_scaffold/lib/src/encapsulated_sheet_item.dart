@@ -43,6 +43,12 @@ class EncapsulatedSheetItem with _$EncapsulatedSheetItem {
   EncapsulatedSheetItem._();
   EncapsulatedScaffoldStore? _store;
 
+  EncapsulatedScaffoldStore? get store => _store;
+  set store(EncapsulatedScaffoldStore? value) {
+    assert(value == null || _store == null);
+    _store = value;
+  }
+
   /// Get nearest [EncapsulatedSheetItem] through the [BuildContext].
   static EncapsulatedSheetItem of(BuildContext context) {
     try {
@@ -56,6 +62,7 @@ class EncapsulatedSheetItem with _$EncapsulatedSheetItem {
 
   /// Deliver this notification to the nearest [EncapsulatedNotificationOverlayController].
   void push(BuildContext context) {
+    assert(_store == null);
     try {
       _store = EncapsulatedScaffoldStore.of(context)..pushSheet(this);
     } catch (_) {

@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 
-/// Source list where this [FirebaseRealtimeChatMessageImpl] was first inserted.
-enum FirebaseRealtimeChatMessageList {
+/// Source list where this [RealtimeChatMessageImpl] was first inserted.
+enum RealtimeChatMessageList {
   /// Paginated item list.
   paginated,
 
@@ -12,8 +12,8 @@ enum FirebaseRealtimeChatMessageList {
   pending,
 }
 
-/// Source database from where this [FirebaseRealtimeChatMessageImpl] was received.
-enum FirebaseRealtimeChatMessageSource {
+/// Source database from where this [RealtimeChatMessageImpl] was received.
+enum RealtimeChatMessageSource {
   /// Offline mirror storage.
   mirrorStorage,
 
@@ -21,19 +21,19 @@ enum FirebaseRealtimeChatMessageSource {
   realtimeDatabase,
 }
 
-/// Implementation required by the [FirebaseFirebaseRealtimeChat] items.
-abstract class FirebaseRealtimeChatMessageImpl {
+/// Implementation required by the [RealtimeChatPod] items.
+abstract class RealtimeChatMessageImpl {
   /// Reference to the message in the database.
   late DatabaseReference reference;
 
   /// Snapshot that was used to build this model.
   DataSnapshot? snapshot;
 
-  /// Source list where this [FirebaseRealtimeChatMessageImpl] was first inserted.
-  late FirebaseRealtimeChatMessageList list;
+  /// Source list where this [RealtimeChatMessageImpl] was first inserted.
+  late RealtimeChatMessageList list;
 
-  /// Source database from where this [FirebaseRealtimeChatMessageImpl] was received.
-  late FirebaseRealtimeChatMessageSource source;
+  /// Source database from where this [RealtimeChatMessageImpl] was received.
+  late RealtimeChatMessageSource source;
 
   /// Server timestamp of this chat message.
   int? createTime;
@@ -58,8 +58,8 @@ abstract class FirebaseRealtimeChatMessageImpl {
   bool get isServerTimestamp;
 }
 
-/// Implementation required by the [FirebaseFirebaseRealtimeChat] participants.
-abstract class FirebaseRealtimeChatParticipantImpl {
+/// Implementation required by the [RealtimeChatPod] participants.
+abstract class RealtimeChatParticipantImpl {
   /// Whether the participant is online in the chat room.
   late bool online;
 

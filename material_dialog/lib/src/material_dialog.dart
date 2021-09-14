@@ -88,6 +88,38 @@ class MaterialDialogContainer extends StatelessWidget {
         },
       );
 
+  static Future<bool?> question(
+    NavigatorState navigator,
+    MaterialLocalizations? localizations, {
+    required String question,
+    String? cancelText,
+    String? continueText,
+    Color? continueTextColor,
+  }) =>
+      showModalFor<bool>(
+        navigator: navigator,
+        localizations: localizations,
+        builder: (context) {
+          final strings = MaterialLocalizations.of(context);
+          return MaterialDialogSimpleContainer(
+            text: Text(question),
+            buttons: [
+              TextButton(
+                // ignore: invalid_null_aware_operator
+                child: Text(cancelText ?? strings.cancelButtonLabel, layoutTwice: true),
+                onPressed: () => Navigator.pop(context),
+              ),
+              TextButton(
+                // ignore: invalid_null_aware_operator
+                child: Text(continueText ?? strings.continueButtonLabel, layoutTwice: true),
+                onPressed: () => Navigator.pop(context, true),
+                style: continueTextColor != null ? TextButton.styleFrom(primary: continueTextColor) : null,
+              ),
+            ],
+          );
+        },
+      );
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);

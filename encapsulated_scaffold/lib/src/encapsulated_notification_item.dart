@@ -75,9 +75,21 @@ class EncapsulatedNotificationItem with _$EncapsulatedNotificationItem {
   EncapsulatedNotificationItem._();
   EncapsulatedScaffoldStore? _store;
 
+  EncapsulatedScaffoldStore? get store => _store;
+  set store(EncapsulatedScaffoldStore? value) {
+    assert(value == null || _store == null);
+    _store = value;
+  }
+
   /// Deliver this notification to the nearest [EncapsulatedNotificationOverlayController].
   void push(BuildContext context, [Set<String> replacements = const <String>{}]) {
-    _store = EncapsulatedScaffoldStore.of(context)..pushNotification(this, replacements);
+    assert(_store == null);
+    try {
+      _store = EncapsulatedScaffoldStore.of(context)..pushNotification(this, replacements);
+    } catch (_) {
+      _store = null;
+      rethrow;
+    }
   }
 
   /// Remove this item from the [EncapsulatedNotificationOverlayController].

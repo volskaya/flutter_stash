@@ -1,5 +1,6 @@
 import 'package:fading_tile/src/fading_tile_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 mixin FadingTileWidget on StatefulWidget {
   int get index;
@@ -28,7 +29,7 @@ mixin FadingTileStateMixin<T extends FadingTileWidget> on State<T> {
   void initState() {
     super.initState();
     _handleIndexChange();
-    widget.getPaginator(widget.index)?.call();
+    SchedulerBinding.instance!.scheduleTask(() => widget.getPaginator(widget.index)?.call(), Priority.touch);
   }
 
   @override

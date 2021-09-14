@@ -1,5 +1,9 @@
 include: package:flutter_lints/flutter.yaml
 
+linter:
+  rules:
+    - use_build_context_synchronously
+
 analyzer:
   exclude:
     - lib/**.g.dart
@@ -11,6 +15,7 @@ analyzer:
     implicit-dynamic: true
 
   errors:
+    use_build_context_synchronously: warning
     missing_required_param: warning
     missing_return: warning
     todo: ignore
@@ -18,3 +23,4 @@ analyzer:
     sdk_version_async_exported_from_core: ignore
     invalid_annotation_target: ignore
     directives_ordering: ignore
+    curly_braces_in_flow_control_structures: ignore

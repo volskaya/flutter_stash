@@ -72,6 +72,34 @@ Future<T?> showModal<T>({
   );
 }
 
+/// Does the same thing [showModal], without passing [BuildContext].
+Future<T?> showModalFor<T>({
+  required WidgetBuilder builder,
+  required NavigatorState navigator,
+  MaterialLocalizations? localizations,
+  ModalConfiguration configuration = const FadeScaleTransitionConfiguration(),
+  bool useRootNavigator = true,
+}) {
+  String? barrierLabel = configuration.barrierLabel;
+  // Avoid looking up [MaterialLocalizations.of(context).modalBarrierDismissLabel]
+  // if there is no dismissible barrier.
+  if (configuration.barrierDismissible && localizations != null) {
+    barrierLabel ??= localizations.modalBarrierDismissLabel;
+  }
+  assert(!configuration.barrierDismissible || barrierLabel != null);
+  return navigator.push<T>(
+    _ModalRoute<T>(
+      barrierColor: configuration.barrierColor,
+      barrierDismissible: configuration.barrierDismissible,
+      barrierLabel: barrierLabel,
+      transitionBuilder: configuration.transitionBuilder,
+      transitionDuration: configuration.transitionDuration,
+      reverseTransitionDuration: configuration.reverseTransitionDuration,
+      builder: builder,
+    ),
+  );
+}
+
 // A modal route that overlays a widget on the current route.
 class _ModalRoute<T> extends PopupRoute<T> {
   /// Creates a route with general modal route.

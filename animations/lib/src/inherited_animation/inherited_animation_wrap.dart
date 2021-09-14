@@ -36,29 +36,29 @@ class InheritedAnimationWrap extends StatefulWidget {
 }
 
 class _InheritedAnimationWrapState extends State<InheritedAnimationWrap> with InheritedAnimationMixin {
-  InheritedOpacityAnimation? opacityAnimation;
-  InheritedScaleAnimation? scaleAnimation;
-  InheritedTranslationAnimation? translationAnimation;
+  InheritedOpacityAnimation? _opacityAnimation;
+  InheritedScaleAnimation? _scaleAnimation;
+  InheritedTranslationAnimation? _translationAnimation;
 
   @override
   void didChangeInheritedAnimation(InheritedAnimation? oldAnimation, InheritedAnimation? animation) {
     super.didChangeInheritedAnimation(oldAnimation, animation);
-    if (widget.opacity) opacityAnimation = inheritedAnimation?.selectOpacityVariant();
-    if (widget.scale) scaleAnimation = inheritedAnimation?.selectScaleVariant();
-    if (widget.translation) translationAnimation = inheritedAnimation?.selectTranslationVariant();
+    if (widget.opacity) _opacityAnimation = inheritedAnimation?.selectOpacityVariant();
+    if (widget.scale) _scaleAnimation = inheritedAnimation?.selectScaleVariant();
+    if (widget.translation) _translationAnimation = inheritedAnimation?.selectTranslationVariant();
   }
 
   @override
   void didUpdateWidget(covariant InheritedAnimationWrap oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.opacity != widget.opacity) {
-      opacityAnimation = widget.opacity ? inheritedAnimation?.selectOpacityVariant() : null;
+      _opacityAnimation = widget.opacity ? inheritedAnimation?.selectOpacityVariant() : null;
     }
     if (oldWidget.scale != widget.scale) {
-      scaleAnimation = widget.scale ? inheritedAnimation?.selectScaleVariant() : null;
+      _scaleAnimation = widget.scale ? inheritedAnimation?.selectScaleVariant() : null;
     }
     if (oldWidget.translation != widget.translation) {
-      translationAnimation = widget.translation ? inheritedAnimation?.selectTranslationVariant() : null;
+      _translationAnimation = widget.translation ? inheritedAnimation?.selectTranslationVariant() : null;
     }
   }
 
@@ -94,32 +94,32 @@ class _InheritedAnimationWrapState extends State<InheritedAnimationWrap> with In
     }
 
     if (widget.opacity) {
-      assert(opacityAnimation != null);
+      assert(_opacityAnimation != null);
       child = FadeTransition(
-        opacity: opacityAnimation!,
+        opacity: _opacityAnimation!,
         child: child,
       );
     }
 
     if (widget.translation) {
-      assert(translationAnimation != null);
+      assert(_translationAnimation != null);
       child = AnimatedBuilder(
-        animation: translationAnimation!,
+        animation: _translationAnimation!,
         child: child,
         builder: (_, child) => Transform.translate(
-          offset: translationAnimation!.value,
+          offset: _translationAnimation!.value,
           child: child,
         ),
       );
     }
 
     if (widget.scale) {
-      assert(scaleAnimation != null);
+      assert(_scaleAnimation != null);
       child = AnimatedBuilder(
-        animation: scaleAnimation!,
+        animation: _scaleAnimation!,
         child: child,
         builder: (_, child) => Transform.scale(
-          scale: scaleAnimation!.value,
+          scale: _scaleAnimation!.value,
           child: child,
         ),
       );
