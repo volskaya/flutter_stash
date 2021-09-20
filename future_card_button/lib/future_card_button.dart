@@ -145,6 +145,7 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
   void initState() {
     _notifier =
         widget.family != null ? FutureButtonBuilder._getFamilyNotifier(widget.family!) : ValueNotifier<bool>(false);
+    _notifier.addListener(markNeedsBuild);
     super.initState();
   }
 
@@ -157,6 +158,7 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
   @override
   void dispose() {
     if (widget.family != null) {
+      _notifier.removeListener(markNeedsBuild);
       FutureButtonBuilder._disposeFamilyNotifier(widget.family!);
     } else {
       _notifier.dispose();
@@ -166,11 +168,8 @@ class FutureButtonBuilderState extends State<FutureButtonBuilder> {
   }
 
   @override
-  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
-        valueListenable: _notifier,
-        builder: (context, locked, __) => widget.builder(
-          context,
-          !locked && widget.onPressed != null ? _handleOnPressed : null,
-        ),
+  Widget build(BuildContext context) => widget.builder(
+        context,
+        !_notifier.value && widget.onPressed != null ? _handleOnPressed : null,
       );
 }

@@ -37,6 +37,7 @@ class RealtimeChatProps<T extends RealtimeChatMessageImpl, D extends RealtimeCha
     required this.collection,
     required this.messageBuilder,
     required this.participantBuilder,
+    this.timestampField = 'createTime',
     this.itemsPerPage = 20,
     this.participants = const <String>{},
     this.onInitState,
@@ -70,6 +71,9 @@ class RealtimeChatProps<T extends RealtimeChatMessageImpl, D extends RealtimeCha
   /// If the participant IDs are defined manually, there won't be any subscription observing
   /// user IDs in the database.
   final Set<String> participants;
+
+  /// The field by which to order queries.
+  final String timestampField;
 
   /// Called when the state is initialized.
   final VoidCallback? onInitState;
@@ -284,7 +288,7 @@ abstract class _RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends Rea
       loader.dispose();
     }
 
-    assert(page == this.page); // Double check page numbers.
+    assert(!mounted || page == this.page); // Double check page numbers.
   }
 
   /// NOTE: `_paginationTimestamp` will have priority over `timestamp`.
@@ -309,12 +313,12 @@ abstract class _RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends Rea
       messageCollection.path,
       oldestTimestamp != null
           ? Finder(
-              filter: Filter.lessThan('createTime', oldestTimestamp),
-              sortOrders: [SortOrder('createTime', false)],
+              filter: Filter.lessThan(props.timestampField, oldestTimestamp),
+              sortOrders: [SortOrder(props.timestampField, false)],
               limit: props.itemsPerPage,
             )
           : Finder(
-              sortOrders: [SortOrder('createTime', false)],
+              sortOrders: [SortOrder(props.timestampField, false)],
               limit: props.itemsPerPage,
             ),
     );
@@ -330,7 +334,7 @@ abstract class _RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends Rea
     } else {
       // If offline storage have no items, fall back to realtime db.
       usedSource = RealtimeChatMessageSource.realtimeDatabase;
-      var query = messageCollection.orderByChild('createTime').limitToLast(props.itemsPerPage);
+      var query = messageCollection.orderByChild(props.timestampField).limitToLast(props.itemsPerPage);
       if (oldestTimestamp != null) query = query.endAt(oldestTimestamp - 1);
       _log.wtf('No offline items, fetching from realtime db');
 
@@ -425,12 +429,12 @@ abstract class _RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends Rea
     assert(!_isSubscribed);
     assert(timestamp != null || paginated.isEmpty, 'Paginated items are not empty, use a timestamp from it');
 
-    var query = messageCollection.orderByChild('createTime');
+    var query = messageCollection.orderByChild(props.timestampField);
 
     // If timestamp exists.
     if (timestamp != null) {
       _log.d('Subscribing with a timestamp @ $timestamp');
-      query = query.startAt(timestamp + 1, key: 'createTime');
+      query = query.startAt(timestamp + 1, key: props.timestampField);
     } else {
       _log.d('Subscribing with no timestamp');
     }

@@ -1,7 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
-part of 'encapsulated_sheet_item.dart';
+part of 'encapsule_sheet.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -13,17 +13,17 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
-class _$EncapsulatedSheetItemTearOff {
-  const _$EncapsulatedSheetItemTearOff();
+class _$EncapsuleSheetTearOff {
+  const _$EncapsuleSheetTearOff();
 
-  _EncapsulatedSheetItem call(
+  _EncapsuleSheet call(
       {String? tag,
       required Widget Function(BuildContext, void Function()) builder,
       Widget Function(BuildContext, Animation<double>, Widget)?
           containerBuilder,
       void Function()? onDismissed,
       bool dismissible = true}) {
-    return _EncapsulatedSheetItem(
+    return _EncapsuleSheet(
       tag: tag,
       builder: builder,
       containerBuilder: containerBuilder,
@@ -34,10 +34,10 @@ class _$EncapsulatedSheetItemTearOff {
 }
 
 /// @nodoc
-const $EncapsulatedSheetItem = _$EncapsulatedSheetItemTearOff();
+const $EncapsuleSheet = _$EncapsuleSheetTearOff();
 
 /// @nodoc
-mixin _$EncapsulatedSheetItem {
+mixin _$EncapsuleSheet {
   /// Tag to differentiate multiple active notifications.
   String? get tag => throw _privateConstructorUsedError;
 
@@ -56,15 +56,15 @@ mixin _$EncapsulatedSheetItem {
   bool get dismissible => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
-  $EncapsulatedSheetItemCopyWith<EncapsulatedSheetItem> get copyWith =>
+  $EncapsuleSheetCopyWith<EncapsuleSheet> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $EncapsulatedSheetItemCopyWith<$Res> {
-  factory $EncapsulatedSheetItemCopyWith(EncapsulatedSheetItem value,
-          $Res Function(EncapsulatedSheetItem) then) =
-      _$EncapsulatedSheetItemCopyWithImpl<$Res>;
+abstract class $EncapsuleSheetCopyWith<$Res> {
+  factory $EncapsuleSheetCopyWith(
+          EncapsuleSheet value, $Res Function(EncapsuleSheet) then) =
+      _$EncapsuleSheetCopyWithImpl<$Res>;
   $Res call(
       {String? tag,
       Widget Function(BuildContext, void Function()) builder,
@@ -75,13 +75,13 @@ abstract class $EncapsulatedSheetItemCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$EncapsulatedSheetItemCopyWithImpl<$Res>
-    implements $EncapsulatedSheetItemCopyWith<$Res> {
-  _$EncapsulatedSheetItemCopyWithImpl(this._value, this._then);
+class _$EncapsuleSheetCopyWithImpl<$Res>
+    implements $EncapsuleSheetCopyWith<$Res> {
+  _$EncapsuleSheetCopyWithImpl(this._value, this._then);
 
-  final EncapsulatedSheetItem _value;
+  final EncapsuleSheet _value;
   // ignore: unused_field
-  final $Res Function(EncapsulatedSheetItem) _then;
+  final $Res Function(EncapsuleSheet) _then;
 
   @override
   $Res call({
@@ -117,11 +117,11 @@ class _$EncapsulatedSheetItemCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$EncapsulatedSheetItemCopyWith<$Res>
-    implements $EncapsulatedSheetItemCopyWith<$Res> {
-  factory _$EncapsulatedSheetItemCopyWith(_EncapsulatedSheetItem value,
-          $Res Function(_EncapsulatedSheetItem) then) =
-      __$EncapsulatedSheetItemCopyWithImpl<$Res>;
+abstract class _$EncapsuleSheetCopyWith<$Res>
+    implements $EncapsuleSheetCopyWith<$Res> {
+  factory _$EncapsuleSheetCopyWith(
+          _EncapsuleSheet value, $Res Function(_EncapsuleSheet) then) =
+      __$EncapsuleSheetCopyWithImpl<$Res>;
   @override
   $Res call(
       {String? tag,
@@ -133,15 +133,15 @@ abstract class _$EncapsulatedSheetItemCopyWith<$Res>
 }
 
 /// @nodoc
-class __$EncapsulatedSheetItemCopyWithImpl<$Res>
-    extends _$EncapsulatedSheetItemCopyWithImpl<$Res>
-    implements _$EncapsulatedSheetItemCopyWith<$Res> {
-  __$EncapsulatedSheetItemCopyWithImpl(_EncapsulatedSheetItem _value,
-      $Res Function(_EncapsulatedSheetItem) _then)
-      : super(_value, (v) => _then(v as _EncapsulatedSheetItem));
+class __$EncapsuleSheetCopyWithImpl<$Res>
+    extends _$EncapsuleSheetCopyWithImpl<$Res>
+    implements _$EncapsuleSheetCopyWith<$Res> {
+  __$EncapsuleSheetCopyWithImpl(
+      _EncapsuleSheet _value, $Res Function(_EncapsuleSheet) _then)
+      : super(_value, (v) => _then(v as _EncapsuleSheet));
 
   @override
-  _EncapsulatedSheetItem get _value => super._value as _EncapsulatedSheetItem;
+  _EncapsuleSheet get _value => super._value as _EncapsuleSheet;
 
   @override
   $Res call({
@@ -151,7 +151,7 @@ class __$EncapsulatedSheetItemCopyWithImpl<$Res>
     Object? onDismissed = freezed,
     Object? dismissible = freezed,
   }) {
-    return _then(_EncapsulatedSheetItem(
+    return _then(_EncapsuleSheet(
       tag: tag == freezed
           ? _value.tag
           : tag // ignore: cast_nullable_to_non_nullable
@@ -177,8 +177,9 @@ class __$EncapsulatedSheetItemCopyWithImpl<$Res>
 }
 
 /// @nodoc
-class _$_EncapsulatedSheetItem extends _EncapsulatedSheetItem {
-  _$_EncapsulatedSheetItem(
+
+class _$_EncapsuleSheet extends _EncapsuleSheet {
+  _$_EncapsuleSheet(
       {this.tag,
       required this.builder,
       this.containerBuilder,
@@ -211,13 +212,13 @@ class _$_EncapsulatedSheetItem extends _EncapsulatedSheetItem {
 
   @override
   String toString() {
-    return 'EncapsulatedSheetItem(tag: $tag, builder: $builder, containerBuilder: $containerBuilder, onDismissed: $onDismissed, dismissible: $dismissible)';
+    return 'EncapsuleSheet(tag: $tag, builder: $builder, containerBuilder: $containerBuilder, onDismissed: $onDismissed, dismissible: $dismissible)';
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _EncapsulatedSheetItem &&
+        (other is _EncapsuleSheet &&
             (identical(other.tag, tag) ||
                 const DeepCollectionEquality().equals(other.tag, tag)) &&
             (identical(other.builder, builder) ||
@@ -245,20 +246,19 @@ class _$_EncapsulatedSheetItem extends _EncapsulatedSheetItem {
 
   @JsonKey(ignore: true)
   @override
-  _$EncapsulatedSheetItemCopyWith<_EncapsulatedSheetItem> get copyWith =>
-      __$EncapsulatedSheetItemCopyWithImpl<_EncapsulatedSheetItem>(
-          this, _$identity);
+  _$EncapsuleSheetCopyWith<_EncapsuleSheet> get copyWith =>
+      __$EncapsuleSheetCopyWithImpl<_EncapsuleSheet>(this, _$identity);
 }
 
-abstract class _EncapsulatedSheetItem extends EncapsulatedSheetItem {
-  factory _EncapsulatedSheetItem(
+abstract class _EncapsuleSheet extends EncapsuleSheet {
+  factory _EncapsuleSheet(
       {String? tag,
       required Widget Function(BuildContext, void Function()) builder,
       Widget Function(BuildContext, Animation<double>, Widget)?
           containerBuilder,
       void Function()? onDismissed,
-      bool dismissible}) = _$_EncapsulatedSheetItem;
-  _EncapsulatedSheetItem._() : super._();
+      bool dismissible}) = _$_EncapsuleSheet;
+  _EncapsuleSheet._() : super._();
 
   @override
 
@@ -284,6 +284,6 @@ abstract class _EncapsulatedSheetItem extends EncapsulatedSheetItem {
   bool get dismissible => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$EncapsulatedSheetItemCopyWith<_EncapsulatedSheetItem> get copyWith =>
+  _$EncapsuleSheetCopyWith<_EncapsuleSheet> get copyWith =>
       throw _privateConstructorUsedError;
 }

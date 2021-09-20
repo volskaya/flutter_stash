@@ -1,18 +1,18 @@
-import 'package:encapsulated_scaffold/src/encapsulated_notification_item.dart';
-import 'package:encapsulated_scaffold/src/encapsulated_notification_overlay_scrim.dart';
-import 'package:encapsulated_scaffold/src/encapsulated_scaffold_store.dart';
+import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:encapsule/src/encapsule_notification.dart';
+import 'package:encapsule/src/encapsule_notification_overlay_scrim.dart';
+import 'package:encapsule/src/encapsule_store.dart';
 import 'package:fancy_switcher/fancy_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:provider/provider.dart';
 
-/// [EncapsulatedNotificationOverlay] provides [EncapsulatedNotificationOverlayController].
+/// [EncapsuleNotificationOverlay] provides [EncapsuleNotificationOverlayController].
 ///
 /// This widget is intended to be nested within [MaterialApp.builder].
-class EncapsulatedNotificationOverlay extends StatefulWidget {
-  /// Creates [EncapsulatedNotificationOverlay].
-  const EncapsulatedNotificationOverlay({
+class EncapsuleNotificationOverlay extends StatefulWidget {
+  /// Creates [EncapsuleNotificationOverlay].
+  const EncapsuleNotificationOverlay({
     Key? key,
     this.body,
     this.children = const <Widget>[],
@@ -29,21 +29,19 @@ class EncapsulatedNotificationOverlay extends StatefulWidget {
   /// Called when the notification item transition ends.
   final VoidCallback? onEnd;
 
-  /// Whether to use [EncapsulatedScaffoldState.bottomInset] on the notification items.
+  /// Whether to use [EncapsuleScaffoldState.bottomInset] on the notification items.
   final bool insetNotifications;
 
   @override
-  EncapsulatedNotificationOverlayController createState() => EncapsulatedNotificationOverlayController();
+  EncapsuleNotificationOverlayController createState() => EncapsuleNotificationOverlayController();
 }
 
-/// Provider of [EncapsulatedNotificationOverlayController].
-class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotificationOverlay> {
-  late final EncapsulatedScaffoldStore _store;
-
+/// Provider of [EncapsuleNotificationOverlayController].
+class EncapsuleNotificationOverlayController extends State<EncapsuleNotificationOverlay> {
   bool _handleBackButton(bool stopDefaultButtonEvent, RouteInfo _) {
     if (stopDefaultButtonEvent) return true;
-    if (_store.importantNotifications.isNotEmpty) {
-      _store.importantNotifications.removeLast().dismiss();
+    if (EncapsuleStore.instance.importantNotifications.isNotEmpty) {
+      EncapsuleStore.instance.importantNotifications.removeLast().dismiss();
       return true;
     }
     return false;
@@ -52,7 +50,6 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
   @override
   void initState() {
     BackButtonInterceptor.add(_handleBackButton);
-    _store = EncapsulatedScaffoldStore.of(context);
     super.initState();
   }
 
@@ -71,21 +68,24 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
           // Switcher for unimportant notifications.
           Observer(
             builder: (_, __) {
-              final item = _store.notification;
+              final item = EncapsuleStore.instance.notification;
               return FancySwitcher(
                 alignment: Alignment.bottomCenter,
                 onEnd: widget.onEnd,
+                inherit: true,
+                paintInheritedAnimations: true,
+                wrapInheritBoundary: true,
+                wrapChildrenInRepaintBoundary: false,
                 child: item?.important == false
                     ? FancySwitcherTag(
                         tag: item,
                         child: _NotificationItem(
-                          store: _store,
                           item: item!,
                           duration: item.timeout,
                           useInset: widget.insetNotifications,
-                          builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
+                          builder: (_, animation) => Provider<EncapsuleNotificationProps>.value(
                             child: item.builder(context, item.dismiss, animation),
-                            value: EncapsulatedNotificationProps(
+                            value: EncapsuleNotificationProps(
                               dismiss: item.dismiss,
                               dismissAnimation: animation,
                               reference: item,
@@ -100,30 +100,35 @@ class EncapsulatedNotificationOverlayController extends State<EncapsulatedNotifi
           ...widget.children,
           // Important notification scrim.
           Observer(
-            builder: (_, __) => EncapsulatedNotificationOverlayScrim(
-              toggled: _store.importantNotifications.isNotEmpty,
-              onDismissed: () =>
-                  (_store.importantNotifications.isNotEmpty ? _store.importantNotifications.last : null)?.dismiss(),
+            builder: (_, __) => EncapsuleNotificationOverlayScrim(
+              toggled: EncapsuleStore.instance.importantNotifications.isNotEmpty,
+              onDismissed: () => (EncapsuleStore.instance.importantNotifications.isNotEmpty
+                      ? EncapsuleStore.instance.importantNotifications.last
+                      : null)
+                  ?.dismiss(),
             ),
           ),
           // Notification item switcher.
           Observer(
             builder: (_, __) {
-              final item = _store.notification;
+              final item = EncapsuleStore.instance.notification;
               return FancySwitcher(
                 alignment: Alignment.bottomCenter,
                 onEnd: widget.onEnd,
+                inherit: true,
+                paintInheritedAnimations: true,
+                wrapInheritBoundary: true,
+                wrapChildrenInRepaintBoundary: false,
                 child: item?.important == true
                     ? FancySwitcherTag(
                         tag: item,
                         child: _NotificationItem(
-                          store: _store,
                           item: item!,
                           duration: item.timeout,
                           useInset: false,
-                          builder: (_, animation) => Provider<EncapsulatedNotificationProps>.value(
+                          builder: (_, animation) => Provider<EncapsuleNotificationProps>.value(
                             child: item.builder(context, item.dismiss, animation),
-                            value: EncapsulatedNotificationProps(
+                            value: EncapsuleNotificationProps(
                               dismiss: item.dismiss,
                               dismissAnimation: animation,
                               reference: item,
@@ -143,7 +148,6 @@ class _NotificationItem extends StatefulObserverWidget {
   const _NotificationItem({
     Key? key,
     required this.builder,
-    required this.store,
     required this.item,
     this.useInset = true,
     this.duration,
@@ -151,8 +155,7 @@ class _NotificationItem extends StatefulObserverWidget {
 
   final Widget Function(BuildContext context, Animation<double>? animation) builder;
   final Duration? duration;
-  final EncapsulatedScaffoldStore store;
-  final EncapsulatedNotificationItem item;
+  final EncapsuleNotification item;
   final bool useInset;
 
   @override
@@ -187,12 +190,12 @@ class __NotificationItemState extends State<_NotificationItem> with SingleTicker
     final padding = mediaQuery.padding +
         mediaQuery.viewInsets +
         (!widget.item.important && widget.useInset
-            ? EdgeInsets.only(bottom: widget.store.capsule?.bottomInset ?? 0)
+            ? EdgeInsets.only(bottom: EncapsuleStore.instance.capsule?.bottomInset ?? 0.0)
             : EdgeInsets.zero);
 
     // Provide the child with correctly insetted padding.
     return IgnorePointer(
-      ignoring: widget.item != widget.store.notification,
+      ignoring: widget.item != EncapsuleStore.instance.notification,
       child: MediaQuery(
         data: mediaQuery.copyWith(padding: padding),
         child: notification,

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 /// Dark scrim overlay to be placed behind notifications.
 ///
 /// Scrim widget is removed from the tree, when the animation is in a dismissed state.
-class EncapsulatedNotificationOverlayScrim extends StatefulWidget {
-  /// Creates [EncapsulatedNotificationOverlayScrim].
-  const EncapsulatedNotificationOverlayScrim({
+class EncapsuleNotificationOverlayScrim extends StatefulWidget {
+  /// Creates [EncapsuleNotificationOverlayScrim].
+  const EncapsuleNotificationOverlayScrim({
     Key? key,
     required this.onDismissed,
     this.toggled = false,
@@ -22,11 +22,11 @@ class EncapsulatedNotificationOverlayScrim extends StatefulWidget {
   final VoidCallback onDismissed;
 
   @override
-  _EncapsulatedNotificationOverlayScrimState createState() => _EncapsulatedNotificationOverlayScrimState();
+  _EncapsuleNotificationOverlayScrimState createState() => _EncapsuleNotificationOverlayScrimState();
 }
 
-class _EncapsulatedNotificationOverlayScrimState extends State<EncapsulatedNotificationOverlayScrim>
-    with SingleTickerProviderStateMixin<EncapsulatedNotificationOverlayScrim> {
+class _EncapsuleNotificationOverlayScrimState extends State<EncapsuleNotificationOverlayScrim>
+    with SingleTickerProviderStateMixin<EncapsuleNotificationOverlayScrim> {
   late final AnimationController _controller;
   late final Animation<Color?> _colorAnimation;
   bool _buildScrim = false;
@@ -73,7 +73,7 @@ class _EncapsulatedNotificationOverlayScrimState extends State<EncapsulatedNotif
   }
 
   @override
-  void didUpdateWidget(covariant EncapsulatedNotificationOverlayScrim oldWidget) {
+  void didUpdateWidget(covariant EncapsuleNotificationOverlayScrim oldWidget) {
     if (oldWidget.toggled != widget.toggled) {
       if (widget.toggled) {
         _controller.forward();

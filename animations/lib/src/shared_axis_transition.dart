@@ -476,7 +476,7 @@ class _ExitTransition extends StatelessWidget {
           inherit: inherit,
         );
 
-        if (fillColor != Colors.transparent) {
+        if (!inherit && fillColor != Colors.transparent) {
           _widget = ColoredBox(color: fillColor, child: child);
         }
 

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:animations/animations.dart';
 import 'package:await_route/await_route.dart';
 import 'package:carousel_slider/src/carousel_slider.dart';
 import 'package:carousel_slider/src/periodic_child_switcher.dart';
@@ -169,7 +170,7 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
     assert(constraints != null || widget.getCacheSize != null);
 
     final photo = _photos.length > index ? _photos[index] : null;
-    final child = SwitchingFirebaseImage(
+    Widget child = SwitchingFirebaseImage(
       scrollAware: widget.scrollAware,
       imageProvider: _getImageProvider(photo, constraints),
       inherit: widget.inherit,
@@ -178,6 +179,15 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
           ? widget.uniqueIdleChildBuilder!(context, photo)
           : widget.idleChild,
     );
+
+    switch (widget.style) {
+      case MultiPhotoCarouselStyle.draggable:
+      case MultiPhotoCarouselStyle.periodicallySwitched:
+        child = InheritedAnimationBuilder(wrapTranslation: true, child: child);
+        break;
+      case MultiPhotoCarouselStyle.periodicallySwitchedImage:
+        break;
+    }
 
     return widget.wrap?.call(context, photo, child) ?? child;
   }
