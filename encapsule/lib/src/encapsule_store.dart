@@ -19,13 +19,6 @@ class EncapsuleStore extends _EncapsuleScaffoldStore with _$EncapsuleStore {
 
   static final instance = EncapsuleStore._();
 
-  /// Closes sheets of [EncapsuleStore].
-  static bool closeSheetsOf() {
-    final closeSheets = EncapsuleStore.instance.sheets.isNotEmpty;
-    EncapsuleStore.instance.sheets.clear();
-    return closeSheets;
-  }
-
   /// Attempts to find the overlay that's used to build [EncapsuleScaffoldOverlay],
   /// if the [EncapsuleStore.overlayKey] is used, else lookup regular root overlay.
   static OverlayState? overlayOf(BuildContext context) =>
@@ -151,6 +144,13 @@ abstract class _EncapsuleScaffoldStore with Store {
 
   void dispose() {
     _visibleNotificationReactionDisposer?.call();
+  }
+
+  /// Closes all sheets.
+  bool closeSheets() {
+    final closeSheets = EncapsuleStore.instance.sheets.isNotEmpty;
+    EncapsuleStore.instance.sheets.clear();
+    return closeSheets;
   }
 }
 
