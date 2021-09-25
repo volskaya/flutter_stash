@@ -12,7 +12,7 @@ import 'package:flutter/scheduler.dart';
 class DelayedProgressIndicator extends ImplicitlyAnimatedWidget {
   const DelayedProgressIndicator({
     Key? key,
-    this.delay = const Duration(seconds: 1),
+    this.delay = const Duration(seconds: 3),
     this.size = 16.0,
     this.center = true,
     this.color,
@@ -69,7 +69,7 @@ class _DelayedProgressIndicatorState extends ImplicitlyAnimatedWidgetState<Delay
 
   @override
   void forEachTween(TweenVisitor<Object?> visitor) {
-    _colorTween = visitor(_colorTween, widget.color, (v) => ColorTween(begin: v as Color?)) as ColorTween;
+    _colorTween = visitor(_colorTween, widget.color, (v) => ColorTween(begin: v as Color?)) as ColorTween?;
   }
 
   @override
@@ -169,5 +169,51 @@ class _DelayedProgressIndicatorState extends ImplicitlyAnimatedWidgetState<Delay
     );
 
     return widget.center ? Center(child: indicator) : indicator;
+  }
+}
+
+class InheritedDelayedProgressIndicator extends InheritedAnimationWidget {
+  const InheritedDelayedProgressIndicator({
+    Key? key,
+    this.delay = const Duration(seconds: 3),
+    this.size = 16.0,
+    this.center = true,
+    this.color,
+    this.optimizeOut = true,
+    this.toggled = true,
+    this.strokeWidth = 4.0,
+    this.opacity = 1.0,
+    this.wrapScale = false,
+    this.wrapTranslation = false,
+  }) : super(key: key);
+
+  final Duration delay;
+  final double size;
+  final Color? color;
+  final bool center;
+  final bool optimizeOut;
+  final bool toggled;
+  final double strokeWidth;
+  final double opacity;
+  final bool wrapScale;
+  final bool wrapTranslation;
+
+  @override
+  Widget build(BuildContext context, InheritedAnimationValue value) {
+    Widget child = DelayedProgressIndicator(
+      opacity: value.opacity,
+      delay: delay,
+      size: size,
+      center: center,
+      color: color,
+      optimizeOut: optimizeOut,
+      toggled: toggled,
+      strokeWidth: strokeWidth,
+    );
+
+    if (wrapTranslation) child = Transform.translate(offset: value.translation, child: child);
+    if (wrapScale) child = Transform.scale(scale: value.scale, child: child);
+
+    return child;
   }
 }

@@ -116,7 +116,6 @@ abstract class Utils {
 
   /// The app has 2 navigators. Make sure [WillPopScope] doesn't
   /// stand in the root navigator's way.
-  @Deprecated('')
   static Future<bool> protectRootNavigator(BuildContext context, FutureOr<bool> Function() callback) async {
     final rootNavigator = Navigator.of(context, rootNavigator: true);
 

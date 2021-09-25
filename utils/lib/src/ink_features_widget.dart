@@ -8,7 +8,7 @@ class InkFeaturesWidget extends StatefulWidget {
     required this.child,
     this.absorbHitTest = true,
     this.color,
-    this.clipBehavior = Clip.hardEdge,
+    this.clipBehavior = Clip.none,
   }) : super(key: key);
 
   final Widget child;
@@ -31,14 +31,14 @@ class _InkFeaturesWidgetState extends State<InkFeaturesWidget> with TickerProvid
 
   @override
   Widget build(BuildContext context) => NotificationListener<LayoutChangedNotification>(
-      onNotification: _handleLayoutChangeNotification,
-      child: InkFeatures(
-        key: _inkFeatureRenderer,
-        vsync: this,
-        color: widget.color,
-        absorbHitTest: widget.absorbHitTest,
-        child: widget.child,
-        clipBehavior: widget.clipBehavior,
-      ),
-    );
+        onNotification: _handleLayoutChangeNotification,
+        child: InkFeatures(
+          key: _inkFeatureRenderer,
+          vsync: this,
+          color: widget.color,
+          absorbHitTest: widget.absorbHitTest,
+          child: widget.child,
+          clipBehavior: widget.clipBehavior,
+        ),
+      );
 }

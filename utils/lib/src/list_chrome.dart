@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class PredicateScrollBehavior extends MaterialScrollBehavior {
-  const PredicateScrollBehavior([this.notificationPredicate = defaultNotificationPredicate]);
+  const PredicateScrollBehavior([
+    this.notificationPredicate = defaultNotificationPredicate,
+  ]);
 
   final bool Function(ScrollNotification notification) notificationPredicate;
 
@@ -12,19 +14,31 @@ class PredicateScrollBehavior extends MaterialScrollBehavior {
 
   @override
   Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
-    switch (getPlatform(context)) {
+    final theme = Theme.of(context);
+    final indicator = theme.androidOverscrollIndicator ?? androidOverscrollIndicator;
+
+    switch (theme.platform) {
       case TargetPlatform.iOS:
       case TargetPlatform.linux:
       case TargetPlatform.macOS:
       case TargetPlatform.windows:
         return child;
       case TargetPlatform.android:
+        switch (indicator) {
+          case AndroidOverscrollIndicator.stretch:
+            return StretchingOverscrollIndicator(
+              axisDirection: details.direction,
+              child: child,
+            );
+          case AndroidOverscrollIndicator.glow:
+            continue glow;
+        }
+      glow:
       case TargetPlatform.fuchsia:
         return GlowingOverscrollIndicator(
-          child: child,
           axisDirection: details.direction,
-          color: Theme.of(context).colorScheme.primary,
-          notificationPredicate: notificationPredicate,
+          color: theme.colorScheme.primary,
+          child: child,
         );
     }
   }
@@ -48,19 +62,28 @@ class MaterialGlowingOverscrollIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    switch (Theme.of(context).platform) {
+    switch (theme.platform) {
       case TargetPlatform.iOS:
       case TargetPlatform.linux:
       case TargetPlatform.macOS:
       case TargetPlatform.windows:
         return child;
       case TargetPlatform.android:
+        switch (theme.androidOverscrollIndicator ?? AndroidOverscrollIndicator.glow) {
+          case AndroidOverscrollIndicator.stretch:
+            return StretchingOverscrollIndicator(
+              axisDirection: direction,
+              child: child,
+            );
+          case AndroidOverscrollIndicator.glow:
+            continue glow;
+        }
+      glow:
       case TargetPlatform.fuchsia:
         return GlowingOverscrollIndicator(
-          child: child,
           axisDirection: direction,
           color: theme.colorScheme.primary,
-          notificationPredicate: notificationPredicate,
+          child: child,
         );
     }
   }

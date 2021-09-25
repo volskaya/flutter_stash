@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:utils/src/ink_features_widget.dart';
 
 class OverlayedInkWell extends StatelessWidget {
   const OverlayedInkWell({
@@ -25,9 +26,7 @@ class OverlayedInkWell extends StatelessWidget {
         children: <Widget>[
           child,
           Positioned.fill(
-            child: Material(
-              type: MaterialType.transparency,
-              borderRadius: borderRadius,
+            child: InkFeaturesWidget(
               child: InkWell(
                 onTap: onTap,
                 onLongPress: onLongPress,
