@@ -26,30 +26,14 @@ class RevealingBarNotification with _$RevealingBarNotification {
   }) = _RevealingBarNotification;
 }
 
-/// Listens for updates from [RevealingBarNotifier]s and calculates if bars
-/// should be visible or hidden.
-class RevealingBarController extends StatefulWidget {
-  /// Creates [RevealingBarController].
-  const RevealingBarController({
-    Key? key,
-    required this.child,
+class RevealingBarControllerState {
+  RevealingBarControllerState({
     this.safeArea = 0,
     this.onlyShowBelowSafeArea = false,
-    this.local,
-    this.remote,
     this.revealAtEnd = false,
-  })  : assert(local == null || local >= 0),
-        assert(remote == null || (local != null && remote > local), 'Use `local` first'),
-        super(key: key);
-
-  /// Child widget of [RevealingBarController].
-  final Widget child;
-
-  /// If not null, will automatically wrap child in a [RevealingBarNotifier] with a local position.
-  final int? local;
-
-  /// If not null, will automatically wrap child in a [RevealingBarNotifier] with a remote position.
-  final int? remote;
+  }) {
+    notifier = ValueNotifier<bool>(!(onlyShowBelowSafeArea && safeArea > 0));
+  }
 
   /// The offset past which to hide the bar.
   final double safeArea;
@@ -60,19 +44,6 @@ class RevealingBarController extends StatefulWidget {
   /// Whether the bars should reveal, when the last scrollable reaches the end.
   final bool revealAtEnd;
 
-  /// Get the nearest [RevealingBarControllerState].
-  static RevealingBarControllerState of(BuildContext context) =>
-      Provider.of<RevealingBarControllerState>(context, listen: false);
-
-  /// Has the [RevealingBarController] set bars as should be visible.
-  static void reveal(BuildContext context) => RevealingBarController.of(context).reveal();
-
-  @override
-  RevealingBarControllerState createState() => RevealingBarControllerState();
-}
-
-/// State of [RevealingBarController].
-class RevealingBarControllerState extends State<RevealingBarController> {
   final _locks = HashSet<dynamic>();
 
   /// Holds the boolean of whether the bars should be hidden.
@@ -92,13 +63,13 @@ class RevealingBarControllerState extends State<RevealingBarController> {
   }
 
   void _alignBars({bool ignoreVelocity = false}) {
-    final force = widget.onlyShowBelowSafeArea ? _globalScrollOffset < widget.safeArea : false;
+    final force = onlyShowBelowSafeArea ? _globalScrollOffset < safeArea : false;
 
     // Animate in/out appbar and navbar, depending on scroll direction
     if (!force) {
       final velocity = _globalScrollOffset - _lastGlobalScrollOffset;
-      final withinSafeArea = _globalScrollOffset < widget.safeArea;
-      final isAtEnd = widget.revealAtEnd && _globalScrollOffset == _globalMaxExtent;
+      final withinSafeArea = _globalScrollOffset < safeArea;
+      final isAtEnd = revealAtEnd && _globalScrollOffset == _globalMaxExtent;
 
       if (isAtEnd) {
         _setVisibility(true); // Visible.
@@ -147,25 +118,99 @@ class RevealingBarControllerState extends State<RevealingBarController> {
     if (removed && !locked) _alignBars(ignoreVelocity: true);
   }
 
-  @override
-  void initState() {
-    notifier = ValueNotifier<bool>(!(widget.onlyShowBelowSafeArea && widget.safeArea > 0));
-    super.initState();
-  }
-
-  @override
   void dispose() {
     notifier.dispose();
-    super.dispose();
   }
+}
+
+/// Listens for updates from [RevealingBarNotifier]s and calculates if bars
+/// should be visible or hidden.
+class RevealingBarControllerProvider {
+  const RevealingBarControllerProvider._();
+
+  /// Get the nearest [RevealingBarControllerState].
+  static RevealingBarControllerState of(BuildContext context) =>
+      Provider.of<RevealingBarControllerState>(context, listen: false);
+
+  /// Has the [RevealingBarController] set bars as should be visible.
+  static void reveal(BuildContext context) => RevealingBarController.of(context).reveal();
+
+  static Widget build({
+    Key? key,
+    required Widget child,
+    double safeArea = 0.0,
+    bool onlyShowBelowSafeArea = false,
+    bool revealAtEnd = false,
+  }) =>
+      Provider<RevealingBarControllerState>(
+        // key: ValueKey(hashValues(revealAtEnd, onlyShowBelowSafeArea, safeArea)),
+        child: child,
+        dispose: (_, v) => v.dispose(),
+        create: (_) => RevealingBarControllerState(
+          revealAtEnd: revealAtEnd,
+          onlyShowBelowSafeArea: onlyShowBelowSafeArea,
+          safeArea: safeArea,
+        ),
+      );
+}
+
+/// Listens for updates from [RevealingBarNotifier]s and calculates if bars
+/// should be visible or hidden.
+class RevealingBarController extends StatelessWidget {
+  /// Creates [RevealingBarController].
+  const RevealingBarController({
+    Key? key,
+    required this.child,
+    this.safeArea = 0,
+    this.onlyShowBelowSafeArea = false,
+    this.local,
+    this.remote,
+    this.revealAtEnd = false,
+  })  : assert(local == null || local >= 0),
+        assert(remote == null || (local != null && remote > local), 'Use `local` first'),
+        super(key: key);
+
+  /// Child widget of [RevealingBarController].
+  final Widget child;
+
+  /// If not null, will automatically wrap child in a [RevealingBarNotifier] with a local position.
+  final int? local;
+
+  /// If not null, will automatically wrap child in a [RevealingBarNotifier] with a remote position.
+  final int? remote;
+
+  /// The offset past which to hide the bar.
+  final double safeArea;
+
+  /// Keeps the bar hidden, unless scrolled past the [safeArea].
+  final bool onlyShowBelowSafeArea;
+
+  /// Whether the bars should reveal, when the last scrollable reaches the end.
+  final bool revealAtEnd;
+
+  /// Get the nearest [RevealingBarControllerState].
+  static RevealingBarControllerState of(BuildContext context) =>
+      Provider.of<RevealingBarControllerState>(context, listen: false);
+
+  /// Has the [RevealingBarController] set bars as should be visible.
+  static void reveal(BuildContext context) => RevealingBarController.of(context).reveal();
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider<RevealingBarControllerState>.value(value: this, child: widget.child);
-    return widget.local != null
+    final provider = Provider<RevealingBarControllerState>(
+      child: child,
+      dispose: (_, v) => v.dispose(),
+      create: (_) => RevealingBarControllerState(
+        revealAtEnd: revealAtEnd,
+        onlyShowBelowSafeArea: onlyShowBelowSafeArea,
+        safeArea: safeArea,
+      ),
+    );
+
+    return local != null
         ? RevealingBarNotifier(
-            local: widget.local!,
-            remote: widget.remote,
+            local: local!,
+            remote: remote,
             child: provider,
           )
         : provider;
@@ -229,7 +274,7 @@ class RevealingBarNotifier extends StatelessWidget {
 }
 
 /// Abstracts transform animation for revealing bars.
-class RevealingBar extends StatelessWidget {
+class RevealingBar extends StatefulWidget {
   /// Creates [RevealingBar]
   const RevealingBar({
     Key? key,
@@ -273,32 +318,55 @@ class RevealingBar extends StatelessWidget {
   final Duration duration;
 
   @override
+  State<RevealingBar> createState() => _RevealingBarState();
+}
+
+class _RevealingBarState extends State<RevealingBar> {
+  RevealingBarControllerState? _controller;
+  Offset? _optimizeOutOffset;
+
+  bool get _showBars => _controller?.notifier.value ?? true;
+
+  void _handleOptizeOutOffsetChange() =>
+      _optimizeOutOffset = widget.optimizeOutChild ? Offset(widget.alignment.x, widget.alignment.y) : null;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = RevealingBarController.of(context)..notifier.addListener(markNeedsBuild);
+    _handleOptizeOutOffsetChange();
+  }
+
+  @override
+  void didUpdateWidget(covariant RevealingBar oldWidget) {
+    if (oldWidget.optimizeOutChild != widget.optimizeOutChild) _handleOptizeOutOffsetChange();
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    _controller?.notifier.removeListener(markNeedsBuild);
+    _controller = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = RevealingBarController.of(context);
-    final optimizeOutOffset = optimizeOutChild ? Offset(alignment.x, alignment.y) : null;
+    final shouldHide = widget.conditional?.call(!_showBars) ?? !_showBars;
 
-    return RepaintBoundary(
-      child: ValueListenableBuilder<bool>(
-        valueListenable: controller.notifier,
-        builder: (_, showBars, __) {
-          final shouldHide = conditional?.call(!showBars) ?? !showBars;
-
-          return IgnorePointer(
-            ignoring: ignoring ?? shouldHide,
-            child: builder?.call(context, child, shouldHide) ??
-                TweenAnimationBuilder<Offset>(
-                  duration: !shouldHide && bounceOut ? bounceOutDuration : duration,
-                  curve: !shouldHide && bounceOut ? Curves.elasticOut : standardEasing,
-                  tween: Tween<Offset>(
-                      end: shouldHide ? optimizeOutOffset ?? Offset(alignment.x, alignment.y) : Offset.zero),
-                  builder: (_, offset, ___) => FractionalTranslation(
-                    translation: offset,
-                    child: offset == optimizeOutOffset ? const SizedBox.shrink() : child,
-                  ),
-                ),
-          );
-        },
-      ),
+    return IgnorePointer(
+      ignoring: widget.ignoring ?? shouldHide,
+      child: widget.builder?.call(context, widget.child, shouldHide) ??
+          TweenAnimationBuilder<Offset>(
+            duration: !shouldHide && widget.bounceOut ? widget.bounceOutDuration : widget.duration,
+            curve: !shouldHide && widget.bounceOut ? Curves.elasticOut : standardEasing,
+            tween: Tween<Offset>(
+                end: shouldHide ? _optimizeOutOffset ?? Offset(widget.alignment.x, widget.alignment.y) : Offset.zero),
+            builder: (_, offset, ___) => FractionalTranslation(
+              translation: offset,
+              child: offset == _optimizeOutOffset ? null : widget.child,
+            ),
+          ),
     );
   }
 }

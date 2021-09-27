@@ -45,6 +45,7 @@ class RealtimeChatProps<T extends RealtimeChatMessageImpl, D extends RealtimeCha
     this.delayedFuture,
     this.delay = Duration.zero,
     this.firebaseDatabase,
+    this.ads = false,
   }) : bucket = 'realtime_chat_pod_$room';
 
   /// The bucket used for this chat.
@@ -93,6 +94,9 @@ class RealtimeChatProps<T extends RealtimeChatMessageImpl, D extends RealtimeCha
   /// When it's not in the default US region, the [FirebaseDatabase.instance] won't
   /// automatically read the url from google-services file.
   final FirebaseDatabase? firebaseDatabase;
+
+  /// A convenience toggle to memoize ads toggle status for the pod.
+  final bool ads;
 
   // Prop equality is tied only to the bucket.
   @override
