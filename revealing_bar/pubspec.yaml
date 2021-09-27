@@ -4,21 +4,17 @@ homepage: github.com/volskaya
 publish_to: none
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.14.0 <3.0.0"
   flutter: ">=1.17.0 <2.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+
   freezed_annotation: ^0.14.1
   provider: ^5.0.0
+  flutter_riverpod: ^1.0.0-dev.7
 
 dev_dependencies:
   freezed: ^0.14.1+1
   build_runner:
-
-dependency_overrides:
-  freezed_annotation:
-    path: /home/projects/forks/freezed/packages/freezed_annotation
-  freezed:
-    path: /home/projects/forks/freezed/packages/freezed
