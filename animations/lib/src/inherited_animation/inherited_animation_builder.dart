@@ -10,30 +10,32 @@ class InheritedAnimationBuilder extends InheritedAnimationWidget {
     this.child,
     this.wrapScale = false,
     this.wrapTranslation = false,
-    this.shouldRebuild = InheritedAnimationWidget.defaultShouldRebuildCallback,
+    bool willChangeOpacity = true,
+    bool willChangeScale = false,
+    bool willChangeTranslation = false,
   })  : assert(builder != null || child != null, 'Define a builder or a child'),
         assert(builder != null || (child != null && (wrapScale || wrapTranslation))),
-        super(key: key);
+        super(
+          key: key,
+          opacity: willChangeOpacity,
+          scale: wrapScale || willChangeScale,
+          translation: wrapTranslation || willChangeTranslation,
+        );
 
   final Widget? child;
   final bool wrapScale;
   final bool wrapTranslation;
-  final InheritedAnimationWidgetShouldRebuildCallback shouldRebuild;
-  final Widget Function(BuildContext context, InheritedAnimationValue value, Widget? child)? builder;
+  final Widget Function(BuildContext context, InheritedAnimation a, Widget? child)? builder;
 
   @override
-  bool shouldRebuildState(InheritedAnimationValue? oldValue, InheritedAnimationValue? value) =>
-      shouldRebuild(oldValue, value);
-
-  @override
-  Widget build(BuildContext context, InheritedAnimationValue value) {
-    Widget child = builder?.call(context, value, this.child) ?? this.child ?? nil;
+  Widget build(BuildContext context, InheritedAnimation a) {
+    Widget child = builder?.call(context, a, this.child) ?? this.child ?? nil;
 
     // If the widget was used properly, the child shouldn't be null here.
     assert(child != nil);
 
-    if (wrapTranslation) child = Transform.translate(offset: value.translation, child: child);
-    if (wrapScale) child = Transform.scale(scale: value.scale, child: child);
+    if (wrapTranslation) child = Transform.translate(offset: a.translation, child: child);
+    if (wrapScale) child = Transform.scale(scale: a.scale, child: child);
 
     return child;
   }

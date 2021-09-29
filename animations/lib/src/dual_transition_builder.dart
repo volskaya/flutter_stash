@@ -32,6 +32,7 @@ typedef TransitionBuilder = Widget Function(
 /// Using this builder allows the widget tree to maintain its shape by nesting
 /// the enter and exit transitions. This ensures that no state information of
 /// any descendant widget is lost when the transition starts or completes.
+@Deprecated('Use DualTransitionAnimationBuilder for better performance')
 class DualTransitionBuilder extends StatefulWidget {
   /// Creates a [DualTransitionBuilder].
   ///

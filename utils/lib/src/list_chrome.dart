@@ -29,6 +29,7 @@ class PredicateScrollBehavior extends MaterialScrollBehavior {
             return StretchingOverscrollIndicator(
               axisDirection: details.direction,
               child: child,
+              notificationPredicate: notificationPredicate,
             );
           case AndroidOverscrollIndicator.glow:
             continue glow;
@@ -39,6 +40,7 @@ class PredicateScrollBehavior extends MaterialScrollBehavior {
           axisDirection: details.direction,
           color: theme.colorScheme.primary,
           child: child,
+          notificationPredicate: notificationPredicate,
         );
     }
   }
@@ -74,6 +76,7 @@ class MaterialGlowingOverscrollIndicator extends StatelessWidget {
             return StretchingOverscrollIndicator(
               axisDirection: direction,
               child: child,
+              notificationPredicate: notificationPredicate,
             );
           case AndroidOverscrollIndicator.glow:
             continue glow;
@@ -84,6 +87,7 @@ class MaterialGlowingOverscrollIndicator extends StatelessWidget {
           axisDirection: direction,
           color: theme.colorScheme.primary,
           child: child,
+          notificationPredicate: notificationPredicate,
         );
     }
   }

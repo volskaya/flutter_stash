@@ -17,6 +17,7 @@ export 'src/animated_change_widget.dart';
 export 'src/animated_listenable_widget.dart';
 export 'src/animated_observer_widget.dart';
 export 'src/collection_attachment_coordinator.dart';
+export 'src/colored_opacity_box.dart';
 export 'src/converters.dart';
 export 'src/corrected_media_query.dart';
 export 'src/custom_ink_splash.dart';
@@ -187,6 +188,17 @@ abstract class Utils {
       return completer.future;
     } else {
       return callback();
+    }
+  }
+
+  static Future<T?> guardFuture<T>({
+    required Future<T> Function() future,
+    required T? Function(Object error, StackTrace stackTrace) onError,
+  }) async {
+    try {
+      return await future();
+    } catch (e, t) {
+      return onError(e, t);
     }
   }
 }

@@ -5,6 +5,7 @@ import 'package:encapsule/src/encapsule_notification.dart';
 import 'package:encapsule/src/encapsule_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
 
 part 'encapsule_store.g.dart';
@@ -35,7 +36,7 @@ abstract class _EncapsuleScaffoldStore with Store {
   }
 
   final overlayKey = GlobalKey<OverlayState>();
-  final _observers = <EncapsuleStoreObserver>[];
+  final _observers = ObserverList<EncapsuleStoreObserver>();
 
   void addObserver(EncapsuleStoreObserver value) => _observers.add(value);
   bool removeObserver(EncapsuleStoreObserver value) => _observers.remove(value);

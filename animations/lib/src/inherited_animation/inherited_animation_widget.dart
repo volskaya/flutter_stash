@@ -2,44 +2,63 @@ import 'package:animations/animations.dart';
 import 'package:animations/src/inherited_animation/inherited_animation_mixin.dart';
 import 'package:flutter/widgets.dart';
 
-typedef InheritedAnimationWidgetShouldRebuildCallback = bool
-    Function(InheritedAnimationValue? oldValue, InheritedAnimationValue? value);
-
 abstract class InheritedAnimationWidget extends StatefulWidget {
   const InheritedAnimationWidget({
     Key? key,
-    this.enableRebuilds = true,
-  }) : super(key: key);
+    bool opacity = false,
+    bool translation = false,
+    bool scale = false,
+  })  : _willChangeOpacity = opacity,
+        _willChangeScale = scale,
+        _willChangeTranslation = translation,
+        _enableRebuilds = opacity || translation || scale,
+        super(key: key);
 
-  final bool enableRebuilds;
-  Widget build(BuildContext context, InheritedAnimationValue value);
-  bool shouldRebuildState(
-    InheritedAnimationValue? oldValue,
-    InheritedAnimationValue? value,
-  ) =>
-      InheritedAnimationWidget.defaultShouldRebuildCallback(oldValue, value);
-
-  static bool defaultShouldRebuildCallback(
-    InheritedAnimationValue? oldValue,
-    InheritedAnimationValue? value,
-  ) =>
-      oldValue != value;
+  final bool _willChangeOpacity;
+  final bool _willChangeTranslation;
+  final bool _willChangeScale;
+  final bool _enableRebuilds;
 
   @override
   _InheritedAnimationWidgetState createState() => _InheritedAnimationWidgetState();
+
+  Widget build(BuildContext context, InheritedAnimation a);
 }
 
 class _InheritedAnimationWidgetState extends State<InheritedAnimationWidget>
     with InheritedAnimationMixin<InheritedAnimationWidget> {
-  InheritedAnimationValue? _value;
+  double? _oldOpacity;
+  double? _oldScale;
+  Offset? _oldTranslation;
+
   bool _firstChange = true;
 
   void _maybeMarkNeedsBuild() {
-    final value = inheritedAnimation?.freeze();
-    if (widget.shouldRebuildState(_value, value)) {
-      _value = value;
-      markNeedsBuild();
+    bool shouldRebuild = false;
+
+    if (widget._willChangeOpacity) {
+      final opacity = inheritedAnimation!.opacity;
+      if (_oldOpacity != opacity) {
+        shouldRebuild = true;
+        _oldOpacity = opacity;
+      }
     }
+    if (widget._willChangeTranslation) {
+      final translation = inheritedAnimation!.translation;
+      if (_oldTranslation != translation) {
+        shouldRebuild = true;
+        _oldTranslation = translation;
+      }
+    }
+    if (widget._willChangeScale) {
+      final scale = inheritedAnimation!.scale;
+      if (_oldScale != scale) {
+        shouldRebuild = true;
+        _oldScale = scale;
+      }
+    }
+
+    if (shouldRebuild) markNeedsBuild();
   }
 
   @override
@@ -47,11 +66,12 @@ class _InheritedAnimationWidgetState extends State<InheritedAnimationWidget>
     super.didChangeInheritedAnimation(oldAnimation, animation);
     assert(mounted);
 
-    if (widget.enableRebuilds) {
+    if (widget._enableRebuilds) {
       oldAnimation?.removeListener(_maybeMarkNeedsBuild);
       animation?.addListener(_maybeMarkNeedsBuild);
     }
 
+    // Always rebuild for first change, even if `widget.shouldRebuildState` would return false.
     if (_firstChange) {
       _firstChange = false;
       _maybeMarkNeedsBuild();
@@ -61,8 +81,8 @@ class _InheritedAnimationWidgetState extends State<InheritedAnimationWidget>
   @override
   void didUpdateWidget(covariant InheritedAnimationWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.enableRebuilds != widget.enableRebuilds) {
-      if (widget.enableRebuilds) {
+    if (oldWidget._enableRebuilds != widget._enableRebuilds) {
+      if (widget._enableRebuilds) {
         inheritedAnimation?.addListener(_maybeMarkNeedsBuild);
       } else {
         inheritedAnimation?.removeListener(_maybeMarkNeedsBuild);
@@ -72,10 +92,10 @@ class _InheritedAnimationWidgetState extends State<InheritedAnimationWidget>
 
   @override
   void dispose() {
-    if (widget.enableRebuilds) inheritedAnimation?.removeListener(_maybeMarkNeedsBuild);
+    if (widget._enableRebuilds) inheritedAnimation?.removeListener(_maybeMarkNeedsBuild);
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => widget.build(context, _value ?? const InheritedAnimationValue());
+  Widget build(BuildContext context) => widget.build(context, inheritedAnimation!);
 }

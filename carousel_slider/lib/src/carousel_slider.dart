@@ -196,6 +196,7 @@ class CarouselSliderState extends State<CarouselSlider>
           inherit: widget.inherit,
           paintInheritedAnimations: widget.paintInheritedAnimations,
           wrapInheritBoundary: widget.wrapInheritBoundary,
+          enableScroll: widget.itemCount > 1,
         );
         break;
       case Axis.vertical:
@@ -209,6 +210,7 @@ class CarouselSliderState extends State<CarouselSlider>
           inherit: widget.inherit,
           paintInheritedAnimations: widget.paintInheritedAnimations,
           wrapInheritBoundary: widget.wrapInheritBoundary,
+          enableScroll: widget.itemCount > 1,
         );
         break;
     }

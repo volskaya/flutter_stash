@@ -3,12 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:animations/src/animations.dart';
+import 'package:animations/src/compound_transition_animation/compound_transition_animation.dart';
+import 'package:animations/src/compound_transition_animation/dual_transition_animation.dart';
+import 'package:animations/src/dual_transition_animation_builder.dart';
 import 'package:animations/src/inherited_animation/inherited_animation_wrap.dart';
 import 'package:flutter/material.dart';
-
-// TODO(shihaohong): Remove DualTransitionBuilder once flutter/flutter's `stable`
-// branch contains DualTransitionBuilder.
-import 'dual_transition_builder.dart' as dual_transition_builder;
 
 /// Used by [PageTransitionsTheme] to define a page route transition animation
 /// in which the outgoing page fades out, then the incoming page fades in and
@@ -228,76 +227,63 @@ class FadeThroughTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color fillColor = this.fillColor ?? Theme.of(context).colorScheme.background;
-
-    Widget child = paintInheritedAnimations
+    final child = paintInheritedAnimations
         ? InheritedAnimationWrap(
-            fillColor: fillColor,
             child: this.child,
             opacity: true,
             scale: true,
           )
         : this.child;
 
-    Widget _widget = _ZoomedFadeInFadeOut(
-      animation: ReverseAnimation(secondaryAnimation),
+    return DualTransitionAnimationBuilder(
       child: child,
-      onEnd: onEnd,
-      sliver: sliver,
-      inherit: inherit,
-    );
-
-    if (!inherit && fillColor != Colors.transparent) {
-      _widget = ColoredBox(color: fillColor, child: _widget);
-    }
-
-    return _ZoomedFadeInFadeOut(
       animation: animation,
-      child: _widget,
+      secondaryAnimation: secondaryAnimation,
+      onStatusChanged: onStatusChanged,
       onEnd: onEnd,
-      sliver: sliver,
-      inherit: inherit,
+      getAnimations: (animation, secondaryAnimation) => [
+        DualTransitionAnimation<double>(
+          compound: CompoundTransitionAnimation.compoundOpacity,
+          animation: CompoundTransitionAnimation<double>(
+            compound: CompoundTransitionAnimation.compoundOpacity,
+            animation: animation,
+            forwardAnimatable: _ZoomedFadeIn._fadeInOpacity,
+            reverseAnimatable: _FadeOut._fadeOutOpacity,
+          ),
+          secondaryAnimation: CompoundTransitionAnimation<double>(
+            compound: CompoundTransitionAnimation.compoundOpacity,
+            animation: secondaryAnimation!,
+            forwardAnimatable: _ZoomedFadeIn._fadeInOpacity,
+            reverseAnimatable: _FadeOut._fadeOutOpacity,
+          ),
+        ),
+        DualTransitionAnimation<double>(
+          compound: CompoundTransitionAnimation.compoundScale,
+          animation: CompoundTransitionAnimation<double>(
+            compound: CompoundTransitionAnimation.compoundScale,
+            animation: animation,
+            forwardAnimatable: _ZoomedFadeIn._scaleIn,
+          ),
+          secondaryAnimation: CompoundTransitionAnimation<double>(
+            compound: CompoundTransitionAnimation.compoundScale,
+            animation: secondaryAnimation,
+            forwardAnimatable: _ZoomedFadeIn._scaleIn,
+          ),
+        ),
+      ],
+      builder: (context, animations, child) => Animations.scale(
+        scale: animations[1] as DualTransitionAnimation<double>,
+        sliver: sliver,
+        inherit: inherit,
+        child: Animations.fade(
+          opacity: animations[0] as DualTransitionAnimation<double>,
+          sliver: sliver,
+          inherit: inherit,
+          child: child,
+        ),
+      ),
     );
   }
-}
-
-class _ZoomedFadeInFadeOut extends StatelessWidget {
-  const _ZoomedFadeInFadeOut({
-    Key? key,
-    required this.animation,
-    required this.child,
-    this.onEnd,
-    this.onStatusChanged,
-    this.sliver = false,
-    this.inherit = false,
-  }) : super(key: key);
-
-  final Animation<double> animation;
-  final Widget child;
-  final VoidCallback? onEnd;
-  final ValueChanged<AnimationStatus>? onStatusChanged;
-  final bool sliver;
-  final bool inherit;
-
-  @override
-  Widget build(BuildContext context) => dual_transition_builder.DualTransitionBuilder(
-        animation: animation,
-        onEnd: onEnd,
-        onStatusChanged: onStatusChanged,
-        forwardBuilder: (BuildContext context, Animation<double> animation, Widget child) => _ZoomedFadeIn(
-          animation: animation,
-          child: child,
-          sliver: sliver,
-          inherit: inherit,
-        ),
-        reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => _FadeOut(
-          child: child,
-          animation: animation,
-          sliver: sliver,
-          inherit: inherit,
-        ),
-        child: child,
-      );
 }
 
 class _ZoomedFadeIn extends StatelessWidget {

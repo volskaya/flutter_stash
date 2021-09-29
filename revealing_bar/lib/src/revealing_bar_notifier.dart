@@ -29,6 +29,8 @@ class RevealingBarNotifier extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (disable) return child;
+
     final route = ModalRoute.of(context);
     final pod = ref.watch(RevealingBarPod.provider.notifier);
 

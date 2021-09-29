@@ -159,4 +159,8 @@ class InheritedAnimation extends Listenable
   InheritedOpacityAnimation selectOpacityVariant() => InheritedOpacityAnimation(this);
   InheritedScaleAnimation selectScaleVariant() => InheritedScaleAnimation(this);
   InheritedTranslationAnimation selectTranslationVariant() => InheritedTranslationAnimation(this);
+
+  late InheritedOpacityAnimation opacityVariant = InheritedOpacityAnimation(this);
+  late InheritedScaleAnimation scaleVariant = InheritedScaleAnimation(this);
+  late InheritedTranslationAnimation translationVariant = InheritedTranslationAnimation(this);
 }

@@ -40,7 +40,12 @@ class Animations {
           ? InheritedAnimationCoordinator(scale: scale, child: child)
           : sliver
               ? _SliverScaleTransition(key: key, scale: scale, sliver: child)
-              : ScaleTransition(key: key, scale: scale, child: child);
+              : ScaleTransition(
+                  key: key,
+                  scale: scale,
+                  child: child,
+                  filterQuality: FilterQuality.none,
+                );
 }
 
 class _SliverScaleTransition extends AnimatedWidget {

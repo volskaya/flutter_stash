@@ -3,14 +3,13 @@
 // found in the LICENSE file.
 
 import 'package:animations/src/animations.dart';
+import 'package:animations/src/compound_transition_animation/compound_transition_animation.dart';
+import 'package:animations/src/compound_transition_animation/dual_transition_animation.dart';
+import 'package:animations/src/dual_transition_animation_builder.dart';
 import 'package:animations/src/inherited_animation/inherited_animation_wrap.dart';
 import 'package:flutter/material.dart' hide decelerateEasing; // ignore: undefined_hidden_name
-// TODO(goderbauer): Remove implementation import when material properly exports the file.
 import 'package:flutter/src/material/curves.dart'; // ignore: implementation_imports
 
-// TODO(shihaohong): Remove DualTransitionBuilder once flutter/flutter's `stable`
-// branch contains DualTransitionBuilder.
-import 'dual_transition_builder.dart' as dual_transition_builder;
 import 'modal.dart';
 
 /// The modal transition configuration for a Material fade transition.
@@ -162,31 +161,47 @@ class FadeScaleTransition extends StatelessWidget {
   static final Animatable<double> _fadeOutTransition = Tween<double>(begin: 1.0, end: 0.0);
 
   @override
-  Widget build(BuildContext context) => dual_transition_builder.DualTransitionBuilder(
-        animation: animation,
-        forwardBuilder: (BuildContext context, Animation<double> animation, Widget child) => Animations.fade(
-          opacity: _fadeInTransition.animate(animation),
-          sliver: sliver,
-          inherit: inherit,
-          child: Animations.scale(
-            scale: _scaleInTransition.animate(animation),
-            child: child,
-            sliver: sliver,
-            inherit: inherit,
+  Widget build(BuildContext context) {
+    final child = paintInheritedAnimations
+        ? InheritedAnimationWrap(
+            child: this.child,
+            opacity: true,
+            scale: true,
+          )
+        : this.child;
+
+    return DualTransitionAnimationBuilder(
+      child: child,
+      animation: animation,
+      getAnimations: (animation, secondaryAnimation) => [
+        DualTransitionAnimation<double>(
+          compound: CompoundTransitionAnimation.compoundOpacity,
+          animation: CompoundTransitionAnimation<double>(
+              compound: CompoundTransitionAnimation.compoundOpacity,
+              animation: animation,
+              forwardAnimatable: _fadeInTransition,
+              reverseAnimatable: _fadeOutTransition),
+        ),
+        DualTransitionAnimation<double>(
+          compound: CompoundTransitionAnimation.compoundScale,
+          animation: CompoundTransitionAnimation<double>(
+            compound: CompoundTransitionAnimation.compoundScale,
+            animation: animation,
+            forwardAnimatable: _scaleInTransition,
           ),
         ),
-        reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => Animations.fade(
-          opacity: _fadeOutTransition.animate(animation),
-          child: child,
+      ],
+      builder: (context, animations, child) => Animations.scale(
+        scale: animations[1] as DualTransitionAnimation<double>,
+        sliver: sliver,
+        inherit: inherit,
+        child: Animations.fade(
+          opacity: animations[0] as DualTransitionAnimation<double>,
           sliver: sliver,
           inherit: inherit,
+          child: child,
         ),
-        child: paintInheritedAnimations
-            ? InheritedAnimationWrap(
-                child: child,
-                opacity: true,
-                scale: true,
-              )
-            : child,
-      );
+      ),
+    );
+  }
 }

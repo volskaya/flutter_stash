@@ -177,7 +177,7 @@ class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<Fadin
           builder: (_, __) => Transform.scale(
             scale: animation.value,
             child: widget.child,
-            // filterQuality: FilterQuality.none,
+            filterQuality: FilterQuality.none,
           ),
         );
         break;

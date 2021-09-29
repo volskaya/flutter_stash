@@ -183,7 +183,7 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
     switch (widget.style) {
       case MultiPhotoCarouselStyle.draggable:
       case MultiPhotoCarouselStyle.periodicallySwitched:
-        child = InheritedAnimationBuilder(wrapTranslation: true, child: child);
+        child = widget.inherit ? InheritedAnimationBuilder(wrapTranslation: true, child: child) : child;
         break;
       case MultiPhotoCarouselStyle.periodicallySwitchedImage:
         break;

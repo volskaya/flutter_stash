@@ -15,6 +15,11 @@ class RevealingBarProps with _$RevealingBarProps {
     @Default(false) bool onlyShowBelowSafeArea,
     @Default(false) bool revealAtEnd,
   }) = _RevealingBarProps;
+
+  const RevealingBarProps._();
+
+  ChangeNotifierProvider<RevealingBarPod> getProviderFamily() => RevealingBarPod.providerFamily(this);
+  Override getProviderOverride() => RevealingBarPod.provider.overrideWithProvider(getProviderFamily());
 }
 
 class RevealingBarPod extends ChangeNotifier implements ValueListenable<bool> {

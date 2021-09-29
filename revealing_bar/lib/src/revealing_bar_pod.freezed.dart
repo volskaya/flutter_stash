@@ -129,11 +129,13 @@ class __$RevealingBarPropsCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_RevealingBarProps implements _RevealingBarProps {
+class _$_RevealingBarProps extends _RevealingBarProps
+    with DiagnosticableTreeMixin {
   const _$_RevealingBarProps(
       {this.safeArea = 0.0,
       this.onlyShowBelowSafeArea = false,
-      this.revealAtEnd = false});
+      this.revealAtEnd = false})
+      : super._();
 
   @JsonKey(defaultValue: 0.0)
   @override
@@ -146,8 +148,18 @@ class _$_RevealingBarProps implements _RevealingBarProps {
   final bool revealAtEnd;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'RevealingBarProps(safeArea: $safeArea, onlyShowBelowSafeArea: $onlyShowBelowSafeArea, revealAtEnd: $revealAtEnd)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'RevealingBarProps'))
+      ..add(DiagnosticsProperty('safeArea', safeArea))
+      ..add(DiagnosticsProperty('onlyShowBelowSafeArea', onlyShowBelowSafeArea))
+      ..add(DiagnosticsProperty('revealAtEnd', revealAtEnd));
   }
 
   @override
@@ -178,11 +190,12 @@ class _$_RevealingBarProps implements _RevealingBarProps {
       __$RevealingBarPropsCopyWithImpl<_RevealingBarProps>(this, _$identity);
 }
 
-abstract class _RevealingBarProps implements RevealingBarProps {
+abstract class _RevealingBarProps extends RevealingBarProps {
   const factory _RevealingBarProps(
       {double safeArea,
       bool onlyShowBelowSafeArea,
       bool revealAtEnd}) = _$_RevealingBarProps;
+  const _RevealingBarProps._() : super._();
 
   @override
   double get safeArea => throw _privateConstructorUsedError;

@@ -185,7 +185,12 @@ class InheritedDelayedProgressIndicator extends InheritedAnimationWidget {
     this.opacity = 1.0,
     this.wrapScale = false,
     this.wrapTranslation = false,
-  }) : super(key: key);
+  }) : super(
+          key: key,
+          opacity: true,
+          scale: wrapScale,
+          translation: wrapTranslation,
+        );
 
   final Duration delay;
   final double size;
@@ -199,9 +204,9 @@ class InheritedDelayedProgressIndicator extends InheritedAnimationWidget {
   final bool wrapTranslation;
 
   @override
-  Widget build(BuildContext context, InheritedAnimationValue value) {
+  Widget build(BuildContext context, InheritedAnimation a) {
     Widget child = DelayedProgressIndicator(
-      opacity: value.opacity,
+      opacity: a.opacity,
       delay: delay,
       size: size,
       center: center,
@@ -211,8 +216,8 @@ class InheritedDelayedProgressIndicator extends InheritedAnimationWidget {
       strokeWidth: strokeWidth,
     );
 
-    if (wrapTranslation) child = Transform.translate(offset: value.translation, child: child);
-    if (wrapScale) child = Transform.scale(scale: value.scale, child: child);
+    if (wrapTranslation) child = Transform.translate(offset: a.translation, child: child);
+    if (wrapScale) child = Transform.scale(scale: a.scale, child: child);
 
     return child;
   }

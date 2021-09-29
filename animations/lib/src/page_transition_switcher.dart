@@ -394,20 +394,18 @@ class _PageTransitionSwitcherState extends State<PageTransitionSwitcher> with Ti
       if (status == AnimationStatus.completed) {
         assert(mounted);
         assert(_activeEntries.contains(entry));
-        setState(() {
-          _activeEntries.remove(entry);
-          entry.dispose();
-        });
+        _activeEntries.remove(entry);
+        entry.dispose();
+        markNeedsBuild();
       }
     });
     primaryController.addStatusListener((AnimationStatus status) {
       if (status == AnimationStatus.dismissed) {
         assert(mounted);
         assert(_activeEntries.contains(entry));
-        setState(() {
-          _activeEntries.remove(entry);
-          entry.dispose();
-        });
+        _activeEntries.remove(entry);
+        entry.dispose();
+        markNeedsBuild();
       }
     });
     return entry;

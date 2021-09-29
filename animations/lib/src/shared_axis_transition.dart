@@ -3,6 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:animations/src/animations.dart';
+import 'package:animations/src/compound_transition_animation/compound_transition_animation.dart';
+import 'package:animations/src/compound_transition_animation/dual_transition_animation.dart';
+import 'package:animations/src/dual_transition_animation_builder.dart';
+import 'package:animations/src/inherited_animation/inherited_animation_coordinator.dart';
 import 'package:animations/src/inherited_animation/inherited_animation_wrap.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
@@ -14,10 +18,6 @@ import 'package:flutter/material.dart'
 // TODO(goderbauer): Remove implementation import when material properly exports the file.
 import 'package:flutter/src/material/curves.dart'; // ignore: implementation_imports
 import 'package:flutter/widgets.dart';
-
-// TODO(shihaohong): Remove DualTransitionBuilder once flutter/flutter's `stable`
-// branch contains DualTransitionBuilder.
-import 'dual_transition_builder.dart' as dual_transition_builder;
 
 /// Determines which type of shared axis transition is used.
 enum SharedAxisTransitionType {
@@ -268,55 +268,170 @@ class SharedAxisTransition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color fillColor = this.fillColor ?? Theme.of(context).colorScheme.background;
-    return dual_transition_builder.DualTransitionBuilder(
-      animation: animation,
-      onEnd: onEnd,
-      onStatusChanged: onStatusChanged,
-      forwardBuilder: (BuildContext context, Animation<double> animation, Widget child) => _EnterTransition(
-        animation: animation,
-        transitionType: transitionType,
-        child: child,
-        sliver: sliver,
-        inherit: inherit,
-      ),
-      reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => _ExitTransition(
-        animation: animation,
-        transitionType: transitionType,
-        reverse: true,
-        fillColor: fillColor,
-        child: child,
-        sliver: sliver,
-        inherit: inherit,
-      ),
-      child: dual_transition_builder.DualTransitionBuilder(
-        animation: ReverseAnimation(secondaryAnimation),
-        forwardBuilder: (BuildContext context, Animation<double> animation, Widget child) => _EnterTransition(
-          animation: animation,
-          transitionType: transitionType,
-          reverse: true,
+    final child = paintInheritedAnimations
+        ? InheritedAnimationWrap(
+            child: this.child,
+            opacity: true,
+            translation: transitionType != SharedAxisTransitionType.scaled,
+            scale: transitionType == SharedAxisTransitionType.scaled,
+          )
+        : this.child;
+
+    switch (transitionType) {
+      case SharedAxisTransitionType.horizontal:
+        return DualTransitionAnimationBuilder(
           child: child,
-          sliver: sliver,
-          inherit: inherit,
-        ),
-        reverseBuilder: (BuildContext context, Animation<double> animation, Widget child) => _ExitTransition(
           animation: animation,
-          transitionType: transitionType,
-          fillColor: fillColor,
+          secondaryAnimation: secondaryAnimation,
+          onStatusChanged: onStatusChanged,
+          onEnd: onEnd,
+          getAnimations: (animation, secondaryAnimation) => [
+            DualTransitionAnimation<double>(
+              compound: CompoundTransitionAnimation.compoundOpacity,
+              animation: CompoundTransitionAnimation<double>(
+                compound: CompoundTransitionAnimation.compoundOpacity,
+                animation: animation,
+                forwardAnimatable: _EnterTransition._fadeInTransition,
+                reverseAnimatable: _ExitTransition._fadeOutTransition,
+              ),
+              secondaryAnimation: CompoundTransitionAnimation<double>(
+                compound: CompoundTransitionAnimation.compoundOpacity,
+                animation: secondaryAnimation!,
+                forwardAnimatable: _EnterTransition._fadeInTransition,
+                reverseAnimatable: _ExitTransition._fadeOutTransition,
+              ),
+            ),
+            DualTransitionAnimation<Offset>(
+              compound: CompoundTransitionAnimation.compoundTranslation,
+              animation: CompoundTransitionAnimation<Offset>(
+                compound: CompoundTransitionAnimation.compoundTranslation,
+                animation: animation,
+                forwardAnimatable: _EnterTransition._horizontalSlideInTransition,
+                reverseAnimatable: _ExitTransition._horizontalSlideOutTransitionReversed,
+              ),
+              secondaryAnimation: CompoundTransitionAnimation<Offset>(
+                compound: CompoundTransitionAnimation.compoundTranslation,
+                animation: secondaryAnimation,
+                forwardAnimatable: _EnterTransition._horizontalSlideInTransitionReversed,
+                reverseAnimatable: _ExitTransition._horizontalSlideOutTransition,
+              ),
+            ),
+          ],
+          builder: (context, animations, child) => Animations.translate(
+            offset: animations[1] as DualTransitionAnimation<Offset>,
+            sliver: sliver,
+            inherit: inherit,
+            child: Animations.fade(
+              opacity: animations[0] as DualTransitionAnimation<double>,
+              sliver: sliver,
+              inherit: inherit,
+              child: child,
+            ),
+          ),
+        );
+      case SharedAxisTransitionType.vertical:
+        return DualTransitionAnimationBuilder(
           child: child,
-          sliver: sliver,
-          inherit: inherit,
-        ),
-        child: paintInheritedAnimations
-            ? InheritedAnimationWrap(
-                fillColor: fillColor,
-                child: child,
-                opacity: true,
-                translation: true,
-              )
-            : child,
-      ),
-    );
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          onStatusChanged: onStatusChanged,
+          onEnd: onEnd,
+          getAnimations: (animation, secondaryAnimation) => [
+            DualTransitionAnimation<double>(
+              compound: CompoundTransitionAnimation.compoundOpacity,
+              animation: CompoundTransitionAnimation<double>(
+                compound: CompoundTransitionAnimation.compoundOpacity,
+                animation: animation,
+                forwardAnimatable: _EnterTransition._fadeInTransition,
+                reverseAnimatable: _ExitTransition._fadeOutTransition,
+              ),
+              secondaryAnimation: CompoundTransitionAnimation<double>(
+                compound: CompoundTransitionAnimation.compoundOpacity,
+                animation: secondaryAnimation!,
+                forwardAnimatable: _EnterTransition._fadeInTransition,
+                reverseAnimatable: _ExitTransition._fadeOutTransition,
+              ),
+            ),
+            DualTransitionAnimation<Offset>(
+              compound: CompoundTransitionAnimation.compoundTranslation,
+              animation: CompoundTransitionAnimation<Offset>(
+                compound: CompoundTransitionAnimation.compoundTranslation,
+                animation: animation,
+                forwardAnimatable: _EnterTransition._verticalSlideInTransition,
+                reverseAnimatable: _ExitTransition._verticalSlideOutTransitionReversed,
+              ),
+              secondaryAnimation: CompoundTransitionAnimation<Offset>(
+                compound: CompoundTransitionAnimation.compoundTranslation,
+                animation: secondaryAnimation,
+                forwardAnimatable: _EnterTransition._verticalSlideInTransitionReversed,
+                reverseAnimatable: _ExitTransition._verticalSlideOutTransition,
+              ),
+            ),
+          ],
+          builder: (context, animations, child) => Animations.translate(
+            offset: animations[1] as DualTransitionAnimation<Offset>,
+            sliver: sliver,
+            inherit: inherit,
+            child: Animations.fade(
+              opacity: animations[0] as DualTransitionAnimation<double>,
+              sliver: sliver,
+              inherit: inherit,
+              child: child,
+            ),
+          ),
+        );
+      case SharedAxisTransitionType.scaled:
+        return DualTransitionAnimationBuilder(
+          child: child,
+          animation: animation,
+          secondaryAnimation: secondaryAnimation,
+          onStatusChanged: onStatusChanged,
+          onEnd: onEnd,
+          getAnimations: (animation, secondaryAnimation) => [
+            DualTransitionAnimation<double>(
+              compound: CompoundTransitionAnimation.compoundOpacity,
+              animation: CompoundTransitionAnimation<double>(
+                compound: CompoundTransitionAnimation.compoundOpacity,
+                animation: animation,
+                forwardAnimatable: _EnterTransition._fadeInTransition,
+                reverseAnimatable: _ExitTransition._fadeOutTransition,
+              ),
+              secondaryAnimation: CompoundTransitionAnimation<double>(
+                compound: CompoundTransitionAnimation.compoundOpacity,
+                animation: secondaryAnimation!,
+                forwardAnimatable: _EnterTransition._fadeInTransition,
+                reverseAnimatable: _ExitTransition._fadeOutTransition,
+              ),
+            ),
+            DualTransitionAnimation<double>(
+              compound: CompoundTransitionAnimation.compoundScale,
+              animation: CompoundTransitionAnimation<double>(
+                compound: CompoundTransitionAnimation.compoundScale,
+                animation: animation,
+                forwardAnimatable: _EnterTransition._scaleUpTransition,
+                reverseAnimatable: _ExitTransition._scaleDownTransition,
+              ),
+              secondaryAnimation: CompoundTransitionAnimation<double>(
+                compound: CompoundTransitionAnimation.compoundScale,
+                animation: secondaryAnimation,
+                forwardAnimatable: _EnterTransition._scaleUpTransition,
+                reverseAnimatable: _ExitTransition._scaleDownTransition,
+              ),
+            ),
+          ],
+          builder: (context, animations, child) => Animations.scale(
+            scale: animations[1] as DualTransitionAnimation<double>,
+            sliver: sliver,
+            inherit: inherit,
+            child: Animations.fade(
+              opacity: animations[0] as DualTransitionAnimation<double>,
+              sliver: sliver,
+              inherit: inherit,
+              child: child,
+            ),
+          ),
+        );
+    }
   }
 }
 
@@ -351,38 +466,48 @@ class _EnterTransition extends StatelessWidget {
     end: 1.00,
   ).chain(CurveTween(curve: standardEasing));
 
+  static final Animatable<Offset> _horizontalSlideInTransition = Tween<Offset>(
+    begin: const Offset(30.0, 0.0),
+    end: Offset.zero,
+  ).chain(CurveTween(curve: standardEasing));
+
+  static final Animatable<Offset> _horizontalSlideInTransitionReversed = Tween<Offset>(
+    begin: const Offset(-30.0, 0.0),
+    end: Offset.zero,
+  ).chain(CurveTween(curve: standardEasing));
+
+  static final Animatable<Offset> _verticalSlideInTransition = Tween<Offset>(
+    begin: const Offset(0.0, 30.0),
+    end: Offset.zero,
+  ).chain(CurveTween(curve: standardEasing));
+
+  static final Animatable<Offset> _verticalSlideInTransitionReversed = Tween<Offset>(
+    begin: const Offset(0.0, -30.0),
+    end: Offset.zero,
+  ).chain(CurveTween(curve: standardEasing));
+
   @override
   Widget build(BuildContext context) {
     switch (transitionType) {
       case SharedAxisTransitionType.horizontal:
-        final Animatable<Offset> slideInTransition = Tween<Offset>(
-          begin: Offset(!reverse ? 30.0 : -30.0, 0.0),
-          end: Offset.zero,
-        ).chain(CurveTween(curve: standardEasing));
-
         return Animations.fade(
           opacity: _fadeInTransition.animate(animation),
           sliver: sliver,
           inherit: inherit,
           child: Animations.translate(
-            offset: slideInTransition.animate(animation),
+            offset: (!reverse ? _horizontalSlideInTransition : _horizontalSlideInTransitionReversed).animate(animation),
             child: child,
             sliver: sliver,
             inherit: inherit,
           ),
         );
       case SharedAxisTransitionType.vertical:
-        final Animatable<Offset> slideInTransition = Tween<Offset>(
-          begin: Offset(0.0, !reverse ? 30.0 : -30.0),
-          end: Offset.zero,
-        ).chain(CurveTween(curve: standardEasing));
-
         return Animations.fade(
           opacity: _fadeInTransition.animate(animation),
           sliver: sliver,
           inherit: inherit,
           child: Animations.translate(
-            offset: slideInTransition.animate(animation),
+            offset: (!reverse ? _verticalSlideInTransition : _verticalSlideInTransitionReversed).animate(animation),
             child: child,
             sliver: sliver,
             inherit: inherit,
@@ -437,17 +562,32 @@ class _ExitTransition extends StatelessWidget {
     end: 0.80,
   ).chain(CurveTween(curve: standardEasing));
 
+  static final Animatable<Offset> _horizontalSlideOutTransition = Tween<Offset>(
+    begin: Offset.zero,
+    end: const Offset(-30.0, 0.0),
+  ).chain(CurveTween(curve: standardEasing));
+
+  static final Animatable<Offset> _horizontalSlideOutTransitionReversed = Tween<Offset>(
+    begin: Offset.zero,
+    end: const Offset(30.0, 0.0),
+  ).chain(CurveTween(curve: standardEasing));
+
+  static final Animatable<Offset> _verticalSlideOutTransition = Tween<Offset>(
+    begin: Offset.zero,
+    end: const Offset(0.0, -30.0),
+  ).chain(CurveTween(curve: standardEasing));
+
+  static final Animatable<Offset> _verticalSlideOutTransitionReversed = Tween<Offset>(
+    begin: Offset.zero,
+    end: const Offset(0.0, 30.0),
+  ).chain(CurveTween(curve: standardEasing));
+
   @override
   Widget build(BuildContext context) {
     switch (transitionType) {
       case SharedAxisTransitionType.horizontal:
-        final Animatable<Offset> slideOutTransition = Tween<Offset>(
-          begin: Offset.zero,
-          end: Offset(!reverse ? -30.0 : 30.0, 0.0),
-        ).chain(CurveTween(curve: standardEasing));
-
         Widget _widget = Animations.translate(
-          offset: slideOutTransition.animate(animation),
+          offset: (!reverse ? _horizontalSlideOutTransition : _horizontalSlideOutTransitionReversed).animate(animation),
           child: child,
           sliver: sliver,
           inherit: inherit,
@@ -464,13 +604,8 @@ class _ExitTransition extends StatelessWidget {
           inherit: inherit,
         );
       case SharedAxisTransitionType.vertical:
-        final Animatable<Offset> slideOutTransition = Tween<Offset>(
-          begin: Offset.zero,
-          end: Offset(0.0, !reverse ? -30.0 : 30.0),
-        ).chain(CurveTween(curve: standardEasing));
-
         Widget _widget = Animations.translate(
-          offset: slideOutTransition.animate(animation),
+          offset: (!reverse ? _verticalSlideOutTransition : _verticalSlideOutTransitionReversed).animate(animation),
           child: child,
           sliver: sliver,
           inherit: inherit,
