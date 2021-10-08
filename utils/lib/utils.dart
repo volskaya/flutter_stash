@@ -86,6 +86,12 @@ abstract class Utils {
       // ignore:invalid_use_of_protected_member
       controller.positions.length == 1 ? controller.offset > offset : false;
 
+  static bool isScrolledToEnd(ScrollController controller, [double offset = 0]) =>
+      // ignore:invalid_use_of_protected_member
+      controller.positions.length == 1
+          ? controller.position.pixels.round() >= controller.position.maxScrollExtent.round()
+          : false;
+
   static Future<Duration> awaitPostframe() async {
     final completer = Completer<Duration>();
     WidgetsBinding.instance!.addPostFrameCallback(completer.complete);

@@ -24,6 +24,7 @@ class FadingTile extends StatefulWidget with FadingTileWidget {
   FadingTile({
     Key? key,
     FadingTileType? type,
+    Duration? duration,
     required this.child,
     required this.index,
     this.paginatorIndex,
@@ -35,6 +36,7 @@ class FadingTile extends StatefulWidget with FadingTileWidget {
         optimizeOutChild = false,
         type = type ?? defaultType,
         sizeDuration = defaultSizeDuration,
+        duration = duration ?? defaultDuration,
         _size = false,
         super(key: key);
 
@@ -43,6 +45,7 @@ class FadingTile extends StatefulWidget with FadingTileWidget {
     Key? key,
     FadingTileType? type,
     Duration? sizeDuration,
+    Duration? duration,
     required this.child,
     required this.index,
     this.paginatorIndex,
@@ -54,6 +57,7 @@ class FadingTile extends StatefulWidget with FadingTileWidget {
     this.paginator,
   })  : type = type ?? defaultType,
         sizeDuration = sizeDuration ?? defaultSizeDuration,
+        duration = duration ?? defaultDuration,
         _size = true,
         super(key: key);
 
@@ -64,11 +68,11 @@ class FadingTile extends StatefulWidget with FadingTileWidget {
 
   final bool _size;
 
+  @override final int index;
+  @override final Duration duration;
+
   /// Child widget to fade in.
   final Widget child;
-
-  /// Index of the child in the list.
-  @override final int index;
 
   /// Index of the child in the list.
   final int? paginatorIndex;
@@ -106,7 +110,8 @@ class FadingTile extends StatefulWidget with FadingTileWidget {
   State<FadingTile> createState() => _FadingTileState();
 }
 
-class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<FadingTile> {
+class _FadingTileState extends State<FadingTile>
+    with SingleTickerProviderStateMixin<FadingTile>, FadingTileStateMixin<FadingTile> {
   static final _curve = CurveTween(curve: Curves.easeOutExpo);
   static final _slideFromLeftTween = Tween<double>(begin: -1.0, end: 0.0).chain(_curve);
   static final _slideFromRightTween = Tween<double>(begin: 1.0, end: 0.0).chain(_curve);
@@ -117,19 +122,19 @@ class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<Fadin
   Widget build(BuildContext context) {
     // Controller is usually not returned anymore, when the tile has faded out and it has disposed.
     // To ease off GC, don't wrap the child in animations.
-    if (fadeAnimationController == null || !widget.fade) return widget.child;
+    if (fadeAnimation == null || !widget.fade) return widget.child;
 
     Widget tile;
 
     switch (widget.type) {
       case FadingTileType.fade:
         tile = _FadeTroughTransitionZoomedFadeIn(
-          animation: fadeAnimationController!,
+          animation: fadeAnimation!,
           child: widget.child,
         );
         break;
       case FadingTileType.slideLeft:
-        final animation = _slideFromLeftTween.animate(fadeAnimationController!);
+        final animation = _slideFromLeftTween.animate(fadeAnimation!);
         tile = AnimatedBuilder(
           animation: animation,
           builder: (_, __) => FractionalTranslation(
@@ -139,7 +144,7 @@ class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<Fadin
         );
         break;
       case FadingTileType.slideRight:
-        final animation = _slideFromRightTween.animate(fadeAnimationController!);
+        final animation = _slideFromRightTween.animate(fadeAnimation!);
         tile = AnimatedBuilder(
           animation: animation,
           builder: (_, __) => FractionalTranslation(
@@ -150,7 +155,7 @@ class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<Fadin
         break;
       case FadingTileType.slideBottom:
         final mediaQuery = MediaQuery.of(context);
-        final animation = _slideFromBottomTween.animate(fadeAnimationController!);
+        final animation = _slideFromBottomTween.animate(fadeAnimation!);
         tile = AnimatedBuilder(
           animation: animation,
           builder: (_, __) => Transform.translate(
@@ -161,7 +166,7 @@ class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<Fadin
         break;
       case FadingTileType.slideTop:
         final mediaQuery = MediaQuery.of(context);
-        final animation = _slideFromBottomTween.animate(fadeAnimationController!);
+        final animation = _slideFromBottomTween.animate(fadeAnimation!);
         tile = AnimatedBuilder(
           animation: animation,
           builder: (_, __) => Transform.translate(
@@ -171,7 +176,7 @@ class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<Fadin
         );
         break;
       case FadingTileType.scaleUp:
-        final animation = _scaleInTween.animate(fadeAnimationController!);
+        final animation = _scaleInTween.animate(fadeAnimation!);
         tile = AnimatedBuilder(
           animation: animation,
           builder: (_, __) => Transform.scale(
@@ -184,20 +189,22 @@ class _FadingTileState extends State<FadingTile> with FadingTileStateMixin<Fadin
     }
 
     if (widget._size) {
-      final CurveTween tween;
+      // final CurveTween tween;
 
-      // Clamp the size animation's interval if its duration is smaller than the fade animation's duration.
-      if (fadeAnimationController!.duration != null && widget.sizeDuration < fadeAnimationController!.duration!) {
-        final end = widget.sizeDuration.inMicroseconds / fadeAnimationController!.duration!.inMicroseconds;
-        final interval = Interval(0.0, end, curve: decelerateEasing);
+      // // Clamp the size animation's interval if its duration is smaller than the fade animation's duration.
+      // if (fadeAnimation!.duration != null && widget.sizeDuration < fadeAnimation!.duration!) {
+      //   final end = widget.sizeDuration.inMicroseconds / fadeAnimation!.duration!.inMicroseconds;
+      //   final interval = Interval(0.0, end, curve: decelerateEasing);
 
-        tween = CurveTween(curve: interval);
-      } else {
-        tween = CurveTween(curve: decelerateEasing);
-      }
+      //   tween = CurveTween(curve: interval);
+      // } else {
+      //   tween = CurveTween(curve: decelerateEasing);
+      // }
+
+      final tween = CurveTween(curve: decelerateEasing);
 
       tile = _SizeInTransition(
-        animation: fadeAnimationController!.drive(tween),
+        animation: fadeAnimation!.drive(tween),
         child: tile,
         alignment: widget.alignment!,
         axis: widget.axis!,

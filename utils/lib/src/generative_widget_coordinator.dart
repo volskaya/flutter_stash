@@ -50,7 +50,7 @@ class GenerativeWidgetCoordinator {
 
   int attachments = 0;
 
-  void preparePaginatedWidget(int position) {
+  Widget preparePaginatedWidget(int position) {
     assert(position <= paginatedWidgets.length, '$position < ${paginatedWidgets.length}');
 
     // Build widgets until no attachment is built.
@@ -62,8 +62,7 @@ class GenerativeWidgetCoordinator {
         attachments += 1;
         paginatedWidgets.add(attachment);
       } else {
-        builders.paginated(effectivePosition, position, attachmentCoordinator).addTo(paginatedWidgets);
-        break; // All the attachments are built, break out the loop.
+        return builders.paginated(effectivePosition, position, attachmentCoordinator)..addTo(paginatedWidgets);
       }
     }
   }

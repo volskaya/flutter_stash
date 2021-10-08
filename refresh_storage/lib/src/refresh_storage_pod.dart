@@ -117,7 +117,6 @@ class RefreshStoragePod {
   }
 
   void dispose() {
-    print('Disposing all page storage');
     for (final value in _state.values) value.item.dispose();
   }
 }
