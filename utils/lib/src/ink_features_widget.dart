@@ -9,12 +9,14 @@ class InkFeaturesWidget extends StatefulWidget {
     this.absorbHitTest = true,
     this.color,
     this.clipBehavior = Clip.none,
+    this.paintForeground = false,
   }) : super(key: key);
 
   final Widget child;
   final bool absorbHitTest;
   final Color? color;
   final Clip clipBehavior;
+  final bool paintForeground;
 
   @override
   _InkFeaturesWidgetState createState() => _InkFeaturesWidgetState();
@@ -39,6 +41,7 @@ class _InkFeaturesWidgetState extends State<InkFeaturesWidget> with TickerProvid
           absorbHitTest: widget.absorbHitTest,
           child: widget.child,
           clipBehavior: widget.clipBehavior,
+          paintForeground: widget.paintForeground,
         ),
       );
 }

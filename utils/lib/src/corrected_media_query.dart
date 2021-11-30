@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 extension CorrectedMediaQueryData on MediaQueryData {
-  EdgeInsets get horizontalPadding => padding.copyWith(top: 0.0, bottom: 0.0);
+  EdgeInsets get horizontalPadding => EdgeInsets.only(left: padding.left, right: padding.right);
 }
 
 /// Assume any bottom inset below [CorrectedMediaQuery.keyboardHeightRatioHeuristic] to
