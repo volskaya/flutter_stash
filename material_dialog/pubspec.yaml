@@ -16,9 +16,9 @@ dependencies:
 
   boxy: ^1.2.0+1
   animations:
-    path: /home/projects/packages/flutter_helpers/animations
+    path: /Users/muru/Projects/packages/flutter_helpers/animations
   refresh_storage:
-    path: /home/projects/packages/flutter_helpers/refresh_storage
+    path: /Users/muru/Projects/packages/flutter_helpers/refresh_storage
 
 dev_dependencies:
   flutter_test:

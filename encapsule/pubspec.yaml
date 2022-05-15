@@ -21,7 +21,7 @@ dependencies:
   freezed_annotation: ^0.14.1
 
   fancy_switcher:
-    path: /home/projects/packages/fancy_switcher
+    path: /Users/muru/Projects/packages/fancy_switcher
 
 dev_dependencies:
   build_runner:
@@ -30,4 +30,4 @@ dev_dependencies:
 
 dependency_overrides:
   mobx_codegen:
-    path: /home/projects/forks/mobx.dart/mobx_codegen
+    path: /Users/muru/Projects/forks/mobx.dart/mobx_codegen

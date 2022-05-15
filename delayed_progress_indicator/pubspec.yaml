@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
 
   animations:
-    path: /home/projects/packages/flutter_helpers/animations
+    path: /Users/muru/Projects/packages/flutter_helpers/animations
 
 dev_dependencies:
   flutter_test:

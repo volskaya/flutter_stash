@@ -64,7 +64,7 @@ class RefreshStoragePod {
 
     if ((entry?.refresh ?? -1) < _refreshes) {
       // Dispose the previous refresh, post frame.
-      if (entry != null) WidgetsBinding.instance!.addPostFrameCallback(entry.item.dispose);
+      if (entry != null) WidgetsBinding.instance.addPostFrameCallback(entry.item.dispose);
 
       // Build the new item.
       entry = RefreshStorageValueItem<T>(item: builder(), refresh: _refreshes);
@@ -92,7 +92,7 @@ class RefreshStoragePod {
   }
 
   /// Returns true if the storage contains this identifier.
-  bool contains(String identifier) => _state.containsKey(identifier);
+  bool contains(String identifier) => _state.containsKey(identifier.hashCode);
   RefreshStorageValueItem<T>? getItem<T extends RefreshStorageItem>(String identifier) =>
       _state[identifier.hashCode] as RefreshStorageValueItem<T>?;
 
@@ -102,7 +102,7 @@ class RefreshStoragePod {
       final previousEntry = _state[identifier.hashCode];
 
       if (previousEntry != null && previousEntry.refresh < refresh) {
-        WidgetsBinding.instance!.addPostFrameCallback(previousEntry.item.dispose);
+        WidgetsBinding.instance.addPostFrameCallback(previousEntry.item.dispose);
       }
     }
 

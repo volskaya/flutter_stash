@@ -1,5 +1,4 @@
 import 'package:animations/animations.dart';
-import 'package:animations/src/inherited_animation/inherited_animation_mixin.dart';
 import 'package:flutter/widgets.dart';
 
 abstract class InheritedAnimationWidget extends StatefulWidget {

@@ -20,8 +20,8 @@ const double _minFlingVelocity = 500.0;
 const double _closeProgressThreshold = 0.6;
 const double _willPopThreshold = 0.8;
 
-typedef ModalBottomSheetContainerBuilder = Widget
-    Function(BuildContext context, Animation<double> animation, Widget child);
+typedef ModalBottomSheetContainerBuilder = Widget Function(
+    BuildContext context, Animation<double> animation, Widget child);
 
 /// A custom bottom sheet.
 ///
@@ -273,7 +273,7 @@ class _ModalBottomSheetState extends State<ModalBottomSheet> with TickerProvider
       // Otherwise the calculate the velocity with a VelocityTracker.
       if (_velocityTracker == null) {
         // ignore: deprecated_member_use
-        _velocityTracker = VelocityTracker();
+        // _velocityTracker = VelocityTracker();
         _startTime = DateTime.now();
       }
       DragUpdateDetails? dragDetails;

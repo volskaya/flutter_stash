@@ -26,13 +26,13 @@ dependencies:
   freezed_annotation: ^0.14.1
 
   refresh_storage:
-    path: /home/projects/packages/flutter_helpers/refresh_storage
+    path: /Users/muru/Projects/packages/flutter_helpers/refresh_storage
   log:
-    path: /home/projects/packages/flutter_helpers/log
+    path: /Users/muru/Projects/packages/flutter_helpers/log
   loader_coordinator:
-    path: /home/projects/packages/flutter_helpers/loader_coordinator
+    path: /Users/muru/Projects/packages/flutter_helpers/loader_coordinator
   await_route:
-    path: /home/projects/packages/flutter_helpers/await_route
+    path: /Users/muru/Projects/packages/flutter_helpers/await_route
   collection: ^1.15.0
 
 dev_dependencies:
@@ -42,8 +42,8 @@ dev_dependencies:
 
 dependency_overrides:
   mobx:
-    path: /home/projects/forks/mobx.dart/mobx
+    path: /Users/muru/Projects/forks/mobx.dart/mobx
   flutter_mobx:
-    path: /home/projects/forks/mobx.dart/flutter_mobx
+    path: /Users/muru/Projects/forks/mobx.dart/flutter_mobx
   mobx_codegen:
-    path: /home/projects/forks/mobx.dart/mobx_codegen
+    path: /Users/muru/Projects/forks/mobx.dart/mobx_codegen

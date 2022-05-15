@@ -1,4 +1,6 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'draggable_key.dart';
@@ -10,22 +12,7 @@ part of 'draggable_key.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$DraggableKeyTearOff {
-  const _$DraggableKeyTearOff();
-
-  _DraggableKey<T> call<T>({required String family, required T id}) {
-    return _DraggableKey<T>(
-      family: family,
-      id: id,
-    );
-  }
-}
-
-/// @nodoc
-const $DraggableKey = _$DraggableKeyTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$DraggableKey<T> {
@@ -73,32 +60,32 @@ class _$DraggableKeyCopyWithImpl<T, $Res>
 }
 
 /// @nodoc
-abstract class _$DraggableKeyCopyWith<T, $Res>
+abstract class _$$_DraggableKeyCopyWith<T, $Res>
     implements $DraggableKeyCopyWith<T, $Res> {
-  factory _$DraggableKeyCopyWith(
-          _DraggableKey<T> value, $Res Function(_DraggableKey<T>) then) =
-      __$DraggableKeyCopyWithImpl<T, $Res>;
+  factory _$$_DraggableKeyCopyWith(
+          _$_DraggableKey<T> value, $Res Function(_$_DraggableKey<T>) then) =
+      __$$_DraggableKeyCopyWithImpl<T, $Res>;
   @override
   $Res call({String family, T id});
 }
 
 /// @nodoc
-class __$DraggableKeyCopyWithImpl<T, $Res>
+class __$$_DraggableKeyCopyWithImpl<T, $Res>
     extends _$DraggableKeyCopyWithImpl<T, $Res>
-    implements _$DraggableKeyCopyWith<T, $Res> {
-  __$DraggableKeyCopyWithImpl(
-      _DraggableKey<T> _value, $Res Function(_DraggableKey<T>) _then)
-      : super(_value, (v) => _then(v as _DraggableKey<T>));
+    implements _$$_DraggableKeyCopyWith<T, $Res> {
+  __$$_DraggableKeyCopyWithImpl(
+      _$_DraggableKey<T> _value, $Res Function(_$_DraggableKey<T>) _then)
+      : super(_value, (v) => _then(v as _$_DraggableKey<T>));
 
   @override
-  _DraggableKey<T> get _value => super._value as _DraggableKey<T>;
+  _$_DraggableKey<T> get _value => super._value as _$_DraggableKey<T>;
 
   @override
   $Res call({
     Object? family = freezed,
     Object? id = freezed,
   }) {
-    return _then(_DraggableKey<T>(
+    return _then(_$_DraggableKey<T>(
       family: family == freezed
           ? _value.family
           : family // ignore: cast_nullable_to_non_nullable
@@ -129,28 +116,27 @@ class _$_DraggableKey<T> implements _DraggableKey<T> {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _DraggableKey<T> &&
-            (identical(other.family, family) ||
-                const DeepCollectionEquality().equals(other.family, family)) &&
-            (identical(other.id, id) ||
-                const DeepCollectionEquality().equals(other.id, id)));
+        (other.runtimeType == runtimeType &&
+            other is _$_DraggableKey<T> &&
+            const DeepCollectionEquality().equals(other.family, family) &&
+            const DeepCollectionEquality().equals(other.id, id));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(family) ^
-      const DeepCollectionEquality().hash(id);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(family),
+      const DeepCollectionEquality().hash(id));
 
   @JsonKey(ignore: true)
   @override
-  _$DraggableKeyCopyWith<T, _DraggableKey<T>> get copyWith =>
-      __$DraggableKeyCopyWithImpl<T, _DraggableKey<T>>(this, _$identity);
+  _$$_DraggableKeyCopyWith<T, _$_DraggableKey<T>> get copyWith =>
+      __$$_DraggableKeyCopyWithImpl<T, _$_DraggableKey<T>>(this, _$identity);
 }
 
 abstract class _DraggableKey<T> implements DraggableKey<T> {
-  const factory _DraggableKey({required String family, required T id}) =
-      _$_DraggableKey<T>;
+  const factory _DraggableKey(
+      {required final String family, required final T id}) = _$_DraggableKey<T>;
 
   @override
   String get family => throw _privateConstructorUsedError;
@@ -158,6 +144,6 @@ abstract class _DraggableKey<T> implements DraggableKey<T> {
   T get id => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$DraggableKeyCopyWith<T, _DraggableKey<T>> get copyWith =>
+  _$$_DraggableKeyCopyWith<T, _$_DraggableKey<T>> get copyWith =>
       throw _privateConstructorUsedError;
 }

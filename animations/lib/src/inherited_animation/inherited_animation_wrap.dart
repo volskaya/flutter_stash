@@ -4,7 +4,6 @@ import 'package:animations/src/inherited_animation/inherited_animation.dart';
 import 'package:animations/src/inherited_animation/inherited_animation_coordinator.dart';
 import 'package:animations/src/inherited_animation/inherited_animation_mixin.dart';
 import 'package:animations/src/inherited_animation/inherited_animation_variants.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class InheritedAnimationWrap extends StatefulWidget {

@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 class TransformValueNotifier<T extends ChangeNotifier, D> implements ValueListenable<D> {
   TransformValueNotifier(

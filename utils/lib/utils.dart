@@ -42,6 +42,7 @@ export 'src/overlayed_ink_well.dart';
 export 'src/page_controller_value_listenable.dart';
 export 'src/proxy_widget_builder.dart';
 export 'src/range_tween.dart';
+export 'src/screen_utils.dart';
 export 'src/scroll_controller_toggle.dart';
 export 'src/storage_upload.dart';
 export 'src/transform_value_notifier.dart';
@@ -94,7 +95,7 @@ abstract class Utils {
 
   static Future<Duration> awaitPostframe() async {
     final completer = Completer<Duration>();
-    WidgetsBinding.instance!.addPostFrameCallback(completer.complete);
+    WidgetsBinding.instance.addPostFrameCallback(completer.complete);
     return completer.future;
   }
 
@@ -183,7 +184,7 @@ abstract class Utils {
   ) {
     if (shouldDefer()) {
       final completer = Completer<T>();
-      WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
         try {
           final v = await callback();
           completer.complete(v);

@@ -74,12 +74,12 @@ class MaterialDialogContainer extends StatelessWidget {
             buttons: [
               TextButton(
                 // ignore: invalid_null_aware_operator
-                child: Text(cancelText ?? strings.cancelButtonLabel, layoutTwice: true),
+                child: Text(cancelText ?? strings.cancelButtonLabel, shrinkWrap: true),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
                 // ignore: invalid_null_aware_operator
-                child: Text(continueText ?? strings.continueButtonLabel, layoutTwice: true),
+                child: Text(continueText ?? strings.continueButtonLabel, shrinkWrap: true),
                 onPressed: () => Navigator.pop(context, true),
                 style: continueTextColor != null ? TextButton.styleFrom(primary: continueTextColor) : null,
               ),
@@ -106,12 +106,12 @@ class MaterialDialogContainer extends StatelessWidget {
             buttons: [
               TextButton(
                 // ignore: invalid_null_aware_operator
-                child: Text(cancelText ?? strings.cancelButtonLabel, layoutTwice: true),
+                child: Text(cancelText ?? strings.cancelButtonLabel, shrinkWrap: true),
                 onPressed: () => Navigator.pop(context),
               ),
               TextButton(
                 // ignore: invalid_null_aware_operator
-                child: Text(continueText ?? strings.continueButtonLabel, layoutTwice: true),
+                child: Text(continueText ?? strings.continueButtonLabel, shrinkWrap: true),
                 onPressed: () => Navigator.pop(context, true),
                 style: continueTextColor != null ? TextButton.styleFrom(primary: continueTextColor) : null,
               ),

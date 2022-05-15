@@ -1,4 +1,6 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'storage_upload.dart';
@@ -10,24 +12,7 @@ part of 'storage_upload.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$StorageUploadObjectTearOff {
-  const _$StorageUploadObjectTearOff();
-
-  _StorageUploadObject call(
-      {required File file, required String path, SettableMetadata? metadata}) {
-    return _StorageUploadObject(
-      file: file,
-      path: path,
-      metadata: metadata,
-    );
-  }
-}
-
-/// @nodoc
-const $StorageUploadObject = _$StorageUploadObjectTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$StorageUploadObject {
@@ -81,25 +66,25 @@ class _$StorageUploadObjectCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$StorageUploadObjectCopyWith<$Res>
+abstract class _$$_StorageUploadObjectCopyWith<$Res>
     implements $StorageUploadObjectCopyWith<$Res> {
-  factory _$StorageUploadObjectCopyWith(_StorageUploadObject value,
-          $Res Function(_StorageUploadObject) then) =
-      __$StorageUploadObjectCopyWithImpl<$Res>;
+  factory _$$_StorageUploadObjectCopyWith(_$_StorageUploadObject value,
+          $Res Function(_$_StorageUploadObject) then) =
+      __$$_StorageUploadObjectCopyWithImpl<$Res>;
   @override
   $Res call({File file, String path, SettableMetadata? metadata});
 }
 
 /// @nodoc
-class __$StorageUploadObjectCopyWithImpl<$Res>
+class __$$_StorageUploadObjectCopyWithImpl<$Res>
     extends _$StorageUploadObjectCopyWithImpl<$Res>
-    implements _$StorageUploadObjectCopyWith<$Res> {
-  __$StorageUploadObjectCopyWithImpl(
-      _StorageUploadObject _value, $Res Function(_StorageUploadObject) _then)
-      : super(_value, (v) => _then(v as _StorageUploadObject));
+    implements _$$_StorageUploadObjectCopyWith<$Res> {
+  __$$_StorageUploadObjectCopyWithImpl(_$_StorageUploadObject _value,
+      $Res Function(_$_StorageUploadObject) _then)
+      : super(_value, (v) => _then(v as _$_StorageUploadObject));
 
   @override
-  _StorageUploadObject get _value => super._value as _StorageUploadObject;
+  _$_StorageUploadObject get _value => super._value as _$_StorageUploadObject;
 
   @override
   $Res call({
@@ -107,7 +92,7 @@ class __$StorageUploadObjectCopyWithImpl<$Res>
     Object? path = freezed,
     Object? metadata = freezed,
   }) {
-    return _then(_StorageUploadObject(
+    return _then(_$_StorageUploadObject(
       file: file == freezed
           ? _value.file
           : file // ignore: cast_nullable_to_non_nullable
@@ -145,35 +130,32 @@ class _$_StorageUploadObject implements _StorageUploadObject {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _StorageUploadObject &&
-            (identical(other.file, file) ||
-                const DeepCollectionEquality().equals(other.file, file)) &&
-            (identical(other.path, path) ||
-                const DeepCollectionEquality().equals(other.path, path)) &&
-            (identical(other.metadata, metadata) ||
-                const DeepCollectionEquality()
-                    .equals(other.metadata, metadata)));
+        (other.runtimeType == runtimeType &&
+            other is _$_StorageUploadObject &&
+            const DeepCollectionEquality().equals(other.file, file) &&
+            const DeepCollectionEquality().equals(other.path, path) &&
+            const DeepCollectionEquality().equals(other.metadata, metadata));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(file) ^
-      const DeepCollectionEquality().hash(path) ^
-      const DeepCollectionEquality().hash(metadata);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(file),
+      const DeepCollectionEquality().hash(path),
+      const DeepCollectionEquality().hash(metadata));
 
   @JsonKey(ignore: true)
   @override
-  _$StorageUploadObjectCopyWith<_StorageUploadObject> get copyWith =>
-      __$StorageUploadObjectCopyWithImpl<_StorageUploadObject>(
+  _$$_StorageUploadObjectCopyWith<_$_StorageUploadObject> get copyWith =>
+      __$$_StorageUploadObjectCopyWithImpl<_$_StorageUploadObject>(
           this, _$identity);
 }
 
 abstract class _StorageUploadObject implements StorageUploadObject {
   const factory _StorageUploadObject(
-      {required File file,
-      required String path,
-      SettableMetadata? metadata}) = _$_StorageUploadObject;
+      {required final File file,
+      required final String path,
+      final SettableMetadata? metadata}) = _$_StorageUploadObject;
 
   @override
   File get file => throw _privateConstructorUsedError;
@@ -183,30 +165,9 @@ abstract class _StorageUploadObject implements StorageUploadObject {
   SettableMetadata? get metadata => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$StorageUploadObjectCopyWith<_StorageUploadObject> get copyWith =>
+  _$$_StorageUploadObjectCopyWith<_$_StorageUploadObject> get copyWith =>
       throw _privateConstructorUsedError;
 }
-
-/// @nodoc
-class _$StorageUploadEventTearOff {
-  const _$StorageUploadEventTearOff();
-
-  _StorageUploadEvent call(
-      {required StorageUploadObject object,
-      required int number,
-      required int totalBytes,
-      required int bytesTransferred}) {
-    return _StorageUploadEvent(
-      object: object,
-      number: number,
-      totalBytes: totalBytes,
-      bytesTransferred: bytesTransferred,
-    );
-  }
-}
-
-/// @nodoc
-const $StorageUploadEvent = _$StorageUploadEventTearOff();
 
 /// @nodoc
 mixin _$StorageUploadEvent {
@@ -279,11 +240,11 @@ class _$StorageUploadEventCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$StorageUploadEventCopyWith<$Res>
+abstract class _$$_StorageUploadEventCopyWith<$Res>
     implements $StorageUploadEventCopyWith<$Res> {
-  factory _$StorageUploadEventCopyWith(
-          _StorageUploadEvent value, $Res Function(_StorageUploadEvent) then) =
-      __$StorageUploadEventCopyWithImpl<$Res>;
+  factory _$$_StorageUploadEventCopyWith(_$_StorageUploadEvent value,
+          $Res Function(_$_StorageUploadEvent) then) =
+      __$$_StorageUploadEventCopyWithImpl<$Res>;
   @override
   $Res call(
       {StorageUploadObject object,
@@ -296,15 +257,15 @@ abstract class _$StorageUploadEventCopyWith<$Res>
 }
 
 /// @nodoc
-class __$StorageUploadEventCopyWithImpl<$Res>
+class __$$_StorageUploadEventCopyWithImpl<$Res>
     extends _$StorageUploadEventCopyWithImpl<$Res>
-    implements _$StorageUploadEventCopyWith<$Res> {
-  __$StorageUploadEventCopyWithImpl(
-      _StorageUploadEvent _value, $Res Function(_StorageUploadEvent) _then)
-      : super(_value, (v) => _then(v as _StorageUploadEvent));
+    implements _$$_StorageUploadEventCopyWith<$Res> {
+  __$$_StorageUploadEventCopyWithImpl(
+      _$_StorageUploadEvent _value, $Res Function(_$_StorageUploadEvent) _then)
+      : super(_value, (v) => _then(v as _$_StorageUploadEvent));
 
   @override
-  _StorageUploadEvent get _value => super._value as _StorageUploadEvent;
+  _$_StorageUploadEvent get _value => super._value as _$_StorageUploadEvent;
 
   @override
   $Res call({
@@ -313,7 +274,7 @@ class __$StorageUploadEventCopyWithImpl<$Res>
     Object? totalBytes = freezed,
     Object? bytesTransferred = freezed,
   }) {
-    return _then(_StorageUploadEvent(
+    return _then(_$_StorageUploadEvent(
       object: object == freezed
           ? _value.object
           : object // ignore: cast_nullable_to_non_nullable
@@ -361,39 +322,37 @@ class _$_StorageUploadEvent extends _StorageUploadEvent {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _StorageUploadEvent &&
-            (identical(other.object, object) ||
-                const DeepCollectionEquality().equals(other.object, object)) &&
-            (identical(other.number, number) ||
-                const DeepCollectionEquality().equals(other.number, number)) &&
-            (identical(other.totalBytes, totalBytes) ||
-                const DeepCollectionEquality()
-                    .equals(other.totalBytes, totalBytes)) &&
-            (identical(other.bytesTransferred, bytesTransferred) ||
-                const DeepCollectionEquality()
-                    .equals(other.bytesTransferred, bytesTransferred)));
+        (other.runtimeType == runtimeType &&
+            other is _$_StorageUploadEvent &&
+            const DeepCollectionEquality().equals(other.object, object) &&
+            const DeepCollectionEquality().equals(other.number, number) &&
+            const DeepCollectionEquality()
+                .equals(other.totalBytes, totalBytes) &&
+            const DeepCollectionEquality()
+                .equals(other.bytesTransferred, bytesTransferred));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(object) ^
-      const DeepCollectionEquality().hash(number) ^
-      const DeepCollectionEquality().hash(totalBytes) ^
-      const DeepCollectionEquality().hash(bytesTransferred);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(object),
+      const DeepCollectionEquality().hash(number),
+      const DeepCollectionEquality().hash(totalBytes),
+      const DeepCollectionEquality().hash(bytesTransferred));
 
   @JsonKey(ignore: true)
   @override
-  _$StorageUploadEventCopyWith<_StorageUploadEvent> get copyWith =>
-      __$StorageUploadEventCopyWithImpl<_StorageUploadEvent>(this, _$identity);
+  _$$_StorageUploadEventCopyWith<_$_StorageUploadEvent> get copyWith =>
+      __$$_StorageUploadEventCopyWithImpl<_$_StorageUploadEvent>(
+          this, _$identity);
 }
 
 abstract class _StorageUploadEvent extends StorageUploadEvent {
   factory _StorageUploadEvent(
-      {required StorageUploadObject object,
-      required int number,
-      required int totalBytes,
-      required int bytesTransferred}) = _$_StorageUploadEvent;
+      {required final StorageUploadObject object,
+      required final int number,
+      required final int totalBytes,
+      required final int bytesTransferred}) = _$_StorageUploadEvent;
   _StorageUploadEvent._() : super._();
 
   @override
@@ -406,6 +365,6 @@ abstract class _StorageUploadEvent extends StorageUploadEvent {
   int get bytesTransferred => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$StorageUploadEventCopyWith<_StorageUploadEvent> get copyWith =>
+  _$$_StorageUploadEventCopyWith<_$_StorageUploadEvent> get copyWith =>
       throw _privateConstructorUsedError;
 }

@@ -72,10 +72,7 @@ class EncapsuleNotificationOverlayController extends State<EncapsuleNotification
               return FancySwitcher(
                 alignment: Alignment.bottomCenter,
                 onEnd: widget.onEnd,
-                inherit: true,
-                paintInheritedAnimations: true,
-                wrapInheritBoundary: true,
-                wrapChildrenInRepaintBoundary: false,
+                addRepaintBoundary: true,
                 child: item?.important == false
                     ? FancySwitcherTag(
                         tag: item,
@@ -115,10 +112,7 @@ class EncapsuleNotificationOverlayController extends State<EncapsuleNotification
               return FancySwitcher(
                 alignment: Alignment.bottomCenter,
                 onEnd: widget.onEnd,
-                inherit: true,
-                paintInheritedAnimations: true,
-                wrapInheritBoundary: true,
-                wrapChildrenInRepaintBoundary: false,
+                addRepaintBoundary: true,
                 child: item?.important == true
                     ? FancySwitcherTag(
                         tag: item,

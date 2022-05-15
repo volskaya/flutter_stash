@@ -33,6 +33,7 @@ class InheritedAnimation extends Listenable
     try {
       return Provider.of<InheritedAnimation?>(context, listen: listen);
     } catch (_) {}
+    return null;
   }
 
   final InheritedAnimation? parent;

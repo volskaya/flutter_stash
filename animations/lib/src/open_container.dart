@@ -617,8 +617,8 @@ class _OpenContainerRoute<T> extends ModalRoute<T> {
       hideableKey.currentState?.placeholderSize = _rectTween.begin!.size;
     }
 
-    if (delayForSourceRoute && SchedulerBinding.instance != null) {
-      SchedulerBinding.instance!.addPostFrameCallback(takeMeasurementsInSourceRoute);
+    if (delayForSourceRoute) {
+      SchedulerBinding.instance.addPostFrameCallback(takeMeasurementsInSourceRoute);
     } else {
       takeMeasurementsInSourceRoute();
     }

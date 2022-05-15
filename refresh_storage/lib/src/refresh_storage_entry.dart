@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 /// Every client is returned their own [RefreshStorageEntry]. This helps properly
 /// unreference the cached value, to avoid memory leaks.

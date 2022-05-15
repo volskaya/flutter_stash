@@ -17,7 +17,7 @@ class ScrollControllerToggle extends ChangeNotifier implements ValueListenable<b
     if (initialValue != null) {
       _value = initialValue;
     } else if (calculateInitialValuePostFrame) {
-      WidgetsBinding.instance!.addPostFrameCallback(
+      WidgetsBinding.instance.addPostFrameCallback(
         (_) => _value = Utils.isScrolled(controller, offset),
       );
     } else {
