@@ -4,7 +4,7 @@ homepage: github.com/volskaya
 publish_to: none
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.18.0-44.0.dev <3.0.0"
   flutter: ">=1.17.0 <2.0.0"
 
 dependencies:
@@ -13,7 +13,7 @@ dependencies:
 
   provider: ^5.0.0
   flutter_hooks: ^0.18.0
-  freezed_annotation: ^0.14.1
+  freezed_annotation: ^2.0.3
 
   utils:
     path: /Users/muru/Projects/packages/flutter_helpers/utils
@@ -29,4 +29,4 @@ dev_dependencies:
     sdk: flutter
 
   build_runner:
-  freezed: ^0.14.5
+  freezed: ^2.0.3+1

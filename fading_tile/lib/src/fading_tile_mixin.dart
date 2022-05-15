@@ -1,6 +1,5 @@
 import 'package:fading_tile/src/fading_tile_coordinator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 mixin FadingTileWidget on StatefulWidget {
   /// Index of the child in the list.
@@ -8,7 +7,9 @@ mixin FadingTileWidget on StatefulWidget {
 
   /// Duration of the animation.
   Duration get duration;
-  VoidCallback? getPaginator(int index) {}
+  VoidCallback? getPaginator(int index) {
+    return null;
+  }
 }
 
 mixin FadingTileStateMixin<T extends FadingTileWidget> on State<T>, TickerProvider {
@@ -64,7 +65,7 @@ mixin FadingTileStateMixin<T extends FadingTileWidget> on State<T>, TickerProvid
 
     final paginator = widget.getPaginator(widget.index);
     if (paginator != null) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) paginator();
       });
     }

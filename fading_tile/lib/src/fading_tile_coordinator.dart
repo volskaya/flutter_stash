@@ -1,9 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:provider/provider.dart';
 import 'package:refresh_storage/refresh_storage.dart';
@@ -106,6 +104,7 @@ class FadingTileCoordinator extends RefreshStorageItem {
         assert(!elapsedTime.isNegative);
       }
     }
+    return null;
   }
 
   void registerIndex(int index) {

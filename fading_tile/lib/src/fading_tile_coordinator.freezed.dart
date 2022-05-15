@@ -1,5 +1,6 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'fading_tile_coordinator.dart';
@@ -11,42 +12,11 @@ part of 'fading_tile_coordinator.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$FadingTilePropsTearOff {
-  const _$FadingTilePropsTearOff();
-
-  _FadingTileProps call({required AnimationController controller}) {
-    return _FadingTileProps(
-      controller: controller,
-    );
-  }
-
-  _FadingTilePropsDelayed delayed(
-      {required AnimationController controller, required Interval interval}) {
-    return _FadingTilePropsDelayed(
-      controller: controller,
-      interval: interval,
-    );
-  }
-
-  _FadingTilePropsInProgress inProgress(
-      {required AnimationController controller, required double progress}) {
-    return _FadingTilePropsInProgress(
-      controller: controller,
-      progress: progress,
-    );
-  }
-}
-
-/// @nodoc
-const $FadingTileProps = _$FadingTilePropsTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$FadingTileProps {
   AnimationController get controller => throw _privateConstructorUsedError;
-
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(AnimationController controller) $default, {
@@ -134,31 +104,31 @@ class _$FadingTilePropsCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$FadingTilePropsCopyWith<$Res>
+abstract class _$$_FadingTilePropsCopyWith<$Res>
     implements $FadingTilePropsCopyWith<$Res> {
-  factory _$FadingTilePropsCopyWith(
-          _FadingTileProps value, $Res Function(_FadingTileProps) then) =
-      __$FadingTilePropsCopyWithImpl<$Res>;
+  factory _$$_FadingTilePropsCopyWith(
+          _$_FadingTileProps value, $Res Function(_$_FadingTileProps) then) =
+      __$$_FadingTilePropsCopyWithImpl<$Res>;
   @override
   $Res call({AnimationController controller});
 }
 
 /// @nodoc
-class __$FadingTilePropsCopyWithImpl<$Res>
+class __$$_FadingTilePropsCopyWithImpl<$Res>
     extends _$FadingTilePropsCopyWithImpl<$Res>
-    implements _$FadingTilePropsCopyWith<$Res> {
-  __$FadingTilePropsCopyWithImpl(
-      _FadingTileProps _value, $Res Function(_FadingTileProps) _then)
-      : super(_value, (v) => _then(v as _FadingTileProps));
+    implements _$$_FadingTilePropsCopyWith<$Res> {
+  __$$_FadingTilePropsCopyWithImpl(
+      _$_FadingTileProps _value, $Res Function(_$_FadingTileProps) _then)
+      : super(_value, (v) => _then(v as _$_FadingTileProps));
 
   @override
-  _FadingTileProps get _value => super._value as _FadingTileProps;
+  _$_FadingTileProps get _value => super._value as _$_FadingTileProps;
 
   @override
   $Res call({
     Object? controller = freezed,
   }) {
-    return _then(_FadingTileProps(
+    return _then(_$_FadingTileProps(
       controller: controller == freezed
           ? _value.controller
           : controller // ignore: cast_nullable_to_non_nullable
@@ -169,34 +139,44 @@ class __$FadingTilePropsCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_FadingTileProps implements _FadingTileProps {
+class _$_FadingTileProps
+    with DiagnosticableTreeMixin
+    implements _FadingTileProps {
   const _$_FadingTileProps({required this.controller});
 
   @override
   final AnimationController controller;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'FadingTileProps(controller: $controller)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'FadingTileProps'))
+      ..add(DiagnosticsProperty('controller', controller));
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _FadingTileProps &&
-            (identical(other.controller, controller) ||
-                const DeepCollectionEquality()
-                    .equals(other.controller, controller)));
+        (other.runtimeType == runtimeType &&
+            other is _$_FadingTileProps &&
+            const DeepCollectionEquality()
+                .equals(other.controller, controller));
   }
 
   @override
   int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(controller);
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(controller));
 
   @JsonKey(ignore: true)
   @override
-  _$FadingTilePropsCopyWith<_FadingTileProps> get copyWith =>
-      __$FadingTilePropsCopyWithImpl<_FadingTileProps>(this, _$identity);
+  _$$_FadingTilePropsCopyWith<_$_FadingTileProps> get copyWith =>
+      __$$_FadingTilePropsCopyWithImpl<_$_FadingTileProps>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -274,44 +254,45 @@ class _$_FadingTileProps implements _FadingTileProps {
 }
 
 abstract class _FadingTileProps implements FadingTileProps {
-  const factory _FadingTileProps({required AnimationController controller}) =
-      _$_FadingTileProps;
+  const factory _FadingTileProps(
+      {required final AnimationController controller}) = _$_FadingTileProps;
 
   @override
   AnimationController get controller => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$FadingTilePropsCopyWith<_FadingTileProps> get copyWith =>
+  _$$_FadingTilePropsCopyWith<_$_FadingTileProps> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$FadingTilePropsDelayedCopyWith<$Res>
+abstract class _$$_FadingTilePropsDelayedCopyWith<$Res>
     implements $FadingTilePropsCopyWith<$Res> {
-  factory _$FadingTilePropsDelayedCopyWith(_FadingTilePropsDelayed value,
-          $Res Function(_FadingTilePropsDelayed) then) =
-      __$FadingTilePropsDelayedCopyWithImpl<$Res>;
+  factory _$$_FadingTilePropsDelayedCopyWith(_$_FadingTilePropsDelayed value,
+          $Res Function(_$_FadingTilePropsDelayed) then) =
+      __$$_FadingTilePropsDelayedCopyWithImpl<$Res>;
   @override
   $Res call({AnimationController controller, Interval interval});
 }
 
 /// @nodoc
-class __$FadingTilePropsDelayedCopyWithImpl<$Res>
+class __$$_FadingTilePropsDelayedCopyWithImpl<$Res>
     extends _$FadingTilePropsCopyWithImpl<$Res>
-    implements _$FadingTilePropsDelayedCopyWith<$Res> {
-  __$FadingTilePropsDelayedCopyWithImpl(_FadingTilePropsDelayed _value,
-      $Res Function(_FadingTilePropsDelayed) _then)
-      : super(_value, (v) => _then(v as _FadingTilePropsDelayed));
+    implements _$$_FadingTilePropsDelayedCopyWith<$Res> {
+  __$$_FadingTilePropsDelayedCopyWithImpl(_$_FadingTilePropsDelayed _value,
+      $Res Function(_$_FadingTilePropsDelayed) _then)
+      : super(_value, (v) => _then(v as _$_FadingTilePropsDelayed));
 
   @override
-  _FadingTilePropsDelayed get _value => super._value as _FadingTilePropsDelayed;
+  _$_FadingTilePropsDelayed get _value =>
+      super._value as _$_FadingTilePropsDelayed;
 
   @override
   $Res call({
     Object? controller = freezed,
     Object? interval = freezed,
   }) {
-    return _then(_FadingTilePropsDelayed(
+    return _then(_$_FadingTilePropsDelayed(
       controller: controller == freezed
           ? _value.controller
           : controller // ignore: cast_nullable_to_non_nullable
@@ -326,7 +307,9 @@ class __$FadingTilePropsDelayedCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_FadingTilePropsDelayed implements _FadingTilePropsDelayed {
+class _$_FadingTilePropsDelayed
+    with DiagnosticableTreeMixin
+    implements _FadingTilePropsDelayed {
   const _$_FadingTilePropsDelayed(
       {required this.controller, required this.interval});
 
@@ -336,32 +319,39 @@ class _$_FadingTilePropsDelayed implements _FadingTilePropsDelayed {
   final Interval interval;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'FadingTileProps.delayed(controller: $controller, interval: $interval)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'FadingTileProps.delayed'))
+      ..add(DiagnosticsProperty('controller', controller))
+      ..add(DiagnosticsProperty('interval', interval));
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _FadingTilePropsDelayed &&
-            (identical(other.controller, controller) ||
-                const DeepCollectionEquality()
-                    .equals(other.controller, controller)) &&
-            (identical(other.interval, interval) ||
-                const DeepCollectionEquality()
-                    .equals(other.interval, interval)));
+        (other.runtimeType == runtimeType &&
+            other is _$_FadingTilePropsDelayed &&
+            const DeepCollectionEquality()
+                .equals(other.controller, controller) &&
+            const DeepCollectionEquality().equals(other.interval, interval));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(controller) ^
-      const DeepCollectionEquality().hash(interval);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(controller),
+      const DeepCollectionEquality().hash(interval));
 
   @JsonKey(ignore: true)
   @override
-  _$FadingTilePropsDelayedCopyWith<_FadingTilePropsDelayed> get copyWith =>
-      __$FadingTilePropsDelayedCopyWithImpl<_FadingTilePropsDelayed>(
+  _$$_FadingTilePropsDelayedCopyWith<_$_FadingTilePropsDelayed> get copyWith =>
+      __$$_FadingTilePropsDelayedCopyWithImpl<_$_FadingTilePropsDelayed>(
           this, _$identity);
 
   @override
@@ -441,46 +431,48 @@ class _$_FadingTilePropsDelayed implements _FadingTilePropsDelayed {
 
 abstract class _FadingTilePropsDelayed implements FadingTileProps {
   const factory _FadingTilePropsDelayed(
-      {required AnimationController controller,
-      required Interval interval}) = _$_FadingTilePropsDelayed;
+      {required final AnimationController controller,
+      required final Interval interval}) = _$_FadingTilePropsDelayed;
 
   @override
   AnimationController get controller => throw _privateConstructorUsedError;
   Interval get interval => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$FadingTilePropsDelayedCopyWith<_FadingTilePropsDelayed> get copyWith =>
+  _$$_FadingTilePropsDelayedCopyWith<_$_FadingTilePropsDelayed> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$FadingTilePropsInProgressCopyWith<$Res>
+abstract class _$$_FadingTilePropsInProgressCopyWith<$Res>
     implements $FadingTilePropsCopyWith<$Res> {
-  factory _$FadingTilePropsInProgressCopyWith(_FadingTilePropsInProgress value,
-          $Res Function(_FadingTilePropsInProgress) then) =
-      __$FadingTilePropsInProgressCopyWithImpl<$Res>;
+  factory _$$_FadingTilePropsInProgressCopyWith(
+          _$_FadingTilePropsInProgress value,
+          $Res Function(_$_FadingTilePropsInProgress) then) =
+      __$$_FadingTilePropsInProgressCopyWithImpl<$Res>;
   @override
   $Res call({AnimationController controller, double progress});
 }
 
 /// @nodoc
-class __$FadingTilePropsInProgressCopyWithImpl<$Res>
+class __$$_FadingTilePropsInProgressCopyWithImpl<$Res>
     extends _$FadingTilePropsCopyWithImpl<$Res>
-    implements _$FadingTilePropsInProgressCopyWith<$Res> {
-  __$FadingTilePropsInProgressCopyWithImpl(_FadingTilePropsInProgress _value,
-      $Res Function(_FadingTilePropsInProgress) _then)
-      : super(_value, (v) => _then(v as _FadingTilePropsInProgress));
+    implements _$$_FadingTilePropsInProgressCopyWith<$Res> {
+  __$$_FadingTilePropsInProgressCopyWithImpl(
+      _$_FadingTilePropsInProgress _value,
+      $Res Function(_$_FadingTilePropsInProgress) _then)
+      : super(_value, (v) => _then(v as _$_FadingTilePropsInProgress));
 
   @override
-  _FadingTilePropsInProgress get _value =>
-      super._value as _FadingTilePropsInProgress;
+  _$_FadingTilePropsInProgress get _value =>
+      super._value as _$_FadingTilePropsInProgress;
 
   @override
   $Res call({
     Object? controller = freezed,
     Object? progress = freezed,
   }) {
-    return _then(_FadingTilePropsInProgress(
+    return _then(_$_FadingTilePropsInProgress(
       controller: controller == freezed
           ? _value.controller
           : controller // ignore: cast_nullable_to_non_nullable
@@ -495,7 +487,9 @@ class __$FadingTilePropsInProgressCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_FadingTilePropsInProgress implements _FadingTilePropsInProgress {
+class _$_FadingTilePropsInProgress
+    with DiagnosticableTreeMixin
+    implements _FadingTilePropsInProgress {
   const _$_FadingTilePropsInProgress(
       {required this.controller, required this.progress});
 
@@ -505,34 +499,40 @@ class _$_FadingTilePropsInProgress implements _FadingTilePropsInProgress {
   final double progress;
 
   @override
-  String toString() {
+  String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
     return 'FadingTileProps.inProgress(controller: $controller, progress: $progress)';
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty('type', 'FadingTileProps.inProgress'))
+      ..add(DiagnosticsProperty('controller', controller))
+      ..add(DiagnosticsProperty('progress', progress));
   }
 
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _FadingTilePropsInProgress &&
-            (identical(other.controller, controller) ||
-                const DeepCollectionEquality()
-                    .equals(other.controller, controller)) &&
-            (identical(other.progress, progress) ||
-                const DeepCollectionEquality()
-                    .equals(other.progress, progress)));
+        (other.runtimeType == runtimeType &&
+            other is _$_FadingTilePropsInProgress &&
+            const DeepCollectionEquality()
+                .equals(other.controller, controller) &&
+            const DeepCollectionEquality().equals(other.progress, progress));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(controller) ^
-      const DeepCollectionEquality().hash(progress);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(controller),
+      const DeepCollectionEquality().hash(progress));
 
   @JsonKey(ignore: true)
   @override
-  _$FadingTilePropsInProgressCopyWith<_FadingTilePropsInProgress>
-      get copyWith =>
-          __$FadingTilePropsInProgressCopyWithImpl<_FadingTilePropsInProgress>(
-              this, _$identity);
+  _$$_FadingTilePropsInProgressCopyWith<_$_FadingTilePropsInProgress>
+      get copyWith => __$$_FadingTilePropsInProgressCopyWithImpl<
+          _$_FadingTilePropsInProgress>(this, _$identity);
 
   @override
   @optionalTypeArgs
@@ -611,14 +611,14 @@ class _$_FadingTilePropsInProgress implements _FadingTilePropsInProgress {
 
 abstract class _FadingTilePropsInProgress implements FadingTileProps {
   const factory _FadingTilePropsInProgress(
-      {required AnimationController controller,
-      required double progress}) = _$_FadingTilePropsInProgress;
+      {required final AnimationController controller,
+      required final double progress}) = _$_FadingTilePropsInProgress;
 
   @override
   AnimationController get controller => throw _privateConstructorUsedError;
   double get progress => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$FadingTilePropsInProgressCopyWith<_FadingTilePropsInProgress>
+  _$$_FadingTilePropsInProgressCopyWith<_$_FadingTilePropsInProgress>
       get copyWith => throw _privateConstructorUsedError;
 }

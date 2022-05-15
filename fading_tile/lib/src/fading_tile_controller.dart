@@ -65,7 +65,7 @@ class _FadingTileControllerState extends State<FadingTileController> {
 
     if (widget.expectedItemCount != null && oldWidget.expectedItemCount != widget.expectedItemCount) {
       // Do it in a postframe to allow widgets to build.
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         _storage.value?.bumpExpectedItemCount(widget.expectedItemCount!);
       });
     }

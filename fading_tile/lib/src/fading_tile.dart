@@ -1,11 +1,9 @@
-import 'dart:ui';
 
 import 'package:animations/animations.dart';
 import 'package:fading_tile/src/fading_tile_controller.dart';
 import 'package:fading_tile/src/fading_tile_mixin.dart';
 import 'package:fading_tile/src/size_expand_transition.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 enum FadingTileType {
   fade,
