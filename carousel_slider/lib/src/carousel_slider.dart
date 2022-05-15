@@ -132,13 +132,13 @@ class CarouselSliderState extends State<CarouselSlider>
     _pageControllerValueListenable = PageControllerValueListenable(controller: _pageController, base: maxItemCount);
 
     _buildMetronome();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     super.initState();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     _metronome?.cancel();
     _timer?.cancel();
     if (widget.pageController == null) _pageController.dispose();

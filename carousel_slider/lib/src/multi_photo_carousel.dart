@@ -121,14 +121,14 @@ class MultiPhotoCarouselState extends State<MultiPhotoCarousel> with InitialDepe
         for (final photo in photos) {
           final imageProvider = _getImageProvider(photo);
           final isCached = imageProvider != null
-              ? PaintingBinding.instance!.imageCache!.containsKey(imageProvider) ||
+              ? PaintingBinding.instance.imageCache.containsKey(imageProvider) ||
                   (widget.precacheThumbnailsInstead
-                      ? PaintingBinding.instance!.imageCache!.containsKey(imageProvider.thumbnail)
+                      ? PaintingBinding.instance.imageCache.containsKey(imageProvider.thumbnail)
                       : false)
               : true;
 
           if (!isCached) {
-            precacheImage(widget.precacheThumbnailsInstead ? imageProvider!.thumbnail : imageProvider!, context);
+            precacheImage(widget.precacheThumbnailsInstead ? imageProvider.thumbnail : imageProvider, context);
           }
         }
       }
