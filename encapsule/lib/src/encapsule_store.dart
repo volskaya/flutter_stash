@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:encapsule/src/encapsule.dart';
 import 'package:encapsule/src/encapsule_notification.dart';
 import 'package:encapsule/src/encapsule_sheet.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
 
 part 'encapsule_store.g.dart';

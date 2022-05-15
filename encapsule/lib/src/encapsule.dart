@@ -66,7 +66,7 @@ class EncapsuleElement extends ProxyElement {
     _value = EncapsuleElementValue(bottomInset: widget.bottomInset);
 
     ModalRoute.of(this); // Register dependency.
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_mounted) _capsuleWasUpdated = EncapsuleStore.instance.capsules.add(_value);
     });
   }
@@ -75,14 +75,14 @@ class EncapsuleElement extends ProxyElement {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_capsuleWasUpdated && ModalRoute.of(this)?.isActive != true) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) => _detatchCapsule());
+      WidgetsBinding.instance.addPostFrameCallback((_) => _detatchCapsule());
     }
   }
 
   @override
   void unmount() {
     _mounted = false;
-    WidgetsBinding.instance!.addPostFrameCallback((_) => _detatchCapsule());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _detatchCapsule());
     super.unmount();
   }
 }

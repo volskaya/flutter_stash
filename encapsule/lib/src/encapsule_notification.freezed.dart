@@ -1,4 +1,6 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'encapsule_notification.dart';
@@ -10,31 +12,12 @@ part of 'encapsule_notification.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$EncapsuleNotificationPropsTearOff {
-  const _$EncapsuleNotificationPropsTearOff();
-
-  _EncapsuleNotificationProps call(
-      {required void Function() dismiss,
-      Animation<double>? dismissAnimation,
-      required EncapsuleNotification reference}) {
-    return _EncapsuleNotificationProps(
-      dismiss: dismiss,
-      dismissAnimation: dismissAnimation,
-      reference: reference,
-    );
-  }
-}
-
-/// @nodoc
-const $EncapsuleNotificationProps = _$EncapsuleNotificationPropsTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$EncapsuleNotificationProps {
   /// Callable to dismiss the notification.
-  void Function() get dismiss => throw _privateConstructorUsedError;
+  VoidCallback get dismiss => throw _privateConstructorUsedError;
 
   /// Progress animation of the notifications dismiss timeout.
   /// Is null when the notification is built without a timeout.
@@ -54,7 +37,7 @@ abstract class $EncapsuleNotificationPropsCopyWith<$Res> {
           $Res Function(EncapsuleNotificationProps) then) =
       _$EncapsuleNotificationPropsCopyWithImpl<$Res>;
   $Res call(
-      {void Function() dismiss,
+      {VoidCallback dismiss,
       Animation<double>? dismissAnimation,
       EncapsuleNotification reference});
 
@@ -80,7 +63,7 @@ class _$EncapsuleNotificationPropsCopyWithImpl<$Res>
       dismiss: dismiss == freezed
           ? _value.dismiss
           : dismiss // ignore: cast_nullable_to_non_nullable
-              as void Function(),
+              as VoidCallback,
       dismissAnimation: dismissAnimation == freezed
           ? _value.dismissAnimation
           : dismissAnimation // ignore: cast_nullable_to_non_nullable
@@ -101,15 +84,15 @@ class _$EncapsuleNotificationPropsCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$EncapsuleNotificationPropsCopyWith<$Res>
+abstract class _$$_EncapsuleNotificationPropsCopyWith<$Res>
     implements $EncapsuleNotificationPropsCopyWith<$Res> {
-  factory _$EncapsuleNotificationPropsCopyWith(
-          _EncapsuleNotificationProps value,
-          $Res Function(_EncapsuleNotificationProps) then) =
-      __$EncapsuleNotificationPropsCopyWithImpl<$Res>;
+  factory _$$_EncapsuleNotificationPropsCopyWith(
+          _$_EncapsuleNotificationProps value,
+          $Res Function(_$_EncapsuleNotificationProps) then) =
+      __$$_EncapsuleNotificationPropsCopyWithImpl<$Res>;
   @override
   $Res call(
-      {void Function() dismiss,
+      {VoidCallback dismiss,
       Animation<double>? dismissAnimation,
       EncapsuleNotification reference});
 
@@ -118,16 +101,17 @@ abstract class _$EncapsuleNotificationPropsCopyWith<$Res>
 }
 
 /// @nodoc
-class __$EncapsuleNotificationPropsCopyWithImpl<$Res>
+class __$$_EncapsuleNotificationPropsCopyWithImpl<$Res>
     extends _$EncapsuleNotificationPropsCopyWithImpl<$Res>
-    implements _$EncapsuleNotificationPropsCopyWith<$Res> {
-  __$EncapsuleNotificationPropsCopyWithImpl(_EncapsuleNotificationProps _value,
-      $Res Function(_EncapsuleNotificationProps) _then)
-      : super(_value, (v) => _then(v as _EncapsuleNotificationProps));
+    implements _$$_EncapsuleNotificationPropsCopyWith<$Res> {
+  __$$_EncapsuleNotificationPropsCopyWithImpl(
+      _$_EncapsuleNotificationProps _value,
+      $Res Function(_$_EncapsuleNotificationProps) _then)
+      : super(_value, (v) => _then(v as _$_EncapsuleNotificationProps));
 
   @override
-  _EncapsuleNotificationProps get _value =>
-      super._value as _EncapsuleNotificationProps;
+  _$_EncapsuleNotificationProps get _value =>
+      super._value as _$_EncapsuleNotificationProps;
 
   @override
   $Res call({
@@ -135,11 +119,11 @@ class __$EncapsuleNotificationPropsCopyWithImpl<$Res>
     Object? dismissAnimation = freezed,
     Object? reference = freezed,
   }) {
-    return _then(_EncapsuleNotificationProps(
+    return _then(_$_EncapsuleNotificationProps(
       dismiss: dismiss == freezed
           ? _value.dismiss
           : dismiss // ignore: cast_nullable_to_non_nullable
-              as void Function(),
+              as VoidCallback,
       dismissAnimation: dismissAnimation == freezed
           ? _value.dismissAnimation
           : dismissAnimation // ignore: cast_nullable_to_non_nullable
@@ -158,18 +142,17 @@ class _$_EncapsuleNotificationProps implements _EncapsuleNotificationProps {
   const _$_EncapsuleNotificationProps(
       {required this.dismiss, this.dismissAnimation, required this.reference});
 
-  @override
-
   /// Callable to dismiss the notification.
-  final void Function() dismiss;
   @override
+  final VoidCallback dismiss;
 
   /// Progress animation of the notifications dismiss timeout.
   /// Is null when the notification is built without a timeout.
-  final Animation<double>? dismissAnimation;
   @override
+  final Animation<double>? dismissAnimation;
 
   /// Reference to the [EncapsuleNotification] these props belong to.
+  @override
   final EncapsuleNotification reference;
 
   @override
@@ -180,44 +163,40 @@ class _$_EncapsuleNotificationProps implements _EncapsuleNotificationProps {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _EncapsuleNotificationProps &&
-            (identical(other.dismiss, dismiss) ||
-                const DeepCollectionEquality()
-                    .equals(other.dismiss, dismiss)) &&
-            (identical(other.dismissAnimation, dismissAnimation) ||
-                const DeepCollectionEquality()
-                    .equals(other.dismissAnimation, dismissAnimation)) &&
-            (identical(other.reference, reference) ||
-                const DeepCollectionEquality()
-                    .equals(other.reference, reference)));
+        (other.runtimeType == runtimeType &&
+            other is _$_EncapsuleNotificationProps &&
+            (identical(other.dismiss, dismiss) || other.dismiss == dismiss) &&
+            const DeepCollectionEquality()
+                .equals(other.dismissAnimation, dismissAnimation) &&
+            const DeepCollectionEquality().equals(other.reference, reference));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(dismiss) ^
-      const DeepCollectionEquality().hash(dismissAnimation) ^
-      const DeepCollectionEquality().hash(reference);
+  int get hashCode => Object.hash(
+      runtimeType,
+      dismiss,
+      const DeepCollectionEquality().hash(dismissAnimation),
+      const DeepCollectionEquality().hash(reference));
 
   @JsonKey(ignore: true)
   @override
-  _$EncapsuleNotificationPropsCopyWith<_EncapsuleNotificationProps>
-      get copyWith => __$EncapsuleNotificationPropsCopyWithImpl<
-          _EncapsuleNotificationProps>(this, _$identity);
+  _$$_EncapsuleNotificationPropsCopyWith<_$_EncapsuleNotificationProps>
+      get copyWith => __$$_EncapsuleNotificationPropsCopyWithImpl<
+          _$_EncapsuleNotificationProps>(this, _$identity);
 }
 
 abstract class _EncapsuleNotificationProps
     implements EncapsuleNotificationProps {
   const factory _EncapsuleNotificationProps(
-          {required void Function() dismiss,
-          Animation<double>? dismissAnimation,
-          required EncapsuleNotification reference}) =
+          {required final VoidCallback dismiss,
+          final Animation<double>? dismissAnimation,
+          required final EncapsuleNotification reference}) =
       _$_EncapsuleNotificationProps;
 
   @override
 
   /// Callable to dismiss the notification.
-  void Function() get dismiss => throw _privateConstructorUsedError;
+  VoidCallback get dismiss => throw _privateConstructorUsedError;
   @override
 
   /// Progress animation of the notifications dismiss timeout.
@@ -229,38 +208,9 @@ abstract class _EncapsuleNotificationProps
   EncapsuleNotification get reference => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$EncapsuleNotificationPropsCopyWith<_EncapsuleNotificationProps>
+  _$$_EncapsuleNotificationPropsCopyWith<_$_EncapsuleNotificationProps>
       get copyWith => throw _privateConstructorUsedError;
 }
-
-/// @nodoc
-class _$EncapsuleNotificationTearOff {
-  const _$EncapsuleNotificationTearOff();
-
-  _EncapsuleNotification call(
-      {String? tag,
-      required Widget Function(
-              BuildContext, void Function(), Animation<double>?)
-          builder,
-      Duration? timeout = const Duration(seconds: 5),
-      void Function()? onDismissed,
-      bool important = false,
-      bool dismissible = true,
-      EncapsuleNotification? previous}) {
-    return _EncapsuleNotification(
-      tag: tag,
-      builder: builder,
-      timeout: timeout,
-      onDismissed: onDismissed,
-      important: important,
-      dismissible: dismissible,
-      previous: previous,
-    );
-  }
-}
-
-/// @nodoc
-const $EncapsuleNotification = _$EncapsuleNotificationTearOff();
 
 /// @nodoc
 mixin _$EncapsuleNotification {
@@ -268,15 +218,15 @@ mixin _$EncapsuleNotification {
   String? get tag => throw _privateConstructorUsedError;
 
   /// Notification widget builder. If [timeout] is null, [timeoutAnimation] will be passed as null as well.
-  Widget Function(BuildContext, void Function(), Animation<double>?)
-      get builder => throw _privateConstructorUsedError;
+  EncapsuleNotificationBuilder get builder =>
+      throw _privateConstructorUsedError;
 
   /// Fade out time of the notification. Set null to keep the item on screen
   /// till user interaction.
   Duration? get timeout => throw _privateConstructorUsedError;
 
   /// Callback on dismiss.
-  void Function()? get onDismissed => throw _privateConstructorUsedError;
+  VoidCallback? get onDismissed => throw _privateConstructorUsedError;
 
   /// Dim the background behind the notification and intercept pop.
   bool get important => throw _privateConstructorUsedError;
@@ -299,10 +249,9 @@ abstract class $EncapsuleNotificationCopyWith<$Res> {
       _$EncapsuleNotificationCopyWithImpl<$Res>;
   $Res call(
       {String? tag,
-      Widget Function(BuildContext, void Function(), Animation<double>?)
-          builder,
+      EncapsuleNotificationBuilder builder,
       Duration? timeout,
-      void Function()? onDismissed,
+      VoidCallback? onDismissed,
       bool important,
       bool dismissible,
       EncapsuleNotification? previous});
@@ -337,8 +286,7 @@ class _$EncapsuleNotificationCopyWithImpl<$Res>
       builder: builder == freezed
           ? _value.builder
           : builder // ignore: cast_nullable_to_non_nullable
-              as Widget Function(
-                  BuildContext, void Function(), Animation<double>?),
+              as EncapsuleNotificationBuilder,
       timeout: timeout == freezed
           ? _value.timeout
           : timeout // ignore: cast_nullable_to_non_nullable
@@ -346,7 +294,7 @@ class _$EncapsuleNotificationCopyWithImpl<$Res>
       onDismissed: onDismissed == freezed
           ? _value.onDismissed
           : onDismissed // ignore: cast_nullable_to_non_nullable
-              as void Function()?,
+              as VoidCallback?,
       important: important == freezed
           ? _value.important
           : important // ignore: cast_nullable_to_non_nullable
@@ -375,18 +323,17 @@ class _$EncapsuleNotificationCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$EncapsuleNotificationCopyWith<$Res>
+abstract class _$$_EncapsuleNotificationCopyWith<$Res>
     implements $EncapsuleNotificationCopyWith<$Res> {
-  factory _$EncapsuleNotificationCopyWith(_EncapsuleNotification value,
-          $Res Function(_EncapsuleNotification) then) =
-      __$EncapsuleNotificationCopyWithImpl<$Res>;
+  factory _$$_EncapsuleNotificationCopyWith(_$_EncapsuleNotification value,
+          $Res Function(_$_EncapsuleNotification) then) =
+      __$$_EncapsuleNotificationCopyWithImpl<$Res>;
   @override
   $Res call(
       {String? tag,
-      Widget Function(BuildContext, void Function(), Animation<double>?)
-          builder,
+      EncapsuleNotificationBuilder builder,
       Duration? timeout,
-      void Function()? onDismissed,
+      VoidCallback? onDismissed,
       bool important,
       bool dismissible,
       EncapsuleNotification? previous});
@@ -396,15 +343,16 @@ abstract class _$EncapsuleNotificationCopyWith<$Res>
 }
 
 /// @nodoc
-class __$EncapsuleNotificationCopyWithImpl<$Res>
+class __$$_EncapsuleNotificationCopyWithImpl<$Res>
     extends _$EncapsuleNotificationCopyWithImpl<$Res>
-    implements _$EncapsuleNotificationCopyWith<$Res> {
-  __$EncapsuleNotificationCopyWithImpl(_EncapsuleNotification _value,
-      $Res Function(_EncapsuleNotification) _then)
-      : super(_value, (v) => _then(v as _EncapsuleNotification));
+    implements _$$_EncapsuleNotificationCopyWith<$Res> {
+  __$$_EncapsuleNotificationCopyWithImpl(_$_EncapsuleNotification _value,
+      $Res Function(_$_EncapsuleNotification) _then)
+      : super(_value, (v) => _then(v as _$_EncapsuleNotification));
 
   @override
-  _EncapsuleNotification get _value => super._value as _EncapsuleNotification;
+  _$_EncapsuleNotification get _value =>
+      super._value as _$_EncapsuleNotification;
 
   @override
   $Res call({
@@ -416,7 +364,7 @@ class __$EncapsuleNotificationCopyWithImpl<$Res>
     Object? dismissible = freezed,
     Object? previous = freezed,
   }) {
-    return _then(_EncapsuleNotification(
+    return _then(_$_EncapsuleNotification(
       tag: tag == freezed
           ? _value.tag
           : tag // ignore: cast_nullable_to_non_nullable
@@ -424,8 +372,7 @@ class __$EncapsuleNotificationCopyWithImpl<$Res>
       builder: builder == freezed
           ? _value.builder
           : builder // ignore: cast_nullable_to_non_nullable
-              as Widget Function(
-                  BuildContext, void Function(), Animation<double>?),
+              as EncapsuleNotificationBuilder,
       timeout: timeout == freezed
           ? _value.timeout
           : timeout // ignore: cast_nullable_to_non_nullable
@@ -433,7 +380,7 @@ class __$EncapsuleNotificationCopyWithImpl<$Res>
       onDismissed: onDismissed == freezed
           ? _value.onDismissed
           : onDismissed // ignore: cast_nullable_to_non_nullable
-              as void Function()?,
+              as VoidCallback?,
       important: important == freezed
           ? _value.important
           : important // ignore: cast_nullable_to_non_nullable
@@ -465,38 +412,36 @@ class _$_EncapsuleNotification extends _EncapsuleNotification {
         assert(important == false || timeout == null),
         super._();
 
-  @override
-
   /// Tag to differentiate multiple active notifications.
-  final String? tag;
   @override
+  final String? tag;
 
   /// Notification widget builder. If [timeout] is null, [timeoutAnimation] will be passed as null as well.
-  final Widget Function(BuildContext, void Function(), Animation<double>?)
-      builder;
-  @JsonKey(defaultValue: const Duration(seconds: 5))
   @override
+  final EncapsuleNotificationBuilder builder;
 
   /// Fade out time of the notification. Set null to keep the item on screen
   /// till user interaction.
-  final Duration? timeout;
   @override
+  @JsonKey()
+  final Duration? timeout;
 
   /// Callback on dismiss.
-  final void Function()? onDismissed;
-  @JsonKey(defaultValue: false)
   @override
+  final VoidCallback? onDismissed;
 
   /// Dim the background behind the notification and intercept pop.
-  final bool important;
-  @JsonKey(defaultValue: true)
   @override
+  @JsonKey()
+  final bool important;
 
   /// Wether the user is allowed to manually dismiss this notification.
-  final bool dismissible;
   @override
+  @JsonKey()
+  final bool dismissible;
 
   /// Reference to the previous [EncapsuleNotification].
+  @override
   final EncapsuleNotification? previous;
 
   @override
@@ -507,58 +452,46 @@ class _$_EncapsuleNotification extends _EncapsuleNotification {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _EncapsuleNotification &&
-            (identical(other.tag, tag) ||
-                const DeepCollectionEquality().equals(other.tag, tag)) &&
-            (identical(other.builder, builder) ||
-                const DeepCollectionEquality()
-                    .equals(other.builder, builder)) &&
-            (identical(other.timeout, timeout) ||
-                const DeepCollectionEquality()
-                    .equals(other.timeout, timeout)) &&
+        (other.runtimeType == runtimeType &&
+            other is _$_EncapsuleNotification &&
+            const DeepCollectionEquality().equals(other.tag, tag) &&
+            (identical(other.builder, builder) || other.builder == builder) &&
+            const DeepCollectionEquality().equals(other.timeout, timeout) &&
             (identical(other.onDismissed, onDismissed) ||
-                const DeepCollectionEquality()
-                    .equals(other.onDismissed, onDismissed)) &&
-            (identical(other.important, important) ||
-                const DeepCollectionEquality()
-                    .equals(other.important, important)) &&
-            (identical(other.dismissible, dismissible) ||
-                const DeepCollectionEquality()
-                    .equals(other.dismissible, dismissible)) &&
-            (identical(other.previous, previous) ||
-                const DeepCollectionEquality()
-                    .equals(other.previous, previous)));
+                other.onDismissed == onDismissed) &&
+            const DeepCollectionEquality().equals(other.important, important) &&
+            const DeepCollectionEquality()
+                .equals(other.dismissible, dismissible) &&
+            const DeepCollectionEquality().equals(other.previous, previous));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(tag) ^
-      const DeepCollectionEquality().hash(builder) ^
-      const DeepCollectionEquality().hash(timeout) ^
-      const DeepCollectionEquality().hash(onDismissed) ^
-      const DeepCollectionEquality().hash(important) ^
-      const DeepCollectionEquality().hash(dismissible) ^
-      const DeepCollectionEquality().hash(previous);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(tag),
+      builder,
+      const DeepCollectionEquality().hash(timeout),
+      onDismissed,
+      const DeepCollectionEquality().hash(important),
+      const DeepCollectionEquality().hash(dismissible),
+      const DeepCollectionEquality().hash(previous));
 
   @JsonKey(ignore: true)
   @override
-  _$EncapsuleNotificationCopyWith<_EncapsuleNotification> get copyWith =>
-      __$EncapsuleNotificationCopyWithImpl<_EncapsuleNotification>(
+  _$$_EncapsuleNotificationCopyWith<_$_EncapsuleNotification> get copyWith =>
+      __$$_EncapsuleNotificationCopyWithImpl<_$_EncapsuleNotification>(
           this, _$identity);
 }
 
 abstract class _EncapsuleNotification extends EncapsuleNotification {
   factory _EncapsuleNotification(
-      {String? tag,
-      required Widget Function(
-              BuildContext, void Function(), Animation<double>?)
-          builder,
-      Duration? timeout,
-      void Function()? onDismissed,
-      bool important,
-      bool dismissible,
-      EncapsuleNotification? previous}) = _$_EncapsuleNotification;
+      {final String? tag,
+      required final EncapsuleNotificationBuilder builder,
+      final Duration? timeout,
+      final VoidCallback? onDismissed,
+      final bool important,
+      final bool dismissible,
+      final EncapsuleNotification? previous}) = _$_EncapsuleNotification;
   _EncapsuleNotification._() : super._();
 
   @override
@@ -568,8 +501,8 @@ abstract class _EncapsuleNotification extends EncapsuleNotification {
   @override
 
   /// Notification widget builder. If [timeout] is null, [timeoutAnimation] will be passed as null as well.
-  Widget Function(BuildContext, void Function(), Animation<double>?)
-      get builder => throw _privateConstructorUsedError;
+  EncapsuleNotificationBuilder get builder =>
+      throw _privateConstructorUsedError;
   @override
 
   /// Fade out time of the notification. Set null to keep the item on screen
@@ -578,7 +511,7 @@ abstract class _EncapsuleNotification extends EncapsuleNotification {
   @override
 
   /// Callback on dismiss.
-  void Function()? get onDismissed => throw _privateConstructorUsedError;
+  VoidCallback? get onDismissed => throw _privateConstructorUsedError;
   @override
 
   /// Dim the background behind the notification and intercept pop.
@@ -593,6 +526,6 @@ abstract class _EncapsuleNotification extends EncapsuleNotification {
   EncapsuleNotification? get previous => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$EncapsuleNotificationCopyWith<_EncapsuleNotification> get copyWith =>
+  _$$_EncapsuleNotificationCopyWith<_$_EncapsuleNotification> get copyWith =>
       throw _privateConstructorUsedError;
 }

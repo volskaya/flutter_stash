@@ -31,8 +31,8 @@ mixin _$EncapsuleStore on _EncapsuleScaffoldStore, Store {
               name: '_EncapsuleScaffoldStore.notification'))
       .value;
 
-  final _$_EncapsuleScaffoldStoreActionController =
-      ActionController(name: '_EncapsuleScaffoldStore');
+  late final _$_EncapsuleScaffoldStoreActionController =
+      ActionController(name: '_EncapsuleScaffoldStore', context: context);
 
   @override
   void pushNotification(EncapsuleNotification item,
