@@ -8,9 +8,10 @@ part of 'realtime_chat_pod.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends RealtimeChatParticipantImpl>
-    on _RealtimeChatPod<T, D>, Store {
-  final _$paginatedAtom = Atom(name: '_RealtimeChatPod.paginated');
+mixin _$RealtimeChatPod<T extends RealtimeChatMessageImpl,
+    D extends RealtimeChatParticipantImpl> on _RealtimeChatPod<T, D>, Store {
+  late final _$paginatedAtom =
+      Atom(name: '_RealtimeChatPod.paginated', context: context);
 
   @override
   List<T> get paginated {
@@ -20,12 +21,15 @@ mixin _$RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends RealtimeCha
 
   @override
   set paginated(List<T> value) {
-    _$paginatedAtom.reportWrite(value, super.paginated, () {
-      super.paginated = value;
-    });
+    if (super.paginated != value) {
+      _$paginatedAtom.reportWrite(value, super.paginated, () {
+        super.paginated = value;
+      });
+    }
   }
 
-  final _$subscribedAtom = Atom(name: '_RealtimeChatPod.subscribed');
+  late final _$subscribedAtom =
+      Atom(name: '_RealtimeChatPod.subscribed', context: context);
 
   @override
   List<T> get subscribed {
@@ -35,12 +39,15 @@ mixin _$RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends RealtimeCha
 
   @override
   set subscribed(List<T> value) {
-    _$subscribedAtom.reportWrite(value, super.subscribed, () {
-      super.subscribed = value;
-    });
+    if (super.subscribed != value) {
+      _$subscribedAtom.reportWrite(value, super.subscribed, () {
+        super.subscribed = value;
+      });
+    }
   }
 
-  final _$pendingAtom = Atom(name: '_RealtimeChatPod.pending');
+  late final _$pendingAtom =
+      Atom(name: '_RealtimeChatPod.pending', context: context);
 
   @override
   List<T> get pending {
@@ -50,12 +57,15 @@ mixin _$RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends RealtimeCha
 
   @override
   set pending(List<T> value) {
-    _$pendingAtom.reportWrite(value, super.pending, () {
-      super.pending = value;
-    });
+    if (super.pending != value) {
+      _$pendingAtom.reportWrite(value, super.pending, () {
+        super.pending = value;
+      });
+    }
   }
 
-  final _$participantsAtom = Atom(name: '_RealtimeChatPod.participants');
+  late final _$participantsAtom =
+      Atom(name: '_RealtimeChatPod.participants', context: context);
 
   @override
   Set<String> get participants {
@@ -65,12 +75,15 @@ mixin _$RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends RealtimeCha
 
   @override
   set participants(Set<String> value) {
-    _$participantsAtom.reportWrite(value, super.participants, () {
-      super.participants = value;
-    });
+    if (super.participants != value) {
+      _$participantsAtom.reportWrite(value, super.participants, () {
+        super.participants = value;
+      });
+    }
   }
 
-  final _$endedAtom = Atom(name: '_RealtimeChatPod.ended');
+  late final _$endedAtom =
+      Atom(name: '_RealtimeChatPod.ended', context: context);
 
   @override
   bool get ended {
@@ -87,7 +100,7 @@ mixin _$RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends RealtimeCha
     }
   }
 
-  final _$pageAtom = Atom(name: '_RealtimeChatPod.page');
+  late final _$pageAtom = Atom(name: '_RealtimeChatPod.page', context: context);
 
   @override
   int get page {
@@ -104,19 +117,21 @@ mixin _$RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends RealtimeCha
     }
   }
 
-  final _$_paginateAsyncAction = AsyncAction('_RealtimeChatPod._paginate');
+  late final _$_paginateAsyncAction =
+      AsyncAction('_RealtimeChatPod._paginate', context: context);
 
   @override
   Future<dynamic> _paginate([int? timestamp]) {
     return _$_paginateAsyncAction.run(() => super._paginate(timestamp));
   }
 
-  final _$_RealtimeChatPodActionController = ActionController(name: '_RealtimeChatPod');
+  late final _$_RealtimeChatPodActionController =
+      ActionController(name: '_RealtimeChatPod', context: context);
 
   @override
   void movePendingItemsToSubscribedItems() {
-    final _$actionInfo =
-        _$_RealtimeChatPodActionController.startAction(name: '_RealtimeChatPod.movePendingItemsToSubscribedItems');
+    final _$actionInfo = _$_RealtimeChatPodActionController.startAction(
+        name: '_RealtimeChatPod.movePendingItemsToSubscribedItems');
     try {
       return super.movePendingItemsToSubscribedItems();
     } finally {

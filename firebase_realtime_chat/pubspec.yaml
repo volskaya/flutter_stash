@@ -5,7 +5,7 @@ homepage: github.com/volskaya/flutter_helpers
 publish_to: none
 
 environment:
-  sdk: ">=2.14.0 <3.0.0"
+  sdk: ">=2.18.0-44.0.dev <3.0.0"
   flutter: ">=1.17.0 <2.0.0"
 
 dependencies:
@@ -22,8 +22,9 @@ dependencies:
   quiver: ^3.0.0
   path_provider: ^2.0.1
   fast_immutable_collections: ^5.1.2
-  flutter_riverpod: ^1.0.0-dev.7
-  freezed_annotation: ^0.14.1
+  flutter_riverpod: ^1.0.3
+  freezed_annotation: ^2.0.3
+  collection: ^1.16.0
 
   refresh_storage:
     path: /Users/muru/Projects/packages/flutter_helpers/refresh_storage
@@ -33,12 +34,11 @@ dependencies:
     path: /Users/muru/Projects/packages/flutter_helpers/loader_coordinator
   await_route:
     path: /Users/muru/Projects/packages/flutter_helpers/await_route
-  collection: ^1.15.0
 
 dev_dependencies:
   build_runner:
   flutter_lints:
-  freezed: ^0.14.1+1
+  freezed: ^2.0.3+1
 
 dependency_overrides:
   mobx:

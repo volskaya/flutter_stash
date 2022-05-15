@@ -38,13 +38,13 @@ class RefreshStoragePod {
 
   static final provider = Provider<RefreshStoragePod>(_referenceNotifier, name: 'RefreshStoragePod');
 
-  static RefreshStoragePod _referenceNotifier(ProviderRefBase ref, [dynamic family]) {
+  static RefreshStoragePod _referenceNotifier(Ref ref, [dynamic family]) {
     final notifier = RefreshStoragePod(ref);
     ref.onDispose(notifier.dispose);
     return notifier;
   }
 
-  final ProviderRefBase ref;
+  final Ref ref;
   final _state = HashMap<int, RefreshStorageValueItem>();
 
   /// Write and get a value from the storage. Data are built with `builder`

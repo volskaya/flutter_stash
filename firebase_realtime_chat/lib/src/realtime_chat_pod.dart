@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_realtime_chat/src/realtime_chat_impl.dart';
 import 'package:firebase_realtime_chat/src/realtime_chat_mirror_storage.dart';
@@ -134,7 +135,7 @@ class RealtimeChatValue<T extends RealtimeChatMessageImpl, D extends RealtimeCha
 class RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends RealtimeChatParticipantImpl>
     extends _RealtimeChatPod<T, D> with _$RealtimeChatPod<T, D> {
   RealtimeChatPod(
-    ProviderRefBase ref, {
+    Ref ref, {
     required int refresh,
     required RealtimeChatProps<T, D> props,
     RealtimeChatValue<T, D>? initialValue,
@@ -211,7 +212,7 @@ abstract class _RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends Rea
 
   static final _log = Log.named('RealtimeChatPod');
 
-  final ProviderRefBase ref;
+  final Ref ref;
   final int refresh;
   final RealtimeChatProps<T, D> props;
   final DateTime createTime;
@@ -423,7 +424,7 @@ abstract class _RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends Rea
     notifyListeners();
 
     if (isFirstPage && mounted && props.onFirstPagePaginated != null) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) props.onFirstPagePaginated?.call(this as RealtimeChatPod<T, D>);
       });
     }
@@ -593,7 +594,7 @@ abstract class _RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends Rea
     if (!mounted) return;
 
     _startSubscription(timestamp: _subscriptionTimestamp);
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     await _startParticipating();
   }
 
@@ -609,7 +610,7 @@ abstract class _RealtimeChatPod<T extends RealtimeChatMessageImpl, D extends Rea
   void didStopListening() {
     dispose();
 
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     mounted = false;
     scrollController.removeListener(_handleScroll);
     scrollController.dispose();

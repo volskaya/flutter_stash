@@ -1,4 +1,6 @@
+// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'realtime_chat_pod.dart';
@@ -10,33 +12,7 @@ part of 'realtime_chat_pod.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$RealtimeChatValueTearOff {
-  const _$RealtimeChatValueTearOff();
-
-  _RealtimeChatPodValue<T, D> call<T extends RealtimeChatMessageImpl,
-          D extends RealtimeChatParticipantImpl>(
-      {required List<T> paginated,
-      required List<T> subscribed,
-      required List<T> pending,
-      required DateTime createTime,
-      bool ended = false,
-      int page = 0}) {
-    return _RealtimeChatPodValue<T, D>(
-      paginated: paginated,
-      subscribed: subscribed,
-      pending: pending,
-      createTime: createTime,
-      ended: ended,
-      page: page,
-    );
-  }
-}
-
-/// @nodoc
-const $RealtimeChatValue = _$RealtimeChatValueTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$RealtimeChatValue<T extends RealtimeChatMessageImpl,
@@ -118,13 +94,13 @@ class _$RealtimeChatValueCopyWithImpl<
 }
 
 /// @nodoc
-abstract class _$RealtimeChatPodValueCopyWith<
+abstract class _$$_RealtimeChatPodValueCopyWith<
     T extends RealtimeChatMessageImpl,
     D extends RealtimeChatParticipantImpl,
     $Res> implements $RealtimeChatValueCopyWith<T, D, $Res> {
-  factory _$RealtimeChatPodValueCopyWith(_RealtimeChatPodValue<T, D> value,
-          $Res Function(_RealtimeChatPodValue<T, D>) then) =
-      __$RealtimeChatPodValueCopyWithImpl<T, D, $Res>;
+  factory _$$_RealtimeChatPodValueCopyWith(_$_RealtimeChatPodValue<T, D> value,
+          $Res Function(_$_RealtimeChatPodValue<T, D>) then) =
+      __$$_RealtimeChatPodValueCopyWithImpl<T, D, $Res>;
   @override
   $Res call(
       {List<T> paginated,
@@ -136,18 +112,18 @@ abstract class _$RealtimeChatPodValueCopyWith<
 }
 
 /// @nodoc
-class __$RealtimeChatPodValueCopyWithImpl<
+class __$$_RealtimeChatPodValueCopyWithImpl<
         T extends RealtimeChatMessageImpl,
         D extends RealtimeChatParticipantImpl,
         $Res> extends _$RealtimeChatValueCopyWithImpl<T, D, $Res>
-    implements _$RealtimeChatPodValueCopyWith<T, D, $Res> {
-  __$RealtimeChatPodValueCopyWithImpl(_RealtimeChatPodValue<T, D> _value,
-      $Res Function(_RealtimeChatPodValue<T, D>) _then)
-      : super(_value, (v) => _then(v as _RealtimeChatPodValue<T, D>));
+    implements _$$_RealtimeChatPodValueCopyWith<T, D, $Res> {
+  __$$_RealtimeChatPodValueCopyWithImpl(_$_RealtimeChatPodValue<T, D> _value,
+      $Res Function(_$_RealtimeChatPodValue<T, D>) _then)
+      : super(_value, (v) => _then(v as _$_RealtimeChatPodValue<T, D>));
 
   @override
-  _RealtimeChatPodValue<T, D> get _value =>
-      super._value as _RealtimeChatPodValue<T, D>;
+  _$_RealtimeChatPodValue<T, D> get _value =>
+      super._value as _$_RealtimeChatPodValue<T, D>;
 
   @override
   $Res call({
@@ -158,17 +134,17 @@ class __$RealtimeChatPodValueCopyWithImpl<
     Object? ended = freezed,
     Object? page = freezed,
   }) {
-    return _then(_RealtimeChatPodValue<T, D>(
+    return _then(_$_RealtimeChatPodValue<T, D>(
       paginated: paginated == freezed
-          ? _value.paginated
+          ? _value._paginated
           : paginated // ignore: cast_nullable_to_non_nullable
               as List<T>,
       subscribed: subscribed == freezed
-          ? _value.subscribed
+          ? _value._subscribed
           : subscribed // ignore: cast_nullable_to_non_nullable
               as List<T>,
       pending: pending == freezed
-          ? _value.pending
+          ? _value._pending
           : pending // ignore: cast_nullable_to_non_nullable
               as List<T>,
       createTime: createTime == freezed
@@ -193,27 +169,45 @@ class _$_RealtimeChatPodValue<T extends RealtimeChatMessageImpl,
         D extends RealtimeChatParticipantImpl>
     extends _RealtimeChatPodValue<T, D> with DiagnosticableTreeMixin {
   const _$_RealtimeChatPodValue(
-      {required this.paginated,
-      required this.subscribed,
-      required this.pending,
+      {required final List<T> paginated,
+      required final List<T> subscribed,
+      required final List<T> pending,
       required this.createTime,
       this.ended = false,
       this.page = 0})
-      : super._();
+      : _paginated = paginated,
+        _subscribed = subscribed,
+        _pending = pending,
+        super._();
+
+  final List<T> _paginated;
+  @override
+  List<T> get paginated {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_paginated);
+  }
+
+  final List<T> _subscribed;
+  @override
+  List<T> get subscribed {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_subscribed);
+  }
+
+  final List<T> _pending;
+  @override
+  List<T> get pending {
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_pending);
+  }
 
   @override
-  final List<T> paginated;
-  @override
-  final List<T> subscribed;
-  @override
-  final List<T> pending;
-  @override
   final DateTime createTime;
-  @JsonKey(defaultValue: false)
   @override
+  @JsonKey()
   final bool ended;
-  @JsonKey(defaultValue: 0)
   @override
+  @JsonKey()
   final int page;
 
   @override
@@ -237,51 +231,45 @@ class _$_RealtimeChatPodValue<T extends RealtimeChatMessageImpl,
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _RealtimeChatPodValue<T, D> &&
-            (identical(other.paginated, paginated) ||
-                const DeepCollectionEquality()
-                    .equals(other.paginated, paginated)) &&
-            (identical(other.subscribed, subscribed) ||
-                const DeepCollectionEquality()
-                    .equals(other.subscribed, subscribed)) &&
-            (identical(other.pending, pending) ||
-                const DeepCollectionEquality()
-                    .equals(other.pending, pending)) &&
-            (identical(other.createTime, createTime) ||
-                const DeepCollectionEquality()
-                    .equals(other.createTime, createTime)) &&
-            (identical(other.ended, ended) ||
-                const DeepCollectionEquality().equals(other.ended, ended)) &&
-            (identical(other.page, page) ||
-                const DeepCollectionEquality().equals(other.page, page)));
+        (other.runtimeType == runtimeType &&
+            other is _$_RealtimeChatPodValue<T, D> &&
+            const DeepCollectionEquality()
+                .equals(other._paginated, _paginated) &&
+            const DeepCollectionEquality()
+                .equals(other._subscribed, _subscribed) &&
+            const DeepCollectionEquality().equals(other._pending, _pending) &&
+            const DeepCollectionEquality()
+                .equals(other.createTime, createTime) &&
+            const DeepCollectionEquality().equals(other.ended, ended) &&
+            const DeepCollectionEquality().equals(other.page, page));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(paginated) ^
-      const DeepCollectionEquality().hash(subscribed) ^
-      const DeepCollectionEquality().hash(pending) ^
-      const DeepCollectionEquality().hash(createTime) ^
-      const DeepCollectionEquality().hash(ended) ^
-      const DeepCollectionEquality().hash(page);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_paginated),
+      const DeepCollectionEquality().hash(_subscribed),
+      const DeepCollectionEquality().hash(_pending),
+      const DeepCollectionEquality().hash(createTime),
+      const DeepCollectionEquality().hash(ended),
+      const DeepCollectionEquality().hash(page));
 
   @JsonKey(ignore: true)
   @override
-  _$RealtimeChatPodValueCopyWith<T, D, _RealtimeChatPodValue<T, D>>
-      get copyWith => __$RealtimeChatPodValueCopyWithImpl<T, D,
-          _RealtimeChatPodValue<T, D>>(this, _$identity);
+  _$$_RealtimeChatPodValueCopyWith<T, D, _$_RealtimeChatPodValue<T, D>>
+      get copyWith => __$$_RealtimeChatPodValueCopyWithImpl<T, D,
+          _$_RealtimeChatPodValue<T, D>>(this, _$identity);
 }
 
 abstract class _RealtimeChatPodValue<T extends RealtimeChatMessageImpl,
     D extends RealtimeChatParticipantImpl> extends RealtimeChatValue<T, D> {
   const factory _RealtimeChatPodValue(
-      {required List<T> paginated,
-      required List<T> subscribed,
-      required List<T> pending,
-      required DateTime createTime,
-      bool ended,
-      int page}) = _$_RealtimeChatPodValue<T, D>;
+      {required final List<T> paginated,
+      required final List<T> subscribed,
+      required final List<T> pending,
+      required final DateTime createTime,
+      final bool ended,
+      final int page}) = _$_RealtimeChatPodValue<T, D>;
   const _RealtimeChatPodValue._() : super._();
 
   @override
@@ -298,6 +286,6 @@ abstract class _RealtimeChatPodValue<T extends RealtimeChatMessageImpl,
   int get page => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$RealtimeChatPodValueCopyWith<T, D, _RealtimeChatPodValue<T, D>>
+  _$$_RealtimeChatPodValueCopyWith<T, D, _$_RealtimeChatPodValue<T, D>>
       get copyWith => throw _privateConstructorUsedError;
 }
