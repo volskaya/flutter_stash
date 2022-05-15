@@ -1,5 +1,6 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'revealing_bar_pod.dart';
@@ -11,26 +12,7 @@ part of 'revealing_bar_pod.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$RevealingBarPropsTearOff {
-  const _$RevealingBarPropsTearOff();
-
-  _RevealingBarProps call(
-      {double safeArea = 0.0,
-      bool onlyShowBelowSafeArea = false,
-      bool revealAtEnd = false}) {
-    return _RevealingBarProps(
-      safeArea: safeArea,
-      onlyShowBelowSafeArea: onlyShowBelowSafeArea,
-      revealAtEnd: revealAtEnd,
-    );
-  }
-}
-
-/// @nodoc
-const $RevealingBarProps = _$RevealingBarPropsTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$RevealingBarProps {
@@ -84,25 +66,25 @@ class _$RevealingBarPropsCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$RevealingBarPropsCopyWith<$Res>
+abstract class _$$_RevealingBarPropsCopyWith<$Res>
     implements $RevealingBarPropsCopyWith<$Res> {
-  factory _$RevealingBarPropsCopyWith(
-          _RevealingBarProps value, $Res Function(_RevealingBarProps) then) =
-      __$RevealingBarPropsCopyWithImpl<$Res>;
+  factory _$$_RevealingBarPropsCopyWith(_$_RevealingBarProps value,
+          $Res Function(_$_RevealingBarProps) then) =
+      __$$_RevealingBarPropsCopyWithImpl<$Res>;
   @override
   $Res call({double safeArea, bool onlyShowBelowSafeArea, bool revealAtEnd});
 }
 
 /// @nodoc
-class __$RevealingBarPropsCopyWithImpl<$Res>
+class __$$_RevealingBarPropsCopyWithImpl<$Res>
     extends _$RevealingBarPropsCopyWithImpl<$Res>
-    implements _$RevealingBarPropsCopyWith<$Res> {
-  __$RevealingBarPropsCopyWithImpl(
-      _RevealingBarProps _value, $Res Function(_RevealingBarProps) _then)
-      : super(_value, (v) => _then(v as _RevealingBarProps));
+    implements _$$_RevealingBarPropsCopyWith<$Res> {
+  __$$_RevealingBarPropsCopyWithImpl(
+      _$_RevealingBarProps _value, $Res Function(_$_RevealingBarProps) _then)
+      : super(_value, (v) => _then(v as _$_RevealingBarProps));
 
   @override
-  _RevealingBarProps get _value => super._value as _RevealingBarProps;
+  _$_RevealingBarProps get _value => super._value as _$_RevealingBarProps;
 
   @override
   $Res call({
@@ -110,7 +92,7 @@ class __$RevealingBarPropsCopyWithImpl<$Res>
     Object? onlyShowBelowSafeArea = freezed,
     Object? revealAtEnd = freezed,
   }) {
-    return _then(_RevealingBarProps(
+    return _then(_$_RevealingBarProps(
       safeArea: safeArea == freezed
           ? _value.safeArea
           : safeArea // ignore: cast_nullable_to_non_nullable
@@ -137,14 +119,14 @@ class _$_RevealingBarProps extends _RevealingBarProps
       this.revealAtEnd = false})
       : super._();
 
-  @JsonKey(defaultValue: 0.0)
   @override
+  @JsonKey()
   final double safeArea;
-  @JsonKey(defaultValue: false)
   @override
+  @JsonKey()
   final bool onlyShowBelowSafeArea;
-  @JsonKey(defaultValue: false)
   @override
+  @JsonKey()
   final bool revealAtEnd;
 
   @override
@@ -165,36 +147,34 @@ class _$_RevealingBarProps extends _RevealingBarProps
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _RevealingBarProps &&
-            (identical(other.safeArea, safeArea) ||
-                const DeepCollectionEquality()
-                    .equals(other.safeArea, safeArea)) &&
-            (identical(other.onlyShowBelowSafeArea, onlyShowBelowSafeArea) ||
-                const DeepCollectionEquality().equals(
-                    other.onlyShowBelowSafeArea, onlyShowBelowSafeArea)) &&
-            (identical(other.revealAtEnd, revealAtEnd) ||
-                const DeepCollectionEquality()
-                    .equals(other.revealAtEnd, revealAtEnd)));
+        (other.runtimeType == runtimeType &&
+            other is _$_RevealingBarProps &&
+            const DeepCollectionEquality().equals(other.safeArea, safeArea) &&
+            const DeepCollectionEquality()
+                .equals(other.onlyShowBelowSafeArea, onlyShowBelowSafeArea) &&
+            const DeepCollectionEquality()
+                .equals(other.revealAtEnd, revealAtEnd));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(safeArea) ^
-      const DeepCollectionEquality().hash(onlyShowBelowSafeArea) ^
-      const DeepCollectionEquality().hash(revealAtEnd);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(safeArea),
+      const DeepCollectionEquality().hash(onlyShowBelowSafeArea),
+      const DeepCollectionEquality().hash(revealAtEnd));
 
   @JsonKey(ignore: true)
   @override
-  _$RevealingBarPropsCopyWith<_RevealingBarProps> get copyWith =>
-      __$RevealingBarPropsCopyWithImpl<_RevealingBarProps>(this, _$identity);
+  _$$_RevealingBarPropsCopyWith<_$_RevealingBarProps> get copyWith =>
+      __$$_RevealingBarPropsCopyWithImpl<_$_RevealingBarProps>(
+          this, _$identity);
 }
 
 abstract class _RevealingBarProps extends RevealingBarProps {
   const factory _RevealingBarProps(
-      {double safeArea,
-      bool onlyShowBelowSafeArea,
-      bool revealAtEnd}) = _$_RevealingBarProps;
+      {final double safeArea,
+      final bool onlyShowBelowSafeArea,
+      final bool revealAtEnd}) = _$_RevealingBarProps;
   const _RevealingBarProps._() : super._();
 
   @override
@@ -205,6 +185,6 @@ abstract class _RevealingBarProps extends RevealingBarProps {
   bool get revealAtEnd => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$RevealingBarPropsCopyWith<_RevealingBarProps> get copyWith =>
+  _$$_RevealingBarPropsCopyWith<_$_RevealingBarProps> get copyWith =>
       throw _privateConstructorUsedError;
 }

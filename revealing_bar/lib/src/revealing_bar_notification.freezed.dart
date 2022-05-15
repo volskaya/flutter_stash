@@ -1,5 +1,6 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
 
 part of 'revealing_bar_notification.dart';
@@ -11,24 +12,7 @@ part of 'revealing_bar_notification.dart';
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more informations: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
-
-/// @nodoc
-class _$RevealingBarNotificationTearOff {
-  const _$RevealingBarNotificationTearOff();
-
-  _RevealingBarNotification call(
-      {required double maxExtent, double? localOffset, double? remoteOffset}) {
-    return _RevealingBarNotification(
-      maxExtent: maxExtent,
-      localOffset: localOffset,
-      remoteOffset: remoteOffset,
-    );
-  }
-}
-
-/// @nodoc
-const $RevealingBarNotification = _$RevealingBarNotificationTearOff();
+    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$RevealingBarNotification {
@@ -82,26 +66,27 @@ class _$RevealingBarNotificationCopyWithImpl<$Res>
 }
 
 /// @nodoc
-abstract class _$RevealingBarNotificationCopyWith<$Res>
+abstract class _$$_RevealingBarNotificationCopyWith<$Res>
     implements $RevealingBarNotificationCopyWith<$Res> {
-  factory _$RevealingBarNotificationCopyWith(_RevealingBarNotification value,
-          $Res Function(_RevealingBarNotification) then) =
-      __$RevealingBarNotificationCopyWithImpl<$Res>;
+  factory _$$_RevealingBarNotificationCopyWith(
+          _$_RevealingBarNotification value,
+          $Res Function(_$_RevealingBarNotification) then) =
+      __$$_RevealingBarNotificationCopyWithImpl<$Res>;
   @override
   $Res call({double maxExtent, double? localOffset, double? remoteOffset});
 }
 
 /// @nodoc
-class __$RevealingBarNotificationCopyWithImpl<$Res>
+class __$$_RevealingBarNotificationCopyWithImpl<$Res>
     extends _$RevealingBarNotificationCopyWithImpl<$Res>
-    implements _$RevealingBarNotificationCopyWith<$Res> {
-  __$RevealingBarNotificationCopyWithImpl(_RevealingBarNotification _value,
-      $Res Function(_RevealingBarNotification) _then)
-      : super(_value, (v) => _then(v as _RevealingBarNotification));
+    implements _$$_RevealingBarNotificationCopyWith<$Res> {
+  __$$_RevealingBarNotificationCopyWithImpl(_$_RevealingBarNotification _value,
+      $Res Function(_$_RevealingBarNotification) _then)
+      : super(_value, (v) => _then(v as _$_RevealingBarNotification));
 
   @override
-  _RevealingBarNotification get _value =>
-      super._value as _RevealingBarNotification;
+  _$_RevealingBarNotification get _value =>
+      super._value as _$_RevealingBarNotification;
 
   @override
   $Res call({
@@ -109,7 +94,7 @@ class __$RevealingBarNotificationCopyWithImpl<$Res>
     Object? localOffset = freezed,
     Object? remoteOffset = freezed,
   }) {
-    return _then(_RevealingBarNotification(
+    return _then(_$_RevealingBarNotification(
       maxExtent: maxExtent == freezed
           ? _value.maxExtent
           : maxExtent // ignore: cast_nullable_to_non_nullable
@@ -147,37 +132,34 @@ class _$_RevealingBarNotification implements _RevealingBarNotification {
   @override
   bool operator ==(dynamic other) {
     return identical(this, other) ||
-        (other is _RevealingBarNotification &&
-            (identical(other.maxExtent, maxExtent) ||
-                const DeepCollectionEquality()
-                    .equals(other.maxExtent, maxExtent)) &&
-            (identical(other.localOffset, localOffset) ||
-                const DeepCollectionEquality()
-                    .equals(other.localOffset, localOffset)) &&
-            (identical(other.remoteOffset, remoteOffset) ||
-                const DeepCollectionEquality()
-                    .equals(other.remoteOffset, remoteOffset)));
+        (other.runtimeType == runtimeType &&
+            other is _$_RevealingBarNotification &&
+            const DeepCollectionEquality().equals(other.maxExtent, maxExtent) &&
+            const DeepCollectionEquality()
+                .equals(other.localOffset, localOffset) &&
+            const DeepCollectionEquality()
+                .equals(other.remoteOffset, remoteOffset));
   }
 
   @override
-  int get hashCode =>
-      runtimeType.hashCode ^
-      const DeepCollectionEquality().hash(maxExtent) ^
-      const DeepCollectionEquality().hash(localOffset) ^
-      const DeepCollectionEquality().hash(remoteOffset);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(maxExtent),
+      const DeepCollectionEquality().hash(localOffset),
+      const DeepCollectionEquality().hash(remoteOffset));
 
   @JsonKey(ignore: true)
   @override
-  _$RevealingBarNotificationCopyWith<_RevealingBarNotification> get copyWith =>
-      __$RevealingBarNotificationCopyWithImpl<_RevealingBarNotification>(
-          this, _$identity);
+  _$$_RevealingBarNotificationCopyWith<_$_RevealingBarNotification>
+      get copyWith => __$$_RevealingBarNotificationCopyWithImpl<
+          _$_RevealingBarNotification>(this, _$identity);
 }
 
 abstract class _RevealingBarNotification implements RevealingBarNotification {
   const factory _RevealingBarNotification(
-      {required double maxExtent,
-      double? localOffset,
-      double? remoteOffset}) = _$_RevealingBarNotification;
+      {required final double maxExtent,
+      final double? localOffset,
+      final double? remoteOffset}) = _$_RevealingBarNotification;
 
   @override
   double get maxExtent => throw _privateConstructorUsedError;
@@ -187,6 +169,6 @@ abstract class _RevealingBarNotification implements RevealingBarNotification {
   double? get remoteOffset => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
-  _$RevealingBarNotificationCopyWith<_RevealingBarNotification> get copyWith =>
-      throw _privateConstructorUsedError;
+  _$$_RevealingBarNotificationCopyWith<_$_RevealingBarNotification>
+      get copyWith => throw _privateConstructorUsedError;
 }
